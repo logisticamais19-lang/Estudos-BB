@@ -750,28 +750,28 @@ const STAGES=[1,3,7,15,30,60]
 const BOOK_COLORS=['#0038A8','#dc2626','#16a34a','#7c3aed','#d97706','#0891b2','#db2777','#374151','#b45309','#065f46']
 const BOOK_EMOJIS=['📚','📖','✏️','🎓','📐','🔬','💰','⚖️','💻','🌎','🧮','📊','🗣️','🏦','🎯','🔢','📝','🧠','⭐','🔥']
 const RECURSOS=[
-  // VÍDEO-AULAS — canais do YouTube verificados
-  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do YouTube. Português, Matemática, Raciocínio Lógico, Bancários e muito mais.',icon:'🎓',url:'https://www.youtube.com/@estrategiaconcursos',badge:'YouTube'},
-  {id:2,tipo:'video',titulo:'Gran Cursos Online — YouTube',desc:'Canal oficial do Gran com milhares de aulas gratuitas para todos os concursos públicos.',icon:'📺',url:'https://www.youtube.com/@grancursosonline',badge:'YouTube'},
-  {id:3,tipo:'video',titulo:'Tec Concursos — Banco do Brasil',desc:'Playlist específica sobre concursos bancários com aulas de Conhecimentos Bancários e Atualidades.',icon:'🏦',url:'https://www.youtube.com/@tecconcursos',badge:'YouTube'},
-  {id:4,tipo:'video',titulo:'Professora Mari — Português',desc:'Aulas claras e objetivas de língua portuguesa focadas em concursos públicos e bancários.',icon:'📝',url:'https://www.youtube.com/@professoramariconcursos',badge:'YouTube'},
-  {id:5,tipo:'video',titulo:'Matemática com Prof. Gui',desc:'Matemática financeira, juros, porcentagem e raciocínio lógico para concursos bancários.',icon:'🔢',url:'https://www.youtube.com/@matematicaparaconcursos',badge:'YouTube'},
-  {id:6,tipo:'video',titulo:'Informática para Concursos — Canal',desc:'Aulas de informática, Excel, Word, segurança digital e internet para concursos bancários.',icon:'💻',url:'https://www.youtube.com/@informaticaparaconcursos',badge:'YouTube'},
+  // VÍDEO-AULAS — links de busca do YouTube (sempre funcionam)
+  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do Brasil com mais de 3 milhões de inscritos. Português, Matemática, Bancários, Informática e muito mais.',icon:'🎓',url:'https://www.youtube.com/c/EstategiaConcursos',badge:'YouTube',yt:true},
+  {id:2,tipo:'video',titulo:'Aulas de Português para Concursos',desc:'Pesquisa no YouTube por aulas gratuitas de língua portuguesa focadas em concursos bancários e públicos.',icon:'📝',url:'https://www.youtube.com/results?search_query=aulas+portugues+concursos+bancarios+gratis',badge:'YouTube',yt:true},
+  {id:3,tipo:'video',titulo:'Matemática Financeira para Bancários',desc:'Pesquisa no YouTube por aulas de matemática financeira, juros compostos e porcentagem para o BB.',icon:'🔢',url:'https://www.youtube.com/results?search_query=matematica+financeira+banco+do+brasil+gratis',badge:'YouTube',yt:true},
+  {id:4,tipo:'video',titulo:'Conhecimentos Bancários — Aulas',desc:'Pesquisa no YouTube por aulas de sistema financeiro, produtos bancários e conhecimentos bancários para concursos.',icon:'🏦',url:'https://www.youtube.com/results?search_query=conhecimentos+bancarios+concurso+BB+aulas+gratis',badge:'YouTube',yt:true},
+  {id:5,tipo:'video',titulo:'Informática para Concursos — Aulas',desc:'Pesquisa no YouTube por aulas gratuitas de informática, pacote Office, internet e segurança para concursos.',icon:'💻',url:'https://www.youtube.com/results?search_query=informatica+para+concursos+publicos+aulas+gratis',badge:'YouTube',yt:true},
+  {id:6,tipo:'video',titulo:'Vendas e Negociação — Sebrae',desc:'Cursos gratuitos do Sebrae sobre vendas, atendimento ao cliente, negociação e técnicas comerciais.',icon:'🤝',url:'https://www.sebrae.com.br/sites/PortalSebrae/cursosonline',badge:'Sebrae',yt:false},
   // APOSTILAS / MATERIAIS OFICIAIS
-  {id:7,tipo:'apostila',titulo:'Banco do Brasil — Área de Carreira',desc:'Página oficial do BB com editais, provas anteriores, gabaritos e informações sobre o concurso.',icon:'🏦',url:'https://bb.com.br/carreira',badge:'Oficial BB'},
-  {id:8,tipo:'apostila',titulo:'BCB — Sistema Financeiro Explicado',desc:'Material do Banco Central explicando o sistema financeiro nacional, produtos e regulação bancária.',icon:'🏛️',url:'https://www.bcb.gov.br/acessoinformacao/portalcidadao',badge:'BCB Oficial'},
-  {id:9,tipo:'apostila',titulo:'IBGE Educa — Dados do Brasil',desc:'Portal do IBGE com dados econômicos, demográficos e estatísticos — essencial para prova de atualidades.',icon:'📊',url:'https://educa.ibge.gov.br',badge:'IBGE Oficial'},
-  {id:10,tipo:'apostila',titulo:'Planalto — Leis e Normas',desc:'Portal do governo com toda a legislação federal: leis, decretos e normas atualizados.',icon:'⚖️',url:'https://www.planalto.gov.br',badge:'Governo Federal'},
-  // QUESTÕES E SIMULADOS
-  {id:11,tipo:'simulado',titulo:'Questões de Concursos',desc:'Maior banco de questões de concursos públicos do Brasil. Filtre por banca, cargo e matéria.',icon:'📋',url:'https://www.questoesdeconcursos.com.br',badge:'Gratuito'},
-  {id:12,tipo:'simulado',titulo:'Tec Concursos — Questões',desc:'Plataforma com milhares de questões gratuitas organizadas por concurso, banca e assunto.',icon:'🎯',url:'https://www.tecconcursos.com.br',badge:'Gratuito'},
-  {id:13,tipo:'simulado',titulo:'CEBRASPE — Provas Anteriores',desc:'Site oficial da banca CEBRASPE com provas e gabaritos de concursos anteriores para download.',icon:'🗂️',url:'https://www.cebraspe.org.br/concursos',badge:'Banca Oficial'},
-  {id:14,tipo:'simulado',titulo:'FGV — Provas e Gabaritos',desc:'Provas anteriores da banca FGV disponíveis para download gratuito no site oficial.',icon:'📄',url:'https://conhecimento.fgv.br/concursos',badge:'Banca Oficial'},
-  // LEGISLAÇÃO E NORMAS BANCÁRIAS
-  {id:15,tipo:'lei',titulo:'BCB — Normas Bancárias',desc:'Resoluções do Conselho Monetário Nacional, circulares e normativos do sistema financeiro.',icon:'📋',url:'https://www.bcb.gov.br/estabilidadefinanceira/buscanormas',badge:'BCB Oficial'},
-  {id:16,tipo:'lei',titulo:'Lei 4.595/64 — Sistema Financeiro',desc:'Lei que estrutura o sistema financeiro nacional — leitura obrigatória para concursos bancários.',icon:'⚖️',url:'https://www.planalto.gov.br/ccivil_03/leis/l4595.htm',badge:'Legislação'},
-  {id:17,tipo:'lei',titulo:'Código de Defesa do Consumidor',desc:'Lei 8.078/90 — CDC completo, importante para questões de atendimento e relação com clientes.',icon:'🛡️',url:'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm',badge:'Legislação'},
-  {id:18,tipo:'lei',titulo:'Sebrae — Educação Financeira',desc:'Conteúdos gratuitos sobre vendas, negociação, crédito e finanças pessoais do Sebrae.',icon:'🤝',url:'https://www.sebrae.com.br/sites/PortalSebrae/ufs',badge:'Sebrae'},
+  {id:7,tipo:'apostila',titulo:'Banco do Brasil — Carreira Oficial',desc:'Página oficial de carreiras do BB com editais, provas anteriores, gabaritos e informações sobre o concurso.',icon:'🏦',url:'https://www.bb.com.br/pbb/pagina-inicial/voce/carreiras#/',badge:'Oficial BB',yt:false},
+  {id:8,tipo:'apostila',titulo:'BCB — Portal do Cidadão',desc:'Material gratuito do Banco Central sobre sistema financeiro, produtos bancários e educação financeira.',icon:'🏛️',url:'https://www.bcb.gov.br/acessoinformacao/portalcidadao',badge:'BCB Oficial',yt:false},
+  {id:9,tipo:'apostila',titulo:'IBGE Educa',desc:'Portal do IBGE com dados econômicos e estatísticos do Brasil — essencial para prova de atualidades.',icon:'📊',url:'https://educa.ibge.gov.br',badge:'IBGE Oficial',yt:false},
+  {id:10,tipo:'apostila',titulo:'Planalto.gov — Legislação Federal',desc:'Todo o acervo de leis brasileiras em vigor, gratuito e atualizado pelo governo federal.',icon:'⚖️',url:'https://www.planalto.gov.br',badge:'Governo Federal',yt:false},
+  // SIMULADOS E QUESTÕES
+  {id:11,tipo:'simulado',titulo:'Questões de Concursos',desc:'Banco de questões gratuitas de concursos organizadas por banca, cargo e matéria. Um dos maiores do Brasil.',icon:'📋',url:'https://www.questoesdeconcursos.com.br',badge:'Gratuito',yt:false},
+  {id:12,tipo:'simulado',titulo:'Tec Concursos — Questões Grátis',desc:'Plataforma com questões gratuitas organizadas por concurso, banca e assunto. Ótimo para simulados do BB.',icon:'🎯',url:'https://www.tecconcursos.com.br',badge:'Gratuito',yt:false},
+  {id:13,tipo:'simulado',titulo:'CEBRASPE — Provas Oficiais',desc:'Site oficial da banca CEBRASPE com provas e gabaritos de concursos anteriores para download gratuito.',icon:'🗂️',url:'https://www.cebraspe.org.br/concursos',badge:'Banca Oficial',yt:false},
+  {id:14,tipo:'simulado',titulo:'FGV — Provas e Gabaritos',desc:'Provas anteriores da banca FGV disponíveis para download no site oficial. Boa para simulação de prova do BB.',icon:'📄',url:'https://conhecimento.fgv.br/concursos',badge:'Banca Oficial',yt:false},
+  // LEGISLAÇÃO
+  {id:15,tipo:'lei',titulo:'BCB — Busca de Normas',desc:'Resoluções CMN, circulares e normativos do sistema financeiro nacional. Base para questões de legislação bancária.',icon:'📋',url:'https://www.bcb.gov.br/estabilidadefinanceira/buscanormas',badge:'BCB Oficial',yt:false},
+  {id:16,tipo:'lei',titulo:'Lei 4.595/64 — Sistema Financeiro',desc:'Lei que estrutura o sistema financeiro nacional — leitura obrigatória para concursos bancários.',icon:'⚖️',url:'https://www.planalto.gov.br/ccivil_03/leis/l4595.htm',badge:'Legislação',yt:false},
+  {id:17,tipo:'lei',titulo:'Código de Defesa do Consumidor',desc:'Lei 8.078/90 completa. Importante para questões sobre atendimento e relação com clientes em bancos.',icon:'🛡️',url:'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm',badge:'Legislação',yt:false},
+  {id:18,tipo:'lei',titulo:'Lei Complementar 105/2001 — Sigilo',desc:'Lei do sigilo bancário — matéria frequente em provas de concursos do setor financeiro.',icon:'🔒',url:'https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp105.htm',badge:'Legislação',yt:false},
 ]
 
 // ═══════════════════════════════════════════════════
@@ -1775,7 +1775,22 @@ function filterRecursos(tipo){
   const tipoLabel={video:'🎬 Vídeo-aula',apostila:'📄 Apostila',simulado:'📝 Simulado',lei:'⚖️ Legislação'}
   filtered.forEach(r=>{
     const a=document.createElement('a');a.className='resource-card';a.href=r.url;a.target='_blank';a.rel='noopener noreferrer'
-    a.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.65rem"><span style="background:${tipoCores[r.tipo]};color:${tipoFg[r.tipo]};font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:9999px">${tipoLabel[r.tipo]}</span><span style="background:#EEF3FF;color:#0038A8;font-size:.65rem;font-weight:700;padding:.2rem .5rem;border-radius:.35rem">${r.badge}</span></div><div style="display:flex;gap:.75rem;align-items:flex-start"><div style="font-size:2rem;flex-shrink:0">${r.icon}</div><div><h3 style="font-weight:700;font-size:.88rem;margin-bottom:.3rem;line-height:1.3">${r.titulo}</h3><p style="font-size:.75rem;color:#6b7280;line-height:1.5">${r.desc}</p><div style="display:flex;align-items:center;gap:.3rem;margin-top:.6rem;font-size:.72rem;color:#0038A8;font-weight:600"><i class="fas fa-external-link-alt"></i> Acessar recurso</div></div></div>`
+    const ytNote=r.yt?`<div style="font-size:.68rem;color:#9ca3af;margin-top:.35rem;display:flex;align-items:center;gap:.3rem"><i class="fab fa-youtube" style="color:#dc2626"></i> Abre no YouTube</div>`:''
+    a.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.65rem">
+      <span style="background:${tipoCores[r.tipo]};color:${tipoFg[r.tipo]};font-size:.68rem;font-weight:700;padding:.2rem .55rem;border-radius:9999px">${tipoLabel[r.tipo]}</span>
+      <span style="background:#EEF3FF;color:#0038A8;font-size:.65rem;font-weight:700;padding:.2rem .5rem;border-radius:.35rem">${r.badge}</span>
+    </div>
+    <div style="display:flex;gap:.75rem;align-items:flex-start">
+      <div style="font-size:2rem;flex-shrink:0">${r.icon}</div>
+      <div style="flex:1;min-width:0">
+        <h3 style="font-weight:700;font-size:.88rem;margin-bottom:.3rem;line-height:1.3">${r.titulo}</h3>
+        <p style="font-size:.75rem;color:#6b7280;line-height:1.5">${r.desc}</p>
+        ${ytNote}
+        <div style="display:flex;align-items:center;gap:.3rem;margin-top:.55rem;font-size:.72rem;color:#0038A8;font-weight:600">
+          <i class="fas fa-external-link-alt"></i> Clique para acessar
+        </div>
+      </div>
+    </div>`
     grid.appendChild(a)
   })
 }
