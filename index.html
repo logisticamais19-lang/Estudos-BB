@@ -200,6 +200,28 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 .emoji-btn.selected{background:#EEF3FF;border-color:#0038A8}
 .emoji-cat-tab{flex-shrink:0;padding:.28rem .55rem;border-radius:.5rem;font-size:.85rem;background:#f3f4f6;border:none;cursor:pointer;transition:all .15s}
 .emoji-cat-tab.active{background:#0038A8;transform:scale(1.08)}
+/* ══ HEATMAP ══ */
+.heatmap-cell{
+  width:13px;height:13px;border-radius:2px;cursor:pointer;
+  transition:transform .1s,box-shadow .1s;flex-shrink:0;
+}
+.heatmap-cell:hover{transform:scale(1.4);box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:1;position:relative;}
+.heatmap-level-0{background:#eef2ff}
+.heatmap-level-1{background:#bfdbfe}
+.heatmap-level-2{background:#60a5fa}
+.heatmap-level-3{background:#2563eb}
+.heatmap-level-4{background:#1d4ed8}
+.heatmap-level-5{background:#1e3a8a}
+.heatmap-month-label{font-size:.62rem;color:#9ca3af;font-weight:600;margin-bottom:.3rem;text-align:center;}
+.heatmap-week{display:flex;flex-direction:column;gap:2px;}
+.heatmap-tooltip{
+  position:fixed;background:#1e293b;color:white;border-radius:.55rem;
+  padding:.4rem .75rem;font-size:.72rem;font-weight:600;pointer-events:none;
+  z-index:9999;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,.3);
+  display:none;
+}
+.stat-card{background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);}
+.streak-flame{font-size:1.8rem;line-height:1;}
 </style>
 </head>
 <body>
@@ -305,6 +327,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
       <a onclick="navigateTo('books')"    class="nav-item" id="nav-books"    style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-book-open"></i><span>Cadernos</span></a>
       <a onclick="navigateTo('notebook')" class="nav-item" id="nav-notebook" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-sticky-note"></i><span>Notas</span></a>
       <a onclick="navigateTo('recursos')" class="nav-item" id="nav-recursos" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-graduation-cap"></i><span>Recursos</span></a>
+      <a onclick="navigateTo('heatmap')"   class="nav-item" id="nav-heatmap"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-fire"></i><span>Heatmap</span></a>
       <a onclick="navigateTo('rewards')"  class="nav-item" id="nav-rewards"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-trophy"></i><span>Recompensas</span></a>
       <a onclick="navigateTo('settings')" class="nav-item" id="nav-settings" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-cog"></i><span>Config.</span></a>
     </div>
@@ -510,6 +533,71 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   </div>
   <div id="recursos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem"></div>
   <div style="margin-top:1.5rem;background:linear-gradient(90deg,#0038A8,#002B85);border-radius:1.5rem;padding:1.25rem 1.5rem;color:white;display:flex;align-items:center;gap:1rem"><i class="fas fa-info-circle" style="font-size:1.4rem;color:#F9DD16;flex-shrink:0"></i><p style="font-size:.78rem;opacity:.9">Todos os links são de domínio público, canais oficiais ou plataformas de acesso livre. O conteúdo pertence aos seus respectivos criadores — ao clicar você é redirecionado ao site original.</p></div>
+</div>
+
+<!-- ══ HEATMAP DE ESTUDOS ══ -->
+<div id="screen-heatmap" class="screen" style="display:none">
+
+  <!-- Tooltip flutuante -->
+  <div id="heatmap-tooltip" class="heatmap-tooltip"></div>
+
+  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem">
+    <i class="fas fa-fire" style="color:#f97316"></i> Heatmap de Estudos
+  </h2>
+  <p style="font-size:.78rem;color:#9ca3af;margin-bottom:1.5rem">Seu histórico de dedicação nos últimos 12 meses — cada quadrado é um dia</p>
+
+  <!-- Cards de resumo -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem" id="heatmap-summary-cards"></div>
+
+  <!-- Legenda -->
+  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Menos</span>
+    <div class="heatmap-cell heatmap-level-0"></div>
+    <div class="heatmap-cell heatmap-level-1"></div>
+    <div class="heatmap-cell heatmap-level-2"></div>
+    <div class="heatmap-cell heatmap-level-3"></div>
+    <div class="heatmap-cell heatmap-level-4"></div>
+    <div class="heatmap-cell heatmap-level-5"></div>
+    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Mais</span>
+    <span style="font-size:.68rem;color:#d1d5db;margin-left:.5rem">
+      □ 0h &nbsp; 🟦 1-30min &nbsp; 🔵 30-60min &nbsp; 💙 1-2h &nbsp; 🟣 2-3h &nbsp; 🌑 3h+
+    </span>
+  </div>
+
+  <!-- Meses label + grid -->
+  <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto">
+    <div id="heatmap-months-label" style="display:flex;gap:2px;margin-bottom:.3rem;padding-left:32px"></div>
+    <div style="display:flex;gap:.5rem;align-items:flex-start">
+      <!-- Dias da semana -->
+      <div style="display:flex;flex-direction:column;gap:2px;margin-top:0;padding-top:0;flex-shrink:0">
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Seg</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Qua</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Sex</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+      </div>
+      <!-- Grid de semanas -->
+      <div id="heatmap-grid" style="display:flex;gap:2px;"></div>
+    </div>
+  </div>
+
+  <!-- Top dias de estudo -->
+  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+      <i class="fas fa-medal" style="color:#f59e0b"></i> Seus melhores dias de estudo
+    </h3>
+    <div id="heatmap-top-days" style="display:flex;flex-direction:column;gap:.5rem"></div>
+  </div>
+
+  <!-- Distribuição por mês -->
+  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+      <i class="fas fa-chart-bar" style="color:#0038A8"></i> Horas por mês
+    </h3>
+    <div id="heatmap-monthly-bars" style="display:flex;flex-direction:column;gap:.6rem"></div>
+  </div>
 </div>
 
 <!-- ══ RECOMPENSAS ══ -->
@@ -1000,7 +1088,7 @@ function navigateTo(n){
   if(nav)nav.classList.add('nav-active')
   const map={0:'renderDashboard',1:'renderSubjects',2:'renderTimer',3:'renderProgress',
              4:'renderTimeline',5:'renderDailyOrganizer','books':'renderBooks',
-             'notebook':'renderNotebook','recursos':'renderRecursos',
+             'notebook':'renderNotebook','recursos':'renderRecursos','heatmap':'renderHeatmap',
              'rewards':'renderRewards','settings':'renderSettings'}
   const fn=map[n];if(fn&&window[fn])window[fn]()
 }
@@ -1798,6 +1886,194 @@ function filterRecursos(tipo){
 // ═══════════════════════════════════════════════════
 // RECOMPENSAS + CONFIGURAÇÕES
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// 🔥 HEATMAP DE ESTUDOS
+// ═══════════════════════════════════════════════════
+function renderHeatmap(){
+  // ── Agrupa minutos por data ──
+  const dayMap = {}
+  studySessions.forEach(s => {
+    dayMap[s.date] = (dayMap[s.date] || 0) + s.minutes
+  })
+
+  // ── Período: últimos 365 dias ──
+  const today = new Date()
+  today.setHours(0,0,0,0)
+  const start = new Date(today)
+  start.setFullYear(start.getFullYear() - 1)
+  // Recua até o domingo anterior para alinhar grid
+  while(start.getDay() !== 0) start.setDate(start.getDate() - 1)
+
+  // ── Calcula nível de cor por minutos ──
+  function getLevel(mins) {
+    if (!mins)    return 0
+    if (mins < 30)  return 1
+    if (mins < 60)  return 2
+    if (mins < 120) return 3
+    if (mins < 180) return 4
+    return 5
+  }
+
+  // ── Resumo cards ──
+  const totalDays = Object.keys(dayMap).length
+  const totalMins = Object.values(dayMap).reduce((a,b)=>a+b, 0)
+  const streak    = calcStreak()
+  const bestDay   = Object.entries(dayMap).sort((a,b)=>b[1]-a[1])[0]
+
+  const summaryData = [
+    { label:'Dias estudados',  value: totalDays,           icon:'📅', color:'#dbeafe', fg:'#1d4ed8' },
+    { label:'Total estudado',  value: fmtMins(totalMins),  icon:'⏱️',  color:'#dcfce7', fg:'#15803d' },
+    { label:'Streak atual',    value: streak + ' dias 🔥', icon:'🔥', color:'#fef3c7', fg:'#92400e' },
+    { label:'Melhor dia',      value: bestDay ? fmtMins(bestDay[1]) : '—', icon:'🏆', color:'#ede9fe', fg:'#6d28d9' },
+  ]
+  const cardsEl = document.getElementById('heatmap-summary-cards')
+  cardsEl.innerHTML = summaryData.map(c => `
+    <div class="stat-card" style="border-left:4px solid ${c.fg}">
+      <div style="font-size:1.5rem;margin-bottom:.35rem">${c.icon}</div>
+      <div style="font-size:1.4rem;font-weight:900;color:${c.fg}">${c.value}</div>
+      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;margin-top:.15rem">${c.label}</div>
+    </div>`).join('')
+
+  // ── Monta grid de semanas ──
+  const grid = document.getElementById('heatmap-grid')
+  const monthsLabel = document.getElementById('heatmap-months-label')
+  grid.innerHTML = ''; monthsLabel.innerHTML = ''
+
+  const weeks = []
+  const cur = new Date(start)
+  let currentWeek = []
+  const mNames = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+  let lastMonth = -1
+  const monthPositions = [] // {month, weekIdx}
+
+  while(cur <= today) {
+    const dateStr = cur.toISOString().split('T')[0]
+    const mins = dayMap[dateStr] || 0
+    const level = getLevel(mins)
+    const isFuture = cur > today
+    const isToday = dateStr === todayStr()
+
+    currentWeek.push({ dateStr, mins, level, isFuture, isToday })
+
+    if(cur.getMonth() !== lastMonth && cur.getDay() <= 1) {
+      monthPositions.push({ month: cur.getMonth(), weekIdx: weeks.length })
+      lastMonth = cur.getMonth()
+    }
+
+    if(cur.getDay() === 6) { // sábado = fim da semana
+      weeks.push(currentWeek)
+      currentWeek = []
+    }
+    cur.setDate(cur.getDate() + 1)
+  }
+  if(currentWeek.length) weeks.push(currentWeek)
+
+  // Labels dos meses
+  monthPositions.forEach((mp, i) => {
+    const nextIdx = monthPositions[i+1]?.weekIdx ?? weeks.length
+    const width = (nextIdx - mp.weekIdx) * 15 // 13px célula + 2px gap
+    const lbl = document.createElement('div')
+    lbl.style.cssText = `width:${width}px;flex-shrink:0;font-size:.62rem;color:#9ca3af;font-weight:600;white-space:nowrap;overflow:hidden`
+    lbl.textContent = mNames[mp.month]
+    monthsLabel.appendChild(lbl)
+  })
+
+  // Grid de células
+  const tooltip = document.getElementById('heatmap-tooltip')
+  weeks.forEach(week => {
+    const col = document.createElement('div')
+    col.className = 'heatmap-week'
+
+    // Preenche dias vazios no início da semana
+    const firstDay = week[0] ? new Date(week[0].dateStr+'T00:00:00').getDay() : 0
+    if(weeks.indexOf(week) === 0) {
+      for(let p = 0; p < firstDay; p++) {
+        const ph = document.createElement('div')
+        ph.style.cssText = 'width:13px;height:13px;flex-shrink:0'
+        col.appendChild(ph)
+      }
+    }
+
+    week.forEach(day => {
+      const cell = document.createElement('div')
+      cell.className = `heatmap-cell heatmap-level-${day.isFuture ? 0 : day.level}`
+      if(day.isToday) cell.style.cssText += ';outline:2px solid #F9DD16;outline-offset:1px'
+
+      // Tooltip
+      cell.addEventListener('mouseenter', e => {
+        const d = new Date(day.dateStr+'T00:00:00')
+        const label = d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
+        tooltip.textContent = day.isFuture ? label + ' — futuro' :
+          day.mins ? `${label} — ${fmtMins(day.mins)} estudados` : `${label} — não estudou`
+        tooltip.style.display = 'block'
+        tooltip.style.left = (e.clientX + 12) + 'px'
+        tooltip.style.top  = (e.clientY - 30) + 'px'
+      })
+      cell.addEventListener('mousemove', e => {
+        tooltip.style.left = (e.clientX + 12) + 'px'
+        tooltip.style.top  = (e.clientY - 30) + 'px'
+      })
+      cell.addEventListener('mouseleave', () => tooltip.style.display = 'none')
+
+      col.appendChild(cell)
+    })
+    grid.appendChild(col)
+  })
+
+  // ── Top 5 dias ──
+  const topDays = Object.entries(dayMap)
+    .sort((a,b) => b[1]-a[1]).slice(0,5)
+  const topEl = document.getElementById('heatmap-top-days')
+  if(!topDays.length) {
+    topEl.innerHTML = '<p style="font-size:.82rem;color:#9ca3af;font-style:italic">Nenhuma sessão registrada ainda.</p>'
+  } else {
+    const maxMins = topDays[0][1]
+    topEl.innerHTML = topDays.map(([date, mins], i) => {
+      const d = new Date(date+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
+      const pct = Math.round(mins/maxMins*100)
+      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣']
+      return `<div style="display:flex;align-items:center;gap:.75rem">
+        <span style="font-size:1.1rem;flex-shrink:0">${medals[i]}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;font-size:.78rem;font-weight:600;margin-bottom:.2rem">
+            <span>${d}</span><span style="color:#0038A8;font-weight:800">${fmtMins(mins)}</span>
+          </div>
+          <div style="height:6px;background:#f3f4f6;border-radius:9999px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#0038A8,#F9DD16);border-radius:9999px;transition:width .8s ease"></div>
+          </div>
+        </div>
+      </div>`
+    }).join('')
+  }
+
+  // ── Barras por mês (últimos 12) ──
+  const monthBars = document.getElementById('heatmap-monthly-bars')
+  const monthTotals = []
+  for(let i = 11; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(1); d.setMonth(d.getMonth() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`
+    const label = d.toLocaleDateString('pt-BR',{month:'short',year:'numeric'})
+    const mins = Object.entries(dayMap)
+      .filter(([date]) => date.startsWith(key))
+      .reduce((a,[,m])=>a+m, 0)
+    monthTotals.push({ label, mins, key })
+  }
+  const maxMonth = Math.max(...monthTotals.map(m=>m.mins), 1)
+  const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`
+  monthBars.innerHTML = monthTotals.map(m => {
+    const pct = Math.round(m.mins/maxMonth*100)
+    const isCurrentMonth = m.key === currentMonthKey
+    return `<div style="display:flex;align-items:center;gap:.75rem">
+      <div style="width:70px;font-size:.72rem;color:#6b7280;font-weight:600;flex-shrink:0;text-align:right">${m.label}</div>
+      <div style="flex:1;height:20px;background:#f3f4f6;border-radius:9999px;overflow:hidden;position:relative">
+        <div style="height:100%;width:${pct}%;background:${isCurrentMonth?'linear-gradient(90deg,#0038A8,#F9DD16)':'linear-gradient(90deg,#60a5fa,#3b82f6)'};border-radius:9999px;transition:width 1s ease;min-width:${m.mins?'4px':'0'}"></div>
+        ${m.mins ? `<span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;font-weight:700;color:${pct>40?'white':'#374151'}">${fmtMins(m.mins)}</span>` : '<span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#d1d5db">sem estudo</span>'}
+      </div>
+    </div>`
+  }).join('')
+}
+
 function renderRewards(){
   const xp=gamification.xp,li=getCurrentLevel(xp),lv=LEVELS[li]
   const pct=lv.maxXP===Infinity?100:Math.round(((xp-lv.minXP)/(lv.maxXP-lv.minXP))*100),next=LEVELS[li+1]
