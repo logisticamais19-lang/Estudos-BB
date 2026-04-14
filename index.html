@@ -1850,85 +1850,92 @@ async function exportBookPDF(){
   const book=books.find(b=>b.id===currentBookId); if(!book) return
   syncEditableBlocks()
   const page=book.pages.find(p=>p.id===currentPageId)||book.pages[0]
-  showXPToast(0,'Preparando PDF...')
 
-  // ── Cria container temporário limpo para o PDF ──
-  const pdfContainer = document.createElement('div')
-  pdfContainer.style.cssText = 'position:fixed;left:-9999px;top:0;width:750px;background:white;padding:40px 50px 40px 70px;font-family:Inter,sans-serif;'
+  // Botão mostra loading
+  showXPToast(0,'Gerando PDF... aguarde ⏳')
 
-  // Linha vermelha estilo caderno
-  const line = document.createElement('div')
-  line.style.cssText = 'position:absolute;left:55px;top:0;bottom:0;width:2px;background:rgba(220,38,38,.12);'
-  pdfContainer.appendChild(line)
+  // ── Monta HTML puro como string (mais confiável que DOM para html2pdf) ──
+  const date = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})
 
-  // Título do caderno + página
-  const header = document.createElement('div')
-  header.style.cssText = 'margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #EEF3FF;'
-  header.innerHTML = `
-    <div style="display:flex;align-items:center;gap:.75rem;">
-      <div style="width:40px;height:40px;background:#0038A8;border-radius:.75rem;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;">${book.emoji||'📚'}</div>
-      <div>
-        <div style="font-size:1.2rem;font-weight:800;color:#111827;">${sanitizeHTML(book.name)}</div>
-        <div style="font-size:.78rem;color:#9ca3af;margin-top:.1rem;">${sanitizeHTML(page.title||'Página 1')} • Exportado em ${new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})}</div>
-      </div>
-    </div>`
-  pdfContainer.appendChild(header)
-
-  // Renderiza cada bloco de forma estática para o PDF
+  let blocksHTML = ''
   for(const block of (page.blocks||[])){
-    const blockDiv = document.createElement('div')
-    blockDiv.style.cssText = 'margin-bottom:1.25rem;page-break-inside:avoid;'
-
-    if(block.type==='text'){
-      blockDiv.innerHTML = sanitizeContent(block.content||'')
-      blockDiv.style.cssText += 'font-size:.9rem;line-height:1.8;color:#374151;'
+    if(block.type==='text' && block.content){
+      blocksHTML += `<div style="margin-bottom:1.5rem;font-size:14px;line-height:1.8;color:#374151;font-family:Arial,sans-serif;">${sanitizeContent(block.content)}</div>`
 
     } else if(block.type==='image' && block.imgData){
-      blockDiv.innerHTML = `<div style="text-align:center;"><img src="${block.imgData}" style="max-width:100%;border-radius:.75rem;max-height:400px;object-fit:contain;"></div>`
+      blocksHTML += `<div style="margin-bottom:1.5rem;text-align:center;"><img src="${block.imgData}" style="max-width:100%;max-height:380px;object-fit:contain;border-radius:8px;"></div>`
 
     } else if(block.type==='table' && block.tableData){
-      const td = block.tableData
-      let tableHTML = `<div style="overflow:hidden;border-radius:.75rem;border:1.5px solid #e5e7eb;">
-        <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
-          <thead><tr>${td.cols.map(c=>`<th style="padding:.5rem .75rem;background:#EEF3FF;border:1.5px solid #e5e7eb;font-weight:700;color:#0038A8;text-align:left;">${sanitizeHTML(c)}</th>`).join('')}</tr></thead>
-          <tbody>${td.rows.map((row,ri)=>`<tr style="background:${ri%2===0?'white':'#fafafa'}">${row.map(cell=>`<td style="padding:.4rem .6rem;border:1.5px solid #e5e7eb;">${sanitizeHTML(cell||'')}</td>`).join('')}</tr>`).join('')}</tbody>
+      const td=block.tableData
+      blocksHTML += `<div style="margin-bottom:1.5rem;overflow:hidden;border-radius:8px;border:1.5px solid #e5e7eb;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;font-family:Arial,sans-serif;">
+          <thead><tr>${td.cols.map(c=>`<th style="padding:8px 10px;background:#EEF3FF;border:1.5px solid #e5e7eb;font-weight:700;color:#0038A8;text-align:left;">${sanitizeHTML(c)}</th>`).join('')}</tr></thead>
+          <tbody>${td.rows.map((row,ri)=>`<tr style="background:${ri%2===0?'white':'#fafafa'};">${row.map(cell=>`<td style="padding:7px 10px;border:1.5px solid #e5e7eb;font-size:13px;">${sanitizeHTML(cell||'')}</td>`).join('')}</tr>`).join('')}</tbody>
         </table></div>`
-      blockDiv.innerHTML = tableHTML
 
     } else if(block.type==='mindmap'){
-      // 🎯 CONVERSÃO SVG — resolve o bug do PDF!
-      const label = document.createElement('div')
-      label.style.cssText = 'font-size:.78rem;font-weight:700;color:#374151;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;'
-      label.innerHTML = '🧠 Mapa Mental'
-      blockDiv.appendChild(label)
-      blockDiv.innerHTML += mmToStaticSVG(block)
+      blocksHTML += `<div style="margin-bottom:1.5rem;">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;font-family:Arial,sans-serif;">🧠 Mapa Mental</div>
+        ${mmToStaticSVG(block)}
+      </div>`
     }
-
-    pdfContainer.appendChild(blockDiv)
   }
 
-  document.body.appendChild(pdfContainer)
+  const fullHTML = `
+    <div style="width:680px;background:white;padding:40px 48px;font-family:Arial,sans-serif;position:relative;">
+      <div style="position:absolute;left:42px;top:0;bottom:0;width:2px;background:rgba(220,38,38,0.1);"></div>
+      <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #EEF3FF;display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;background:#0038A8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0;">${book.emoji||'📚'}</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#111827;">${sanitizeHTML(book.name)}</div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:3px;">${sanitizeHTML(page.title||'Página 1')} &nbsp;•&nbsp; ${date}</div>
+        </div>
+      </div>
+      ${blocksHTML}
+    </div>`
+
+  // Cria iframe oculto para render isolado (garante captura correta)
+  const iframe = document.createElement('iframe')
+  iframe.style.cssText = 'position:fixed;top:0;left:0;width:780px;height:auto;border:none;opacity:0;pointer-events:none;z-index:-1;'
+  document.body.appendChild(iframe)
+
+  // Escreve HTML no iframe
+  iframe.contentDocument.open()
+  iframe.contentDocument.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:white;}</style></head><body>${fullHTML}</body></html>`)
+  iframe.contentDocument.close()
+
+  // Aguarda imagens carregarem
+  await new Promise(resolve => setTimeout(resolve, 600))
+
+  const targetEl = iframe.contentDocument.body.firstElementChild
 
   const fileName = book.pages.length>1
     ? `Caderno - ${book.name} - ${page.title}.pdf`
     : `Caderno - ${book.name}.pdf`
 
   const opt = {
-    margin: [0.8, 0.5, 0.8, 0.5],
+    margin: [0.5, 0, 0.5, 0],
     filename: fileName,
-    image: { type:'jpeg', quality:.97 },
-    html2canvas: { scale:2, useCORS:true, logging:false, allowTaint:true },
-    jsPDF: { unit:'cm', format:'a4', orientation:'portrait' }
+    image: { type: 'jpeg', quality: 0.97 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      windowWidth: 780
+    },
+    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
   }
 
   try {
-    await html2pdf().from(pdfContainer).set(opt).save()
-    showXPToast(0, `PDF "${book.name}" gerado! 📄 Verifique Downloads`)
+    await html2pdf().from(targetEl).set(opt).save()
+    showXPToast(0, `PDF "${book.name}" pronto! 📄 Verifique Downloads`)
   } catch(e) {
     console.error('PDF error:', e)
-    showXPToast(0, 'Erro ao gerar PDF. Tente novamente.')
+    showXPToast(0, 'Erro ao gerar PDF.')
   } finally {
-    document.body.removeChild(pdfContainer)
+    document.body.removeChild(iframe)
   }
 }
 
