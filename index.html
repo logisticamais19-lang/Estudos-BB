@@ -1472,7 +1472,7 @@ function loadBookCoverImg(event){
   };reader.readAsDataURL(file)
 }
 async function saveNewBook(){
-  const name=document.getElementById('book-name').value.trim();if(!name){shakeEl('book-name');return}
+  const name=document.getElementById('book-name').value.trim().substring(0,80);if(!name){shakeEl('book-name');return}
   const book={id:uid(),name,emoji:bookSelectedEmoji,color:bookSelectedColor,coverImg:bookCoverImgData,pages:[{id:uid(),title:'Página 1',blocks:[]}],createdAt:new Date().toISOString()}
   books.push(book);gamification.stats.totalBooks=(gamification.stats.totalBooks||0)+1
   await saveData();closeModal('modal-new-book');renderBooks();checkBadges();addXP(15,'Caderno criado! 📚')
@@ -1608,7 +1608,7 @@ function execFmt(cmd,val){document.execCommand(cmd,false,val||null)}
 function updateBlockContent(blockId,content){
   const book=books.find(b=>b.id===currentBookId);if(!book)return
   const page=book.pages.find(p=>p.id===currentPageId)||book.pages[0]
-  const block=page?.blocks.find(bl=>bl.id===blockId);if(block)block.content=content
+  const block=page?.blocks.find(bl=>bl.id===blockId);if(block)block.content=sanitizeContent(content)
 }
 function loadBlockImage(blockId,event){
   const file=event.target.files[0];if(!file)return
@@ -1734,24 +1734,202 @@ async function saveBookPage(){
   syncEditableBlocks()
   await saveData();showXPToast(0,'Caderno salvo! ✅')
 }
+// ── Sanitiza HTML para prevenir XSS ──
+function sanitizeHTML(str){
+  if(!str) return ''
+  const div=document.createElement('div')
+  div.textContent=str
+  return div.innerHTML
+}
+function sanitizeContent(html){
+  if(!html) return ''
+  // Remove script tags, event handlers, javascript: links
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi,'')
+    .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi,'')
+    .replace(/javascript\s*:/gi,'')
+    .replace(/<iframe[\s\S]*?>/gi,'')
+    .replace(/<object[\s\S]*?>/gi,'')
+    .replace(/<embed[\s\S]*?>/gi,'')
+}
+
+// ── Converte mapa mental para SVG estático (para PDF perfeito) ──
+function mmToStaticSVG(block){
+  const nodes = block.mmNodes || []
+  if(!nodes.length) return '<div style="padding:1rem;color:#9ca3af;font-style:italic;text-align:center">Mapa mental vazio</div>'
+
+  // Calcula bounding box
+  const padding = 60
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity
+  nodes.forEach(n=>{
+    const w = n.type==='central'?130:Math.max(90,(n.text?.length||0)*7+(n.emoji?30:0)+24)
+    const h = n.type==='central'?64:(n.emoji&&n.text?56:38)
+    minX=Math.min(minX,n.x-w/2); minY=Math.min(minY,n.y-h/2)
+    maxX=Math.max(maxX,n.x+w/2); maxY=Math.max(maxY,n.y+h/2)
+  })
+  const svgW = maxX - minX + padding*2
+  const svgH = maxY - minY + padding*2
+  const ox = padding - minX  // offset X
+  const oy = padding - minY  // offset Y
+
+  let svgParts = []
+
+  // Linhas curvas
+  nodes.forEach(node=>{
+    if(!node.parentId) return
+    const parent=nodes.find(n=>n.id===node.parentId); if(!parent) return
+    const x1=parent.x+ox, y1=parent.y+oy, x2=node.x+ox, y2=node.y+oy
+    const mx=(x1+x2)/2
+    const stroke=node.type==='grandchild'?'#d1d5db':'#93c5fd'
+    const sw=node.type==='grandchild'?1.5:2.5
+    svgParts.push(`<path d="M ${x1} ${y1} Q ${mx} ${y1} ${x2} ${y2}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"/>`)
+  })
+
+  // Nós como elementos SVG
+  nodes.forEach(node=>{
+    const x=node.x+ox, y=node.y+oy
+    const isCentral=node.type==='central'
+    const isGrand=node.type==='grandchild'
+    const w=isCentral?130:Math.max(90,(node.text?.length||0)*7+(node.emoji?30:0)+24)
+    const h=isCentral?64:(node.emoji&&node.text?56:38)
+    const rx=isCentral?16:10
+    const x0=x-w/2, y0=y-h/2
+
+    // Fundo do nó
+    const fill=isCentral?'#0038A8':isGrand?'#f9fafb':'#fffbeb'
+    const stroke=isCentral?'#002B85':isGrand?'#e5e7eb':'#F9DD16'
+    const sw=isCentral?0:2
+    svgParts.push(`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`)
+
+    // Sombra leve (como retângulo semi-transparente deslocado)
+    if(!isCentral){
+      svgParts.push(`<rect x="${x0+2}" y="${y0+2}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="rgba(0,0,0,0.06)" style="filter:blur(2px)"/>`)
+    }
+
+    // Refaz na frente da sombra
+    svgParts.push(`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`)
+
+    // Emoji
+    if(node.emoji){
+      const emojiY=node.text?(y0+16):(y+5)
+      const emojiSize=isCentral?18:14
+      svgParts.push(`<text x="${x}" y="${emojiY}" text-anchor="middle" dominant-baseline="middle" font-size="${emojiSize}">${node.emoji}</text>`)
+    }
+
+    // Texto
+    if(node.text){
+      const textColor=isCentral?'white':'#374151'
+      const textSize=isCentral?13:isGrand?10:11
+      const textWeight=isCentral?'bold':'600'
+      const textY=node.emoji?(y0+h-14):y
+      // Quebra texto longo
+      const words=node.text.split(' ')
+      let lines=[], line=''
+      words.forEach(w=>{
+        const test=(line?line+' ':'')+w
+        if(test.length*6>w+8&&line){lines.push(line);line=w}
+        else line=test
+      })
+      if(line)lines.push(line)
+      const lineH=14
+      const startY=textY-(lines.length-1)*lineH/2
+      lines.forEach((ln,i)=>{
+        svgParts.push(`<text x="${x}" y="${startY+i*lineH}" text-anchor="middle" dominant-baseline="middle" font-size="${textSize}" font-weight="${textWeight}" fill="${textColor}" font-family="Inter,sans-serif">${sanitizeHTML(ln)}</text>`)
+      })
+    }
+  })
+
+  return `<div style="background:linear-gradient(135deg,#f8faff,#f0f4ff);border-radius:.85rem;padding:.5rem;border:1px solid #e5e7eb;margin:.5rem 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:auto;display:block">
+      ${svgParts.join('\n')}
+    </svg>
+  </div>`
+}
+
 async function exportBookPDF(){
-  const book=books.find(b=>b.id===currentBookId);if(!book)return
+  const book=books.find(b=>b.id===currentBookId); if(!book) return
   syncEditableBlocks()
   const page=book.pages.find(p=>p.id===currentPageId)||book.pages[0]
-  showXPToast(0,'Gerando PDF...')
-  const el=document.getElementById('book-page-container')
-  // Esconde elementos de edição temporariamente
-  document.querySelectorAll('.block-actions,.text-toolbar,.book-tab-add').forEach(e=>e.style.display='none')
-  document.querySelectorAll('.page-block').forEach(e=>e.style.border='none')
-  const fileName=book.pages.length>1?`Caderno - ${book.name} - ${page.title}.pdf`:`Caderno - ${book.name}.pdf`
-  const opt={margin:.5,filename:fileName,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,logging:false},jsPDF:{unit:'cm',format:'a4',orientation:'portrait'}}
-  html2pdf().from(el).set(opt).save().then(()=>{
-    document.querySelectorAll('.block-actions').forEach(e=>e.style.display='')
-    document.querySelectorAll('.text-toolbar').forEach(e=>e.style.display='flex')
-    document.querySelectorAll('.book-tab-add').forEach(e=>e.style.display='flex')
-    document.querySelectorAll('.page-block').forEach(e=>e.style.border='2px dashed transparent')
-    showXPToast(0,`PDF baixado! 📄 Verifique sua pasta Downloads`)
-  })
+  showXPToast(0,'Preparando PDF...')
+
+  // ── Cria container temporário limpo para o PDF ──
+  const pdfContainer = document.createElement('div')
+  pdfContainer.style.cssText = 'position:fixed;left:-9999px;top:0;width:750px;background:white;padding:40px 50px 40px 70px;font-family:Inter,sans-serif;'
+
+  // Linha vermelha estilo caderno
+  const line = document.createElement('div')
+  line.style.cssText = 'position:absolute;left:55px;top:0;bottom:0;width:2px;background:rgba(220,38,38,.12);'
+  pdfContainer.appendChild(line)
+
+  // Título do caderno + página
+  const header = document.createElement('div')
+  header.style.cssText = 'margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #EEF3FF;'
+  header.innerHTML = `
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <div style="width:40px;height:40px;background:#0038A8;border-radius:.75rem;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;">${book.emoji||'📚'}</div>
+      <div>
+        <div style="font-size:1.2rem;font-weight:800;color:#111827;">${sanitizeHTML(book.name)}</div>
+        <div style="font-size:.78rem;color:#9ca3af;margin-top:.1rem;">${sanitizeHTML(page.title||'Página 1')} • Exportado em ${new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+    </div>`
+  pdfContainer.appendChild(header)
+
+  // Renderiza cada bloco de forma estática para o PDF
+  for(const block of (page.blocks||[])){
+    const blockDiv = document.createElement('div')
+    blockDiv.style.cssText = 'margin-bottom:1.25rem;page-break-inside:avoid;'
+
+    if(block.type==='text'){
+      blockDiv.innerHTML = sanitizeContent(block.content||'')
+      blockDiv.style.cssText += 'font-size:.9rem;line-height:1.8;color:#374151;'
+
+    } else if(block.type==='image' && block.imgData){
+      blockDiv.innerHTML = `<div style="text-align:center;"><img src="${block.imgData}" style="max-width:100%;border-radius:.75rem;max-height:400px;object-fit:contain;"></div>`
+
+    } else if(block.type==='table' && block.tableData){
+      const td = block.tableData
+      let tableHTML = `<div style="overflow:hidden;border-radius:.75rem;border:1.5px solid #e5e7eb;">
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+          <thead><tr>${td.cols.map(c=>`<th style="padding:.5rem .75rem;background:#EEF3FF;border:1.5px solid #e5e7eb;font-weight:700;color:#0038A8;text-align:left;">${sanitizeHTML(c)}</th>`).join('')}</tr></thead>
+          <tbody>${td.rows.map((row,ri)=>`<tr style="background:${ri%2===0?'white':'#fafafa'}">${row.map(cell=>`<td style="padding:.4rem .6rem;border:1.5px solid #e5e7eb;">${sanitizeHTML(cell||'')}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>`
+      blockDiv.innerHTML = tableHTML
+
+    } else if(block.type==='mindmap'){
+      // 🎯 CONVERSÃO SVG — resolve o bug do PDF!
+      const label = document.createElement('div')
+      label.style.cssText = 'font-size:.78rem;font-weight:700;color:#374151;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;'
+      label.innerHTML = '🧠 Mapa Mental'
+      blockDiv.appendChild(label)
+      blockDiv.innerHTML += mmToStaticSVG(block)
+    }
+
+    pdfContainer.appendChild(blockDiv)
+  }
+
+  document.body.appendChild(pdfContainer)
+
+  const fileName = book.pages.length>1
+    ? `Caderno - ${book.name} - ${page.title}.pdf`
+    : `Caderno - ${book.name}.pdf`
+
+  const opt = {
+    margin: [0.8, 0.5, 0.8, 0.5],
+    filename: fileName,
+    image: { type:'jpeg', quality:.97 },
+    html2canvas: { scale:2, useCORS:true, logging:false, allowTaint:true },
+    jsPDF: { unit:'cm', format:'a4', orientation:'portrait' }
+  }
+
+  try {
+    await html2pdf().from(pdfContainer).set(opt).save()
+    showXPToast(0, `PDF "${book.name}" gerado! 📄 Verifique Downloads`)
+  } catch(e) {
+    console.error('PDF error:', e)
+    showXPToast(0, 'Erro ao gerar PDF. Tente novamente.')
+  } finally {
+    document.body.removeChild(pdfContainer)
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1775,9 +1953,13 @@ function openEditNoteModal(noteId){
   showModal('modal-note-editor')
 }
 async function saveNote(){
-  const title=document.getElementById('note-title-input').value.trim()||'Sem título'
+  const title=(document.getElementById('note-title-input').value.trim()||'Sem título').substring(0,100)
   let noteData={id:editingNoteId||uid(),title,type:currentNoteType,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}
-  if(currentNoteType==='text'){noteData.content=document.getElementById('note-editor-content').innerHTML;noteData.preview=document.getElementById('note-editor-content').textContent.substring(0,100)}
+  if(currentNoteType==='text'){
+    const raw=document.getElementById('note-editor-content').innerHTML
+    if(raw.length>200000){showXPToast(0,'⚠️ Texto muito longo. Reduza o conteúdo.');return}
+    noteData.content=sanitizeContent(raw);noteData.preview=document.getElementById('note-editor-content').textContent.substring(0,100)
+  }
   else if(currentNoteType==='draw'){noteData.drawData=document.getElementById('draw-canvas').toDataURL();noteData.preview='Desenho'}
   else if(currentNoteType==='table'){noteData.tableData=tableData;noteData.preview=tableData.cols.join(' | ')}
   if(editingNoteId){const idx=notes.findIndex(n=>n.id===editingNoteId);if(idx>=0){noteData.createdAt=notes[idx].createdAt;notes[idx]=noteData}}
