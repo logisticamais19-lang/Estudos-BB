@@ -1234,7 +1234,34 @@ function tickTimer(){
   else timerSeconds++
   updateTimerDisplay()
 }
+// ── Som do cronômetro ──
+function playTimerSound(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)()
+    // Toca 3 bipes: agudos e decrescentes
+    const bipes=[
+      {freq:880,start:0,dur:.12},
+      {freq:880,start:.18,dur:.12},
+      {freq:1100,start:.36,dur:.35}
+    ]
+    bipes.forEach(b=>{
+      const osc=ctx.createOscillator()
+      const gain=ctx.createGain()
+      osc.connect(gain);gain.connect(ctx.destination)
+      osc.type='sine';osc.frequency.value=b.freq
+      gain.gain.setValueAtTime(0,ctx.currentTime+b.start)
+      gain.gain.linearRampToValueAtTime(.5,ctx.currentTime+b.start+.02)
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+b.start+b.dur)
+      osc.start(ctx.currentTime+b.start)
+      osc.stop(ctx.currentTime+b.start+b.dur+.05)
+    })
+    // Fecha o contexto depois do último bipe
+    setTimeout(()=>ctx.close(),1200)
+  }catch(e){console.warn('Som não disponível:',e)}
+}
+
 async function onTimerFinished(){
+  playTimerSound()
   const mins=timerMode>0?timerMode:Math.round(timerSeconds/60)
   sessionFinishedSubjectId=currentTimerSubjectId;sessionFinishedMinutes=mins
   const sub=subjects.find(s=>s.id===currentTimerSubjectId)
@@ -1850,92 +1877,86 @@ async function exportBookPDF(){
   const book=books.find(b=>b.id===currentBookId); if(!book) return
   syncEditableBlocks()
   const page=book.pages.find(p=>p.id===currentPageId)||book.pages[0]
-
-  // Botão mostra loading
   showXPToast(0,'Gerando PDF... aguarde ⏳')
 
-  // ── Monta HTML puro como string (mais confiável que DOM para html2pdf) ──
   const date = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})
 
+  // ── Monta HTML dos blocos ──
   let blocksHTML = ''
   for(const block of (page.blocks||[])){
     if(block.type==='text' && block.content){
-      blocksHTML += `<div style="margin-bottom:1.5rem;font-size:14px;line-height:1.8;color:#374151;font-family:Arial,sans-serif;">${sanitizeContent(block.content)}</div>`
+      blocksHTML += `<div style="margin-bottom:20px;font-size:14px;line-height:1.9;color:#374151;">${sanitizeContent(block.content)}</div>`
 
     } else if(block.type==='image' && block.imgData){
-      blocksHTML += `<div style="margin-bottom:1.5rem;text-align:center;"><img src="${block.imgData}" style="max-width:100%;max-height:380px;object-fit:contain;border-radius:8px;"></div>`
+      blocksHTML += `<div style="margin-bottom:20px;text-align:center;"><img src="${block.imgData}" style="max-width:100%;max-height:360px;object-fit:contain;border-radius:8px;"></div>`
 
     } else if(block.type==='table' && block.tableData){
       const td=block.tableData
-      blocksHTML += `<div style="margin-bottom:1.5rem;overflow:hidden;border-radius:8px;border:1.5px solid #e5e7eb;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;font-family:Arial,sans-serif;">
-          <thead><tr>${td.cols.map(c=>`<th style="padding:8px 10px;background:#EEF3FF;border:1.5px solid #e5e7eb;font-weight:700;color:#0038A8;text-align:left;">${sanitizeHTML(c)}</th>`).join('')}</tr></thead>
-          <tbody>${td.rows.map((row,ri)=>`<tr style="background:${ri%2===0?'white':'#fafafa'};">${row.map(cell=>`<td style="padding:7px 10px;border:1.5px solid #e5e7eb;font-size:13px;">${sanitizeHTML(cell||'')}</td>`).join('')}</tr>`).join('')}</tbody>
+      blocksHTML += `<div style="margin-bottom:20px;border:1.5px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr>${td.cols.map(c=>`<th style="padding:8px 10px;background:#EEF3FF;border-bottom:2px solid #bfdbfe;font-weight:700;color:#0038A8;text-align:left;">${sanitizeHTML(c)}</th>`).join('')}</tr></thead>
+          <tbody>${td.rows.map((row,ri)=>`<tr style="background:${ri%2===0?'#fff':'#f8faff'};">${row.map(cell=>`<td style="padding:7px 10px;border-top:1px solid #e5e7eb;">${sanitizeHTML(cell||'')}</td>`).join('')}</tr>`).join('')}</tbody>
         </table></div>`
 
     } else if(block.type==='mindmap'){
-      blocksHTML += `<div style="margin-bottom:1.5rem;">
-        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;font-family:Arial,sans-serif;">🧠 Mapa Mental</div>
+      blocksHTML += `<div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">🧠 Mapa Mental</div>
         ${mmToStaticSVG(block)}
       </div>`
     }
   }
 
-  const fullHTML = `
-    <div style="width:680px;background:white;padding:40px 48px;font-family:Arial,sans-serif;position:relative;">
-      <div style="position:absolute;left:42px;top:0;bottom:0;width:2px;background:rgba(220,38,38,0.1);"></div>
-      <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #EEF3FF;display:flex;align-items:center;gap:12px;">
-        <div style="width:44px;height:44px;background:#0038A8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0;">${book.emoji||'📚'}</div>
-        <div>
-          <div style="font-size:18px;font-weight:800;color:#111827;">${sanitizeHTML(book.name)}</div>
-          <div style="font-size:12px;color:#9ca3af;margin-top:3px;">${sanitizeHTML(page.title||'Página 1')} &nbsp;•&nbsp; ${date}</div>
-        </div>
+  if(!blocksHTML){
+    blocksHTML='<p style="color:#9ca3af;font-style:italic;font-size:13px;">Página sem conteúdo.</p>'
+  }
+
+  // ── Cria div visível mas coberto por overlay ──
+  // Overlay escuro cobre a tela enquanto gera PDF
+  const overlay = document.createElement('div')
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,56,168,.7);z-index:99998;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;color:white;'
+  overlay.innerHTML=`<div style="font-size:2rem;">📄</div><div style="font-weight:700;font-size:1rem;">Gerando PDF...</div><div style="font-size:.82rem;opacity:.8;">Aguarde alguns segundos</div>`
+  document.body.appendChild(overlay)
+
+  // Container do PDF visível atrás do overlay
+  const wrap = document.createElement('div')
+  wrap.style.cssText='position:fixed;top:0;left:0;width:794px;background:white;z-index:99997;overflow:visible;'
+  wrap.innerHTML=`
+    <div id="pdf-content" style="width:794px;padding:48px 56px 48px 72px;background:white;position:relative;font-family:Arial,Helvetica,sans-serif;">
+      <div style="position:absolute;left:52px;top:0;bottom:0;width:2px;background:rgba(220,38,38,.15);"></div>
+      <div style="margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #EEF3FF;">
+        <div style="font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">EstudoBB — Caderno de Estudos</div>
+        <div style="font-size:20px;font-weight:800;color:#111827;margin-bottom:4px;">${sanitizeHTML(book.name)}</div>
+        <div style="font-size:13px;color:#6b7280;">${sanitizeHTML(page.title||'Página 1')} &nbsp;·&nbsp; ${date}</div>
       </div>
       ${blocksHTML}
     </div>`
+  document.body.appendChild(wrap)
 
-  // Cria iframe oculto para render isolado (garante captura correta)
-  const iframe = document.createElement('iframe')
-  iframe.style.cssText = 'position:fixed;top:0;left:0;width:780px;height:auto;border:none;opacity:0;pointer-events:none;z-index:-1;'
-  document.body.appendChild(iframe)
+  // Aguarda render completo (imagens, SVG, fontes)
+  await new Promise(r=>setTimeout(r,800))
 
-  // Escreve HTML no iframe
-  iframe.contentDocument.open()
-  iframe.contentDocument.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:white;}</style></head><body>${fullHTML}</body></html>`)
-  iframe.contentDocument.close()
-
-  // Aguarda imagens carregarem
-  await new Promise(resolve => setTimeout(resolve, 600))
-
-  const targetEl = iframe.contentDocument.body.firstElementChild
-
-  const fileName = book.pages.length>1
+  const targetEl = wrap.querySelector('#pdf-content')
+  const fileName  = book.pages.length>1
     ? `Caderno - ${book.name} - ${page.title}.pdf`
     : `Caderno - ${book.name}.pdf`
 
   const opt = {
-    margin: [0.5, 0, 0.5, 0],
-    filename: fileName,
-    image: { type: 'jpeg', quality: 0.97 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      windowWidth: 780
-    },
-    jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    margin:     0,
+    filename:   fileName,
+    image:      { type:'jpeg', quality:0.95 },
+    html2canvas:{ scale:2, useCORS:true, allowTaint:true, logging:false, backgroundColor:'#ffffff' },
+    jsPDF:      { unit:'mm', format:'a4', orientation:'portrait' }
   }
 
   try {
     await html2pdf().from(targetEl).set(opt).save()
-    showXPToast(0, `PDF "${book.name}" pronto! 📄 Verifique Downloads`)
-  } catch(e) {
-    console.error('PDF error:', e)
-    showXPToast(0, 'Erro ao gerar PDF.')
+    showXPToast(0,`PDF "${book.name}" pronto! 📄 Verifique Downloads`)
+  } catch(e){
+    console.error('PDF error:',e)
+    showXPToast(0,'Erro ao gerar PDF. Tente novamente.')
   } finally {
-    document.body.removeChild(iframe)
+    document.body.removeChild(wrap)
+    document.body.removeChild(overlay)
   }
 }
 
