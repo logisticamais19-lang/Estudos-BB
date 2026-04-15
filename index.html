@@ -608,17 +608,19 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 <!-- ══ RECOMPENSAS ══ -->
 <div id="screen-rewards" class="screen" style="display:none">
   <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.25rem">🏆 Suas Recompensas</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
-    <div style="background:linear-gradient(135deg,#0038A8,#001A55);border-radius:1.5rem;padding:1.75rem;color:white;box-shadow:0 8px 30px rgba(0,56,168,.3)"><div style="font-size:.7rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Nível atual</div><div id="rewards-level-name" style="font-size:1.8rem;font-weight:900;color:#F9DD16;line-height:1">Iniciante</div><div id="rewards-xp-text" style="font-size:.85rem;opacity:.8;margin:.4rem 0 1rem">0 XP total</div><div class="level-bar" style="height:12px;margin-bottom:.5rem"><div id="rewards-level-bar" class="level-bar-fill" style="width:0%;height:100%"></div></div><div id="rewards-next-level" style="font-size:.72rem;opacity:.65">Próximo: 200 XP</div></div>
-    <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)"><h3 style="font-weight:700;margin-bottom:1rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">Estatísticas</h3><div id="rewards-stats" style="display:flex;flex-direction:column;gap:.65rem"></div></div>
-    <div style="grid-column:span 1/-1;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)"><h3 style="font-weight:700;margin-bottom:1rem;font-size:.9rem">🎖 Badges</h3><div id="badges-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.75rem"></div></div>
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem">
+      <div style="background:linear-gradient(135deg,#0038A8,#001A55);border-radius:1.5rem;padding:1.75rem;color:white;box-shadow:0 8px 30px rgba(0,56,168,.3)"><div style="font-size:.7rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Nível atual</div><div id="rewards-level-name" style="font-size:1.8rem;font-weight:900;color:#F9DD16;line-height:1">Iniciante</div><div id="rewards-xp-text" style="font-size:.85rem;opacity:.8;margin:.4rem 0 1rem">0 XP total</div><div class="level-bar" style="height:12px;margin-bottom:.5rem"><div id="rewards-level-bar" class="level-bar-fill" style="width:0%;height:100%"></div></div><div id="rewards-next-level" style="font-size:.72rem;opacity:.65">Próximo: 200 XP</div></div>
+      <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)"><h3 style="font-weight:700;margin-bottom:1rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">Estatísticas</h3><div id="rewards-stats" style="display:flex;flex-direction:column;gap:.65rem"></div></div>
+    </div>
+    <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)"><h3 style="font-weight:700;margin-bottom:1rem;font-size:.9rem">🎖 Badges</h3><div id="badges-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.75rem"></div></div>
   </div>
 </div>
 
 <!-- ══ CONFIGURAÇÕES ══ -->
 <div id="screen-settings" class="screen" style="display:none">
   <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.25rem">⚙️ Configurações</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
     <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
       <h3 style="font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem"><i class="fas fa-user-circle" style="color:#0038A8"></i> Perfil</h3>
       <div style="display:flex;flex-direction:column;gap:.65rem">
