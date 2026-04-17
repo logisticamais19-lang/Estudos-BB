@@ -467,58 +467,84 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <button onclick="addSubject()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Adicionar matéria</button>
   </div>
   <!-- NOVO: Templates de Plano Inteligente -->
-<div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-bottom:1.5rem">
-  <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem">
-    <span style="font-size:1.3rem">🎯</span>
+<div style="background:white;border-radius:1.5rem;padding:1.75rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#0038A8,#002B85);border-radius:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <i class="fas fa-rocket" style="color:#F9DD16;font-size:.95rem"></i>
+    </div>
     <div>
       <h3 style="font-size:1rem;font-weight:800;color:#111827">Planos Prontos para o Concurso BB</h3>
-      <p style="font-size:.75rem;color:#9ca3af;margin-top:.1rem">Selecione um template e carregue automaticamente tarefas, cadernos e revisões</p>
+      <p style="font-size:.75rem;color:#9ca3af;margin-top:.1rem">Selecione um template — matérias, cadernos, tarefas e revisões criados automaticamente</p>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem">
 
-    <!-- Template 1 -->
-    <div style="border:2px solid #bfdbfe;border-radius:1.25rem;padding:1.25rem;background:#f8faff;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#0038A8';this.style.background='#EEF3FF'" onmouseleave="this.style.borderColor='#bfdbfe';this.style.background='#f8faff'">
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
-        <span style="background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">6 MESES</span>
-        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INICIANTE</span>
+    <!-- Template 1 — Iniciante -->
+    <div style="border:2px solid #e0e7ff;border-radius:1.25rem;padding:1.5rem;background:white;transition:all .2s;display:flex;flex-direction:column" onmouseenter="this.style.borderColor='#0038A8';this.style.boxShadow='0 8px 24px rgba(0,56,168,.13)'" onmouseleave="this.style.borderColor='#e0e7ff';this.style.boxShadow='none'">
+      <div style="width:44px;height:44px;background:#EEF3FF;border-radius:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+        <i class="fas fa-seedling" style="color:#0038A8;font-size:1.1rem"></i>
       </div>
-      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Iniciante BB – 6 meses</h4>
-      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Ideal para quem está começando do zero. Meta diária: 2h</p>
-      <button onclick="loadPlanTemplate(1)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#0038A8;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#0038A8;color:white;font-size:.6rem;font-weight:800;padding:.2rem .65rem;border-radius:9999px;letter-spacing:.04em">6 MESES</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Iniciante</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.95rem;color:#111827;margin-bottom:.4rem;line-height:1.3">Iniciante BB</h4>
+      <p style="font-size:.78rem;color:#6b7280;line-height:1.6;flex:1;margin-bottom:1rem">Ideal para quem está começando do zero. Cobre todas as matérias com ritmo gradual.</p>
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.9rem;font-size:.72rem;color:#0038A8;font-weight:700;background:#EEF3FF;padding:.4rem .75rem;border-radius:.6rem">
+        <i class="fas fa-clock"></i> Meta diária: 2h
+      </div>
+      <button onclick="loadPlanTemplate(1)" style="width:100%;padding:.7rem;border-radius:.85rem;background:#0038A8;color:white;border:none;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseenter="this.style.background='#002B85';this.style.transform='translateY(-1px)'" onmouseleave="this.style.background='#0038A8';this.style.transform='none'"><i class="fas fa-bolt"></i> Carregar este plano</button>
     </div>
 
-    <!-- Template 2 -->
-    <div style="border:2px solid #c4b5fd;border-radius:1.25rem;padding:1.25rem;background:#faf8ff;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#7c3aed';this.style.background='#ede9fe'" onmouseleave="this.style.borderColor='#c4b5fd';this.style.background='#faf8ff'">
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
-        <span style="background:#7c3aed;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">4 MESES</span>
-        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INTERMEDIÁRIO</span>
+    <!-- Template 2 — Intermediário -->
+    <div style="border:2px solid #e0e7ff;border-radius:1.25rem;padding:1.5rem;background:white;transition:all .2s;display:flex;flex-direction:column" onmouseenter="this.style.borderColor='#7c3aed';this.style.boxShadow='0 8px 24px rgba(124,58,237,.13)'" onmouseleave="this.style.borderColor='#e0e7ff';this.style.boxShadow='none'">
+      <div style="width:44px;height:44px;background:#f5f3ff;border-radius:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+        <i class="fas fa-chart-line" style="color:#7c3aed;font-size:1.1rem"></i>
       </div>
-      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Intermediário BB – 4 meses</h4>
-      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Para quem já tem base. Meta diária: 3h</p>
-      <button onclick="loadPlanTemplate(2)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#7c3aed;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#6d28d9'" onmouseleave="this.style.background='#7c3aed'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#7c3aed;color:white;font-size:.6rem;font-weight:800;padding:.2rem .65rem;border-radius:9999px;letter-spacing:.04em">4 MESES</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Intermediário</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.95rem;color:#111827;margin-bottom:.4rem;line-height:1.3">Intermediário BB</h4>
+      <p style="font-size:.78rem;color:#6b7280;line-height:1.6;flex:1;margin-bottom:1rem">Para quem já tem base e quer acelerar. Foco em bancários e português.</p>
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.9rem;font-size:.72rem;color:#7c3aed;font-weight:700;background:#f5f3ff;padding:.4rem .75rem;border-radius:.6rem">
+        <i class="fas fa-clock"></i> Meta diária: 3h
+      </div>
+      <button onclick="loadPlanTemplate(2)" style="width:100%;padding:.7rem;border-radius:.85rem;background:#7c3aed;color:white;border:none;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseenter="this.style.background='#6d28d9';this.style.transform='translateY(-1px)'" onmouseleave="this.style.background='#7c3aed';this.style.transform='none'"><i class="fas fa-bolt"></i> Carregar este plano</button>
     </div>
 
-    <!-- Template 3 -->
-    <div style="border:2px solid #86efac;border-radius:1.25rem;padding:1.25rem;background:#f0fdf4;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#16a34a';this.style.background='#dcfce7'" onmouseleave="this.style.borderColor='#86efac';this.style.background='#f0fdf4'">
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
-        <span style="background:#16a34a;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">30-45 DIAS</span>
-        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INTENSIVO</span>
+    <!-- Template 3 — Intensivo -->
+    <div style="border:2px solid #e0e7ff;border-radius:1.25rem;padding:1.5rem;background:white;transition:all .2s;display:flex;flex-direction:column" onmouseenter="this.style.borderColor='#16a34a';this.style.boxShadow='0 8px 24px rgba(22,163,74,.13)'" onmouseleave="this.style.borderColor='#e0e7ff';this.style.boxShadow='none'">
+      <div style="width:44px;height:44px;background:#f0fdf4;border-radius:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+        <i class="fas fa-fire" style="color:#16a34a;font-size:1.1rem"></i>
       </div>
-      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Foco Redação + Atualidades</h4>
-      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Intensivo em redação e atualidades do mercado financeiro</p>
-      <button onclick="loadPlanTemplate(3)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#16a34a;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#15803d'" onmouseleave="this.style.background='#16a34a'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#16a34a;color:white;font-size:.6rem;font-weight:800;padding:.2rem .65rem;border-radius:9999px;letter-spacing:.04em">30-45 DIAS</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Intensivo</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.95rem;color:#111827;margin-bottom:.4rem;line-height:1.3">Foco Redação + Atualidades</h4>
+      <p style="font-size:.78rem;color:#6b7280;line-height:1.6;flex:1;margin-bottom:1rem">Intensivo em redação e atualidades do mercado financeiro.</p>
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.9rem;font-size:.72rem;color:#16a34a;font-weight:700;background:#f0fdf4;padding:.4rem .75rem;border-radius:.6rem">
+        <i class="fas fa-clock"></i> Meta diária: 2h
+      </div>
+      <button onclick="loadPlanTemplate(3)" style="width:100%;padding:.7rem;border-radius:.85rem;background:#16a34a;color:white;border:none;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseenter="this.style.background='#15803d';this.style.transform='translateY(-1px)'" onmouseleave="this.style.background='#16a34a';this.style.transform='none'"><i class="fas fa-bolt"></i> Carregar este plano</button>
     </div>
 
-    <!-- Template 4 -->
-    <div style="border:2px solid #fca5a5;border-radius:1.25rem;padding:1.25rem;background:#fff7f7;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#dc2626';this.style.background='#fee2e2'" onmouseleave="this.style.borderColor='#fca5a5';this.style.background='#fff7f7'">
-      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
-        <span style="background:#dc2626;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">30 DIAS</span>
-        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">REVISÃO FINAL</span>
+    <!-- Template 4 — Revisão Final -->
+    <div style="border:2px solid #e0e7ff;border-radius:1.25rem;padding:1.5rem;background:white;transition:all .2s;display:flex;flex-direction:column" onmouseenter="this.style.borderColor='#dc2626';this.style.boxShadow='0 8px 24px rgba(220,38,38,.13)'" onmouseleave="this.style.borderColor='#e0e7ff';this.style.boxShadow='none'">
+      <div style="width:44px;height:44px;background:#fff1f2;border-radius:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:1rem">
+        <i class="fas fa-flag-checkered" style="color:#dc2626;font-size:1.1rem"></i>
       </div>
-      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Revisão Final – 30 dias antes da prova</h4>
-      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Revisão intensiva com foco em questões e mapas mentais</p>
-      <button onclick="loadPlanTemplate(4)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#dc2626;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#b91c1c'" onmouseleave="this.style.background='#dc2626'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#dc2626;color:white;font-size:.6rem;font-weight:800;padding:.2rem .65rem;border-radius:9999px;letter-spacing:.04em">30 DIAS</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Revisão Final</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.95rem;color:#111827;margin-bottom:.4rem;line-height:1.3">Revisão Final</h4>
+      <p style="font-size:.78rem;color:#6b7280;line-height:1.6;flex:1;margin-bottom:1rem">Revisão intensiva com questões, mapas mentais e simulados. Últimos 30 dias.</p>
+      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.9rem;font-size:.72rem;color:#dc2626;font-weight:700;background:#fff1f2;padding:.4rem .75rem;border-radius:.6rem">
+        <i class="fas fa-clock"></i> Meta diária: 4h
+      </div>
+      <button onclick="loadPlanTemplate(4)" style="width:100%;padding:.7rem;border-radius:.85rem;background:#dc2626;color:white;border:none;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.4rem" onmouseenter="this.style.background='#b91c1c';this.style.transform='translateY(-1px)'" onmouseleave="this.style.background='#dc2626';this.style.transform='none'"><i class="fas fa-bolt"></i> Carregar este plano</button>
     </div>
 
   </div>
@@ -1304,7 +1330,7 @@ const BOOK_COLORS=['#0038A8','#dc2626','#16a34a','#7c3aed','#d97706','#0891b2','
 const BOOK_EMOJIS=['📚','📖','✏️','🎓','📐','🔬','💰','⚖️','💻','🌎','🧮','📊','🗣️','🏦','🎯','🔢','📝','🧠','⭐','🔥']
 const RECURSOS=[
   // VÍDEO-AULAS — links de busca do YouTube (sempre funcionam)
-  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do Brasil com mais de 3 milhões de inscritos. Português, Matemática, Bancários, Informática e muito mais.',icon:'🎓',url:'https://www.youtube.com/c/EstategiaConcursos',badge:'YouTube',yt:true},
+  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do Brasil com mais de 3 milhões de inscritos. Português, Matemática, Bancários, Informática e muito mais.',icon:'🎓',url:'https://www.youtube.com/@EstrategiaConcursos',badge:'YouTube',yt:true},
   {id:2,tipo:'video',titulo:'Aulas de Português para Concursos',desc:'Pesquisa no YouTube por aulas gratuitas de língua portuguesa focadas em concursos bancários e públicos.',icon:'📝',url:'https://www.youtube.com/results?search_query=aulas+portugues+concursos+bancarios+gratis',badge:'YouTube',yt:true},
   {id:3,tipo:'video',titulo:'Matemática Financeira para Bancários',desc:'Pesquisa no YouTube por aulas de matemática financeira, juros compostos e porcentagem para o BB.',icon:'🔢',url:'https://www.youtube.com/results?search_query=matematica+financeira+banco+do+brasil+gratis',badge:'YouTube',yt:true},
   {id:4,tipo:'video',titulo:'Conhecimentos Bancários — Aulas',desc:'Pesquisa no YouTube por aulas de sistema financeiro, produtos bancários e conhecimentos bancários para concursos.',icon:'🏦',url:'https://www.youtube.com/results?search_query=conhecimentos+bancarios+concurso+BB+aulas+gratis',badge:'YouTube',yt:true},
@@ -1364,7 +1390,7 @@ let _distribuicao = {}
 let _uid=null,_isOnline=navigator.onLine,_pendingSync=false,_userPlan='free'
 
 const PLAN_FEATURES={
-  free:    {subjects:5,tasks:30,heatmap:false,books:false,reviews:false,rewards:false,export:false},
+  free:    {subjects:5,tasks:30,heatmap:false,books:false,reviews:true,rewards:true,export:false},
   basico:  {subjects:999,tasks:999,heatmap:true,books:false,reviews:true,rewards:true,export:false},
   basicoAnual:{subjects:999,tasks:999,heatmap:true,books:false,reviews:true,rewards:true,export:false},
   pro:     {subjects:999,tasks:999,heatmap:true,books:true,reviews:true,rewards:true,export:true},
@@ -1381,6 +1407,11 @@ function showPlanGate(planName){
   const el=document.getElementById('plan-gate-name')
   if(el)el.textContent=planName
   showModal('modal-plan-gate')
+  // Volta para o dashboard para não deixar tela em branco
+  const screens=document.querySelectorAll('[id^="screen-"]')
+  screens.forEach(s=>s.style.display='none')
+  const dash=document.getElementById('screen-0')
+  if(dash)dash.style.display='block'
 }
 
 // ═══════════════════════════════════════════════════
@@ -1670,7 +1701,15 @@ function navigateTo(n){
              'rewards':'renderRewards','settings':'renderSettings',
              'pricing':'renderPricing','admin':'renderAdmin'}
   // BUG #5 FIX: trata Promise de funções async como renderPricing
-  const fn=map[n];if(fn&&window[fn]){const r=window[fn]();if(r&&r.then)r.catch(e=>console.warn('navigateTo async error:',e))}
+  const fn=map[n]
+  if(fn&&window[fn]){
+    try{
+      const r=window[fn]()
+      if(r&&r.then)r.catch(e=>console.warn('navigateTo render error:',e))
+    }catch(e){
+      console.error('Render error in',fn,':',e)
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -2876,7 +2915,7 @@ function renderHeatmap(){
 }
 
 function renderRewards(){
-  if(!requirePlan('rewards','basico'))return;
+  // Recompensas visível para todos os planos (motivação)
   const xp=gamification.xp,li=getCurrentLevel(xp),lv=LEVELS[li]
   const pct=lv.maxXP===Infinity?100:Math.round(((xp-lv.minXP)/(lv.maxXP-lv.minXP))*100),next=LEVELS[li+1]
   document.getElementById('rewards-level-name').textContent=`${lv.icon} ${lv.name}`
@@ -3648,46 +3687,38 @@ const PLAN_TEMPLATES = {
 async function loadPlanTemplate(templateId) {
   const tpl = PLAN_TEMPLATES[templateId]
   if (!tpl) return
-  if (!confirm(`Carregar o plano "${tpl.name}"? Isso adicionará matérias, tarefas e revisões à sua conta.`)) return
+  if (!confirm(`Carregar o plano "${tpl.name}"?\n\nSerão criados automaticamente:\n• Matérias\n• Cadernos\n• Tarefas\n• Revisões espaçadas`)) return
 
-  // 1. Carregar matérias (adiciona sem remover as existentes)
+  // 1. Matérias
   tpl.subjects.forEach(sub => {
     const exists = subjects.find(s => s.name === sub.name)
     if (!exists) subjects.push({ id: Date.now() + Math.random(), ...sub })
   })
 
-  // 2. Atualizar meta diária
-  if (profile) {
-    profile.dailyGoalH = tpl.dailyGoalH
-  }
+  // 2. Meta diária
+  if (profile) profile.dailyGoalH = tpl.dailyGoalH
 
-  // 3. Adicionar tarefas para hoje e próximos dias
+  // 3. Tarefas para hoje e próximos dias
   const today = todayStr()
   tpl.tasks.forEach((task, i) => {
     const taskDate = addDays(today, i)
     const exists = dailyTasks.find(t => t.text === task.text && t.date === taskDate)
     if (!exists) {
       dailyTasks.push({
-        id: uid(),
-        text: task.text,
-        done: false,
-        date: taskDate,
-        type: task.type || 'study',
-        priority: 'normal',
-        start: '', end: ''
+        id: uid(), text: task.text, done: false, date: taskDate,
+        type: task.type || 'study', priority: 'normal', start: '', end: ''
       })
     }
   })
 
-  // 4. Adicionar revisões espaçadas
+  // 4. Revisões espaçadas
   tpl.reviews.forEach((topic, i) => {
     const exists = reviewItems.find(r => r.topic === topic)
     if (!exists) {
       reviewItems.push({
-        id: uid(),
-        topic,
+        id: uid(), topic,
         subjectName: tpl.subjects[0]?.name || '—',
-        notes: `Adicionado pelo template: ${tpl.name}`,
+        notes: `Template: ${tpl.name}`,
         lastReview: today,
         nextReview: addDays(today, i + 1),
         stage: 1
@@ -3695,28 +3726,43 @@ async function loadPlanTemplate(templateId) {
     }
   })
 
-  // 5. Salvar tudo
+  // 5. Criar cadernos automaticamente
+  const bookColors = ['#0038A8','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2']
+  const bookEmojis = ['📚','📖','✏️','🎓','📐','🔬']
+  let booksCreated = 0
+  tpl.books.forEach((bookName, i) => {
+    const exists = books.find(b => b.name === bookName)
+    if (!exists) {
+      books.push({
+        id: uid(),
+        name: bookName,
+        emoji: bookEmojis[i % bookEmojis.length],
+        color: bookColors[i % bookColors.length],
+        coverImg: '',
+        pages: [{ id: uid(), title: 'Página 1', blocks: [] }],
+        createdAt: new Date().toISOString()
+      })
+      booksCreated++
+    }
+  })
+  if (booksCreated > 0) {
+    gamification.stats.totalBooks = (gamification.stats.totalBooks || 0) + booksCreated
+  }
+
+  // 6. Salvar tudo
   await saveData()
 
-  // 6. Toast + sugestão de cadernos
+  // 7. Feedback com toasts
   showXPToast(0, `✅ Plano "${tpl.name}" carregado!`)
-
-  // 7. Sugerir cadernos
-  if (tpl.books.length > 0) {
-    const bookList = tpl.books.map(b => `• ${b}`).join('\n') // BUG #6 FIX: \n explícito
-    setTimeout(() => {
-      alert(`📚 Cadernos sugeridos para este plano:
-
-${bookList}
-
-Vá em "Cadernos" para criá-los!`)
-    }, 1200)
+  if (booksCreated > 0) {
+    setTimeout(() => showXPToast(0, `📚 ${booksCreated} caderno(s) criado(s) automaticamente!`), 1600)
   }
 
   // 8. Re-renderizar
   renderSubjects()
   updateHeaderUser()
   renderDashboard()
+  checkBadges()
 }
 // /NOVO: Templates de Plano Inteligente
 
