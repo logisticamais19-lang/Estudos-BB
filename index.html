@@ -1350,6 +1350,10 @@ let tableData={cols:['Coluna 1','Coluna 2','Coluna 3'],rows:[['','',''],['','','
 // Recursos
 let currentRecursoFilter='all'
 
+// Cronograma e Distribuição (declarados aqui para evitar ReferenceError)
+let _cronograma = {}
+let _distribuicao = {}
+
 // Firebase
 let _uid=null,_isOnline=navigator.onLine,_pendingSync=false,_userPlan='free'
 
@@ -2999,7 +3003,7 @@ const CRONO_TYPES = [
 ]
 
 // cronograma[day][hour] = {type, label}
-let _cronograma = {}
+// _cronograma declarado no bloco de estado global
 
 function loadCronograma() {
   // _cronograma already loaded from Firebase/localStorage on login
@@ -3146,7 +3150,7 @@ function clearCronoCell(dayIdx, hourIdx) {
 // ═══════════════════════════════════════════════════
 // DISTRIBUIÇÃO POR MATÉRIA
 // ═══════════════════════════════════════════════════
-let _distribuicao = {} // { subjectId: horasSemana }
+// _distribuicao declarado no bloco de estado global
 
 function loadDistribuicao() {
   // _distribuicao already loaded from Firebase/localStorage on login
