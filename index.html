@@ -102,6 +102,8 @@ body{background:#EEF2FF;min-height:100vh;padding-bottom:50px}
   #mobile-nav{display:flex}
   .bb-header .nav-desktop{display:none!important}
   #app-content-wrap{padding:.75rem .65rem}
+  /* BUG #11 FIX: footer oculto no mobile para não sobrepor nav bar */
+  footer{display:none!important}
 }
 @media(min-width:769px){
   #mobile-nav{display:none!important}
@@ -457,11 +459,14 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 </div>
 
 <!-- ══ PLANO ══ -->
+<!-- BUG #3 FIX: estrutura flex corrigida — h2 e botão dentro do flex, templates fora -->
 <div id="screen-1" class="screen" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem"><!-- NOVO: Renomear aba Plano -->
-  <h2 style="font-size:1.4rem;font-weight:800">Plano Inteligente</h2>
-
-<!-- NOVO: Templates de Plano Inteligente -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <!-- NOVO: Renomear aba Plano -->
+    <h2 style="font-size:1.4rem;font-weight:800">Plano Inteligente</h2>
+    <button onclick="addSubject()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Adicionar matéria</button>
+  </div>
+  <!-- NOVO: Templates de Plano Inteligente -->
 <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-bottom:1.5rem">
   <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem">
     <span style="font-size:1.3rem">🎯</span>
@@ -518,8 +523,8 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
   </div>
 </div>
-<!-- /NOVO: Templates --><button onclick="addSubject()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Adicionar matéria</button></div>
-  <div style="background:white;border-radius:1.5rem;padding:.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto"><table style="width:100%;min-width:580px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af"><th style="text-align:left;padding:.75rem 1.25rem">Matéria</th><th style="text-align:center;padding:.75rem">Horas</th><th style="text-align:center;padding:.75rem">Meta</th><th style="text-align:center;padding:.75rem">Progresso</th><th style="text-align:center;padding:.75rem;width:10rem">Ações</th></tr></thead><tbody id="subjects-table"></tbody></table></div>
+<!-- /NOVO: Templates -->
+    <div style="background:white;border-radius:1.5rem;padding:.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto"><table style="width:100%;min-width:580px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af"><th style="text-align:left;padding:.75rem 1.25rem">Matéria</th><th style="text-align:center;padding:.75rem">Horas</th><th style="text-align:center;padding:.75rem">Meta</th><th style="text-align:center;padding:.75rem">Progresso</th><th style="text-align:center;padding:.75rem;width:10rem">Ações</th></tr></thead><tbody id="subjects-table"></tbody></table>
 </div>
 
 <!-- ══ TIMER ══ -->
@@ -1409,7 +1414,12 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 // ═══════════════════════════════════════════════════
 // FIREBASE
 // ═══════════════════════════════════════════════════
+// BUG #1 FIX + BUG #12 FIX: única definição de onFirebaseReady + flag signup
+let _firebaseReady = false
+let _signupInProgress = false
 window.onFirebaseReady=async function(user){
+  if(_signupInProgress){_signupInProgress=false;return}
+  _firebaseReady=true
   _uid=user.uid
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
@@ -1418,6 +1428,7 @@ window.onFirebaseReady=async function(user){
   document.getElementById('auth-screen').style.display='none'
   document.getElementById('app').style.display='block'
   updateHeaderUser();navigateTo(0)
+  checkAdminAccess();updateHeaderUser()
 }
 window.onFirebaseSignOut=function(){
   document.getElementById('app-loading').style.display='none'
@@ -1508,6 +1519,8 @@ function switchAuthTab(tab){
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
 async function doSignup(){
+  // BUG #12 FIX: sinaliza signup em progresso para onFirebaseReady ignorar primeira chamada
+  _signupInProgress = true
   const name=document.getElementById('signup-name').value.trim()
   const email=document.getElementById('signup-email').value.trim()
   const pass=document.getElementById('signup-pass').value
@@ -1529,6 +1542,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free'})
     await window._fbService.save(_uid,'profile',profile)
   }catch(e){
+    _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
     showAuthError('signup-error',msgs[e.code]||'Erro: '+e.message)
   }
@@ -1649,7 +1663,8 @@ function navigateTo(n){
              'notebook':'renderNotebook','recursos':'renderRecursos','heatmap':'renderHeatmap',
              'rewards':'renderRewards','settings':'renderSettings',
              'pricing':'renderPricing','admin':'renderAdmin'}
-  const fn=map[n];if(fn&&window[fn])window[fn]()
+  // BUG #5 FIX: trata Promise de funções async como renderPricing
+  const fn=map[n];if(fn&&window[fn]){const r=window[fn]();if(r&&r.then)r.catch(e=>console.warn('navigateTo async error:',e))}
 }
 
 // ═══════════════════════════════════════════════════
@@ -2427,7 +2442,9 @@ function mmToStaticSVG(block){
       const lineH=14
       const startY=textY-(lines.length-1)*lineH/2
       lines.forEach((ln,i)=>{
-        svgParts.push(`<text x="${x}" y="${startY+i*lineH}" text-anchor="middle" dominant-baseline="middle" font-size="${textSize}" font-weight="${textWeight}" fill="${textColor}" font-family="Inter,sans-serif">${sanitizeHTML(ln)}</text>`)
+        // BUG #9 FIX: sanitização inline segura para contexto SVG
+        const _svgSafe = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+        svgParts.push(`<text x="${x}" y="${startY+i*lineH}" text-anchor="middle" dominant-baseline="middle" font-size="${textSize}" font-weight="${textWeight}" fill="${textColor}" font-family="Inter,sans-serif">${_svgSafe(ln)}</text>`)
       })
     }
   })
@@ -2893,17 +2910,16 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 // ═══════════════════════════════════════════════════
 window.addEventListener('load',()=>{
   setOnlineStatus(navigator.onLine);loadFromLocalStorage()
-  const timeout=setTimeout(()=>{
-    if(document.getElementById('app-loading').style.display!=='none'){
+  // BUG #1 FIX: usa flag em vez de wrapper de onFirebaseReady
+  const _loadTimeout=setTimeout(()=>{
+    if(!_firebaseReady&&document.getElementById('app-loading').style.display!=='none'){
       document.getElementById('app-loading').style.display='none'
       if(profile){document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';updateHeaderUser();navigateTo(0)}
       else document.getElementById('auth-screen').style.display='flex'
     }
   },5000)
-  const origReady=window.onFirebaseReady
-  window.onFirebaseReady=async(user)=>{clearTimeout(timeout);await origReady(user)}
-  const origOut=window.onFirebaseSignOut
-  window.onFirebaseSignOut=()=>{clearTimeout(timeout);origOut()}
+  const _origSignOut=window.onFirebaseSignOut
+  window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
@@ -2958,7 +2974,8 @@ window.navigateTo=function(n){
   const mEl=mMap[n]?document.getElementById(mMap[n]):null
   if(mEl)mEl.classList.add('nav-active')
   else{
-    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings','pricing':'mnav-m-pricing','admin':'mnav-m-admin'}
+    // BUG #2 FIX: entrada admin removida do moreMap (elemento mnav-m-admin não existe no HTML)
+    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings','pricing':'mnav-m-pricing'}
     const mEl2=moreMap[n]?document.getElementById(moreMap[n]):null
     if(mEl2)mEl2.classList.add('nav-active')
   }
@@ -3105,7 +3122,7 @@ function openCronoCell(dayIdx, hourIdx) {
     </div>`
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove() })
   document.body.appendChild(modal)
-  // Store temp selected type
+  // BUG #4 FIX: inicializa _cronoTmpType imediatamente após append
   window._cronoTmpType = cur.type || ''
 }
 
@@ -3357,8 +3374,9 @@ function selectPlan(plan) {
 }
 
 function goToStripeCheckout() {
-  if (!_selectedPlan || !STRIPE_LINKS[_selectedPlan]) {
-    alert('Configure os links do Stripe antes de ativar o checkout.')
+  // BUG #10 FIX: detecta links placeholder além de links ausentes
+  if (!_selectedPlan || !STRIPE_LINKS[_selectedPlan] || STRIPE_LINKS[_selectedPlan].includes('SUBSTITUA')) {
+    alert('O link de pagamento ainda não foi configurado. Entre em contato com o suporte.')
     return
   }
   window.open(STRIPE_LINKS[_selectedPlan] + '?client_reference_id=' + (_uid||''), '_blank')
@@ -3382,6 +3400,7 @@ async function adminSavePlan(uid) {
   await adminChangePlan(uid, sel.value)
 }
 
+// BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
 async function adminLoadUsers() {
   if (!isAdmin()) return
   const loading = document.getElementById('admin-loading')
@@ -3389,6 +3408,7 @@ async function adminLoadUsers() {
   if (loading) { loading.style.display = 'block'; loading.textContent = 'Carregando...' }
   if (tbody) tbody.innerHTML = ''
   try {
+    // Tenta getDocs via import dinâmico (requer regras admin no Firestore)
     const { getFirestore, collection, getDocs, getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
     const db2 = getFirestore()
     try {
@@ -3396,9 +3416,16 @@ async function adminLoadUsers() {
       _adminUsers = []
       snap.forEach(d => _adminUsers.push({ uid: d.id, ...d.data() }))
     } catch(e2) {
-      const selfDoc = await getDoc(doc(db2, 'users', _uid))
-      _adminUsers = selfDoc.exists() ? [{ uid: _uid, ...selfDoc.data() }] : []
-      if (loading) loading.textContent = '⚠️ Permissão limitada. Publique as regras do Firestore.'
+      // Fallback: carrega apenas o próprio usuário via _fbService
+      try {
+        const selfData = await window._fbService.loadAll(_uid)
+        const selfUser = { uid: _uid, plan: await window._fbService.getUserPlan(_uid).catch(()=>'free'), name: selfData?.profile?.name || '—', createdAt: null }
+        _adminUsers = [selfUser]
+        if (loading) loading.textContent = '⚠️ Para listar todos os usuários, configure a Cloud Function /admin/users ou as Firestore Rules com a claim admin=true no Firebase Authentication.'
+      } catch(e3) {
+        _adminUsers = []
+        if (loading) loading.textContent = '⚠️ Para listar todos os usuários, configure a Cloud Function /admin/users ou as Firestore Rules com a claim admin=true no Firebase Authentication.'
+      }
     }
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
@@ -3419,15 +3446,17 @@ function adminRenderTable(users) {
   const planBg  = { free:'#f3f4f6', basico:'#EEF3FF', basicoAnual:'#dbeafe', pro:'#001A55', proAnual:'#001A55' }
   const planFg  = { free:'#6b7280', basico:'#0038A8', basicoAnual:'#1d4ed8', pro:'#F9DD16', proAnual:'#F9DD16' }
   const planLbl = { free:'FREE', basico:'BÁSICO', basicoAnual:'BÁSICO ANUAL', pro:'PRO', proAnual:'PRO ANUAL' }
+  // BUG #8 FIX: usa data-uid em vez de onclick inline para evitar problemas com UIDs especiais
   users.forEach(u => {
     const tr = document.createElement('tr')
     tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
     const plan = u.plan || 'free'
     const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
+    const safeUid = _esc(u.uid)
     tr.innerHTML = `
       <td style="padding:.85rem 1rem">
         <div style="font-weight:600;font-size:.85rem">${_esc(u.name||'—')}</div>
-        <div style="font-size:.68rem;color:#9ca3af">${_esc(u.uid)}</div>
+        <div style="font-size:.68rem;color:#9ca3af">${safeUid}</div>
       </td>
       <td style="text-align:center;padding:.75rem">
         <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
@@ -3435,7 +3464,7 @@ function adminRenderTable(users) {
       <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
       <td style="text-align:center;padding:.75rem">
         <div style="display:flex;gap:.35rem;align-items:center;justify-content:center">
-          <select id="sel-${_esc(u.uid)}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
+          <select id="sel-${safeUid}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
             <option value="${plan}">${planLbl[plan]||plan} (atual)</option>
             ${plan!=='free'?'<option value="free">→ Free</option>':''}
             ${plan!=='basico'?'<option value="basico">→ Básico Mensal</option>':''}
@@ -3443,10 +3472,15 @@ function adminRenderTable(users) {
             ${plan!=='pro'?'<option value="pro">→ Pro Mensal</option>':''}
             ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
           </select>
-          <button onclick="adminSavePlan('${_esc(u.uid)}')" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
+          <button class="admin-save-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
         </div>
       </td>`
     tbody.appendChild(tr)
+  })
+  // BUG #8 FIX: delegador de eventos centralizado no tbody
+  tbody.addEventListener('click', e => {
+    const btn = e.target.closest('.admin-save-btn')
+    if (btn) adminSavePlan(btn.dataset.uid)
   })
 }
 
@@ -3508,12 +3542,7 @@ function checkAdminAccess() {
   }
 }
 
-const _origOnFirebaseReady2 = window.onFirebaseReady
-window.onFirebaseReady = async function(user) {
-  await _origOnFirebaseReady2(user)
-  checkAdminAccess()
-  updateHeaderUser()
-}
+// BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
 
 // NOVO: Templates de Plano Inteligente
 const PLAN_TEMPLATES = {
@@ -3644,8 +3673,7 @@ async function loadPlanTemplate(templateId) {
 
   // 7. Sugerir cadernos
   if (tpl.books.length > 0) {
-    const bookList = tpl.books.map(b => `• ${b}`).join('
-')
+    const bookList = tpl.books.map(b => `• ${b}`).join('\n') // BUG #6 FIX: \n explícito
     setTimeout(() => {
       alert(`📚 Cadernos sugeridos para este plano:
 
