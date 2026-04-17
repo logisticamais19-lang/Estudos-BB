@@ -2882,7 +2882,7 @@ function loadDistribuicao() {
 function saveDistribuicao() {
   subjects.forEach(s => {
     const inp = document.getElementById('dist-' + s.id)
-    if (inp) _distribuicao[s.id] = parseFloat(inp.value) || 0
+    if (inp) _distribuicao[String(s.id)] = parseFloat(inp.value) || 0
   })
   localStorage.setItem('bb_distribuicao', JSON.stringify(_distribuicao))
   showXPToast(0, 'Distribuição salva! ✅')
@@ -2904,7 +2904,7 @@ function renderDistribuicao() {
 
   // Inputs por matéria
   container.innerHTML = subjects.map(sub => {
-    const val = _distribuicao[sub.id] || 0
+    const val = _distribuicao[String(sub.id)] || 0
     return `<div style="display:flex;align-items:center;gap:.75rem">
       <div style="flex:1;min-width:0">
         <div style="font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(sub.name)}</div>
@@ -2953,16 +2953,54 @@ function renderDistribuicao() {
 }
 
 function updateDist(subId, val) {
-  _distribuicao[subId] = Math.max(0, Math.min(40, parseFloat(val) || 0))
-  renderDistribuicao()
+  _distribuicao[String(subId)] = Math.max(0, Math.min(40, parseFloat(val) || 0))
+  updateDistChart()
 }
 
 function adjustDist(subId, delta) {
-  const cur = parseFloat(_distribuicao[subId]) || 0
-  _distribuicao[subId] = Math.max(0, Math.min(40, Math.round((cur + delta) * 2) / 2))
+  const key = String(subId)
+  const cur = parseFloat(_distribuicao[key]) || 0
+  const newVal = Math.max(0, Math.min(40, Math.round((cur + delta) * 2) / 2))
+  _distribuicao[key] = newVal
+  // Update only the input value — no full re-render
   const inp = document.getElementById('dist-' + subId)
-  if (inp) inp.value = _distribuicao[subId]
-  renderDistribuicao()
+  if (inp) inp.value = newVal
+  updateDistChart()
+}
+
+function updateDistChart() {
+  // Update total
+  const total = subjects.reduce((a, s) => a + (parseFloat(_distribuicao[String(s.id)]) || 0), 0)
+  const totalEl = document.getElementById('distribuicao-total')
+  if (totalEl) totalEl.textContent = total.toFixed(1) + 'h'
+  // Update chart bars
+  const chart = document.getElementById('distribuicao-chart')
+  if (!chart) return
+  const maxH = Math.max(...subjects.map(s => parseFloat(_distribuicao[String(s.id)]) || 0), 1)
+  const colors = ['#0038A8','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2','#db2777','#065f46']
+  chart.innerHTML = subjects.map((sub, i) => {
+    const h = parseFloat(_distribuicao[String(sub.id)]) || 0
+    const pct = Math.round(h / maxH * 100)
+    const totalPct = total ? Math.round(h / total * 100) : 0
+    const color = colors[i % colors.length]
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:.2rem">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${_esc(sub.name)}</span>
+        <span style="color:${color};font-weight:800;flex-shrink:0">${h}h <span style="color:#9ca3af;font-weight:500">(${totalPct}%)</span></span>
+      </div>
+      <div style="height:10px;background:#f3f4f6;border-radius:9999px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:9999px;transition:width .4s ease"></div>
+      </div>
+    </div>`
+  }).join('')
+  // Sugestão
+  const leastProgress = subjects.slice().sort((a,b) => a.progress - b.progress)[0]
+  if (leastProgress) {
+    const tip = document.createElement('div')
+    tip.style.cssText = 'margin-top:.75rem;background:#FEF3C7;border-radius:.85rem;padding:.75rem 1rem;font-size:.75rem;color:#92400e;font-weight:600'
+    tip.innerHTML = `⚠️ <strong>${_esc(leastProgress.name)}</strong> tem o menor progresso (${leastProgress.progress}%). Considere aumentar as horas desta matéria.`
+    chart.appendChild(tip)
+  }
 }
 
 // Registrar Service Worker para PWA
