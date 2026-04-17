@@ -61,7 +61,7 @@
       try{const s=await getDoc(doc(db,'users',uid));return s.exists()?(s.data().plan||'free'):'free';}catch{return 'free';}
     },
     async initUser(uid,data){
-      return setDoc(doc(db,'users',uid),{plan:'free',...data},{merge:true});
+      return setDoc(doc(db,'users',uid),{...data},{merge:true}); // NÃO sobrescreve plan
     }
   };
 
@@ -1524,8 +1524,9 @@ async function navigateTo(n){
   const screen=document.getElementById(`screen-${n}`),nav=document.getElementById(`nav-${n}`)
   if(screen)screen.style.display='block'
   if(nav)nav.classList.add('nav-active')
-  // Recarrega plano sempre que navega (garante que plano atualizado é usado nos gates)
-  if(_uid && window._fbService) {
+  // Recarrega plano apenas para telas gateadas
+  const gatedScreens = ['heatmap','books','rewards','pricing','4']
+  if(_uid && window._fbService && gatedScreens.includes(String(n))) {
     _userPlan = await window._fbService.getUserPlan(_uid).catch(()=>_userPlan)
   }
   const map={0:'renderDashboard',1:'renderSubjects',2:'renderTimer',3:'renderProgress',
@@ -2913,6 +2914,14 @@ function renderAdmin() {
   adminLoadUsers()
 }
 
+async function adminSavePlan(uid) {
+  const sel = document.getElementById('sel-' + uid)
+  if (!sel) return
+  const plan = sel.value
+  if (!plan) return
+  await adminChangePlan(uid, plan)
+}
+
 async function adminLoadUsers() {
   if (!isAdmin()) return
   const loading = document.getElementById('admin-loading')
@@ -2968,12 +2977,15 @@ function adminRenderTable(users) {
       </td>
       <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
       <td style="text-align:center;padding:.75rem">
-        <select onchange="adminChangePlan('${_esc(u.uid)}', this.value)" style="padding:.35rem .6rem;border:1.5px solid #e5e7eb;border-radius:.6rem;font-size:.75rem;background:white;cursor:pointer">
-          <option value="">Alterar plano...</option>
-          <option value="free">→ Free</option>
-          <option value="basico">→ Básico</option>
-          <option value="pro">→ Pro</option>
-        </select>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <select id="sel-${_esc(u.uid)}" style="padding:.35rem .6rem;border:1.5px solid #e5e7eb;border-radius:.6rem;font-size:.75rem;background:white;cursor:pointer">
+            <option value="${plan}">${plan.toUpperCase()} (atual)</option>
+            ${plan!=='free'?'<option value="free">→ Free</option>':''}
+            ${plan!=='basico'?'<option value="basico">→ Básico</option>':''}
+            ${plan!=='pro'?'<option value="pro">→ Pro</option>':''}
+          </select>
+          <button onclick="adminSavePlan('${_esc(u.uid)}')" style="padding:.35rem .7rem;background:#0038A8;color:white;border:none;border-radius:.6rem;font-size:.72rem;font-weight:700;cursor:pointer">Salvar</button>
+        </div>
       </td>`
     tbody.appendChild(tr)
   })
@@ -3006,17 +3018,26 @@ async function adminChangePlan(uid, plan) {
   if (!plan || !isAdmin()) return
   if (!confirm(`Alterar plano de ${uid} para "${plan}"?`)) return
   try {
+    // Usa o mesmo firebase já inicializado na página
     const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    await setDoc(doc(getFirestore(), 'users', uid), { plan, planUpdatedAt: serverTimestamp() }, { merge: true })
-    // Se alterou o próprio usuário, atualiza sessão imediatamente
+    const db2 = getFirestore()
+    // Salva APENAS o campo plan — não toca em nenhum outro dado
+    await setDoc(doc(db2, 'users', uid), { plan: plan, planUpdatedAt: serverTimestamp() }, { merge: true })
+    // Verifica se salvou corretamente
+    const { getDoc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const check = await getDoc(doc(db2, 'users', uid))
+    const savedPlan = check.data()?.plan
+    if (savedPlan !== plan) throw new Error('Plano não foi salvo corretamente: ' + savedPlan)
+    // Atualiza sessão se for o próprio admin
     if (uid === _uid) {
       _userPlan = plan
       updatePlanUI()
     }
-    alert('Plano atualizado! ✅')
+    alert(`✅ Plano alterado para "${plan}" com sucesso!`)
     adminLoadUsers()
   } catch (e) {
-    alert('Erro: ' + e.message)
+    alert('❌ Erro ao alterar plano: ' + e.message)
+    console.error('adminChangePlan error:', e)
   }
 }
 
