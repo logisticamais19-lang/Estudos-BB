@@ -269,12 +269,12 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   transition:transform .1s,box-shadow .1s;flex-shrink:0;
 }
 .heatmap-cell:hover{transform:scale(1.4);box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:1;position:relative;}
-.heatmap-level-0{background:#eef2ff}
-.heatmap-level-1{background:#bfdbfe}
-.heatmap-level-2{background:#60a5fa}
-.heatmap-level-3{background:#2563eb}
-.heatmap-level-4{background:#1d4ed8}
-.heatmap-level-5{background:#1e3a8a}
+.heatmap-level-0{background:#f0f4ff}
+.heatmap-level-1{background:#c7d9ff}
+.heatmap-level-2{background:#7ba8ff}
+.heatmap-level-3{background:#F9DD16}
+.heatmap-level-4{background:#f59e0b}
+.heatmap-level-5{background:#0038A8}
 .heatmap-month-label{font-size:.62rem;color:#9ca3af;font-weight:600;margin-bottom:.3rem;text-align:center;}
 .heatmap-week{display:flex;flex-direction:column;gap:2px;}
 .heatmap-tooltip{
@@ -389,7 +389,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     </div>
   </div>
   <!-- NAV -->
-  <div class="nav-desktop" style="max-width:1280px;margin:0 auto;padding:0 1rem;border-top:1px solid rgba(255,255,255,.15);overflow-x:auto">
+  <div class="nav-desktop" style="max-width:1280px;margin:0 auto;padding:0 1rem;border-top:1px solid rgba(255,255,255,.15);overflow-x:hidden">
     <div style="display:flex;align-items:center;gap:.25rem;min-width:max-content">
       <a onclick="navigateTo(0)"          class="nav-item" id="nav-0"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-home"></i><span>Dashboard</span></a>
       <a onclick="navigateTo(1)"          class="nav-item" id="nav-1"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-book"></i><span>Plano</span></a>
@@ -611,66 +611,74 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ HEATMAP DE ESTUDOS ══ -->
 <div id="screen-heatmap" class="screen" style="display:none">
-
-  <!-- Tooltip flutuante -->
   <div id="heatmap-tooltip" class="heatmap-tooltip"></div>
 
-  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem">
-    <i class="fas fa-fire" style="color:#f97316"></i> Heatmap de Estudos
-  </h2>
-  <p style="font-size:.78rem;color:#9ca3af;margin-bottom:1.5rem">Seu histórico de dedicação nos últimos 12 meses — cada quadrado é um dia</p>
-
-  <!-- Cards de resumo -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem" id="heatmap-summary-cards"></div>
-
-  <!-- Legenda -->
-  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
-    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Menos</span>
-    <div class="heatmap-cell heatmap-level-0"></div>
-    <div class="heatmap-cell heatmap-level-1"></div>
-    <div class="heatmap-cell heatmap-level-2"></div>
-    <div class="heatmap-cell heatmap-level-3"></div>
-    <div class="heatmap-cell heatmap-level-4"></div>
-    <div class="heatmap-cell heatmap-level-5"></div>
-    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Mais</span>
-    <span style="font-size:.68rem;color:#d1d5db;margin-left:.5rem">
-      □ 0h &nbsp; 🟦 1-30min &nbsp; 🔵 30-60min &nbsp; 💙 1-2h &nbsp; 🟣 2-3h &nbsp; 🌑 3h+
-    </span>
-  </div>
-
-  <!-- Meses label + grid -->
-  <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto">
-    <div id="heatmap-months-label" style="display:flex;gap:2px;margin-bottom:.3rem;padding-left:32px"></div>
-    <div style="display:flex;gap:.5rem;align-items:flex-start">
-      <!-- Dias da semana -->
-      <div style="display:flex;flex-direction:column;gap:2px;margin-top:0;padding-top:0;flex-shrink:0">
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Seg</div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Qua</div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Sex</div>
-        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-      </div>
-      <!-- Grid de semanas -->
-      <div id="heatmap-grid" style="display:flex;gap:2px;"></div>
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <h2 style="font-size:1.5rem;font-weight:900;display:flex;align-items:center;gap:.6rem;margin-bottom:.2rem">
+        <span style="background:linear-gradient(135deg,#f97316,#ef4444);border-radius:.65rem;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0"><i class="fas fa-fire"></i></span>
+        Heatmap de Estudos
+      </h2>
+      <p style="font-size:.78rem;color:#9ca3af;margin-left:44px">Histórico dos últimos 12 meses — cada célula é um dia</p>
     </div>
   </div>
 
-  <!-- Top dias de estudo -->
-  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
-      <i class="fas fa-medal" style="color:#f59e0b"></i> Seus melhores dias de estudo
-    </h3>
-    <div id="heatmap-top-days" style="display:flex;flex-direction:column;gap:.5rem"></div>
+  <!-- Cards de resumo -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-bottom:1.75rem" id="heatmap-summary-cards"></div>
+
+  <!-- Grid principal -->
+  <div style="background:white;border-radius:1.75rem;padding:1.75rem;box-shadow:0 4px 24px rgba(0,56,168,.09);margin-bottom:1.25rem">
+    <!-- Legenda topo -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
+      <span style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em">Atividade anual</span>
+      <div style="display:flex;align-items:center;gap:.4rem">
+        <span style="font-size:.68rem;color:#9ca3af">Menos</span>
+        <div class="heatmap-cell heatmap-level-0" style="width:11px;height:11px"></div>
+        <div class="heatmap-cell heatmap-level-1" style="width:11px;height:11px"></div>
+        <div class="heatmap-cell heatmap-level-2" style="width:11px;height:11px"></div>
+        <div class="heatmap-cell heatmap-level-3" style="width:11px;height:11px"></div>
+        <div class="heatmap-cell heatmap-level-4" style="width:11px;height:11px"></div>
+        <div class="heatmap-cell heatmap-level-5" style="width:11px;height:11px"></div>
+        <span style="font-size:.68rem;color:#9ca3af">Mais</span>
+      </div>
+    </div>
+    <!-- Meses + grid -->
+    <div style="overflow-x:auto;padding-bottom:.5rem">
+      <div id="heatmap-months-label" style="display:flex;gap:2px;margin-bottom:.3rem;padding-left:32px"></div>
+      <div style="display:flex;gap:.5rem;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Seg</div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Qua</div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Sex</div>
+          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        </div>
+        <div id="heatmap-grid" style="display:flex;gap:2px;"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- Distribuição por mês -->
-  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
-      <i class="fas fa-chart-bar" style="color:#0038A8"></i> Horas por mês
-    </h3>
-    <div id="heatmap-monthly-bars" style="display:flex;flex-direction:column;gap:.6rem"></div>
+  <!-- Bottom grid: top dias + horas por mês lado a lado -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
+    <!-- Top dias -->
+    <div style="background:white;border-radius:1.75rem;padding:1.5rem;box-shadow:0 4px 24px rgba(0,56,168,.09)">
+      <h3 style="font-size:.85rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
+        <span style="background:#fef3c7;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem">🏅</span>
+        Melhores dias
+      </h3>
+      <div id="heatmap-top-days" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    </div>
+    <!-- Horas por mês -->
+    <div style="background:white;border-radius:1.75rem;padding:1.5rem;box-shadow:0 4px 24px rgba(0,56,168,.09)">
+      <h3 style="font-size:.85rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
+        <span style="background:#EEF3FF;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem">📊</span>
+        Horas por mês
+      </h3>
+      <div id="heatmap-monthly-bars" style="display:flex;flex-direction:column;gap:.6rem"></div>
+    </div>
   </div>
 </div>
 
@@ -720,76 +728,114 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ SCREEN: PLANOS ══ -->
 <div id="screen-pricing" class="screen" style="display:none">
-  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:.5rem">💎 Escolha seu Plano</h2>
-  <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.75rem">Comece grátis e evolua conforme sua necessidade.</p>
-  <div id="current-plan-badge" style="display:inline-flex;align-items:center;gap:.5rem;background:#EEF3FF;border:1.5px solid #bfdbfe;border-radius:2rem;padding:.4rem 1rem;font-size:.78rem;font-weight:700;color:#0038A8;margin-bottom:1.5rem">
-    <i class="fas fa-check-circle"></i> <span id="current-plan-label">Plano atual: Free</span>
+
+  <!-- Hero header -->
+  <div style="text-align:center;margin-bottom:2.5rem;padding:2rem 1rem">
+    <div style="display:inline-flex;align-items:center;gap:.5rem;background:#EEF3FF;border:1.5px solid #bfdbfe;border-radius:2rem;padding:.4rem 1.1rem;font-size:.75rem;font-weight:700;color:#0038A8;margin-bottom:1.25rem">
+      <i class="fas fa-check-circle"></i> <span id="current-plan-label">Plano atual: Free (Gratuito)</span>
+    </div>
+    <h2 style="font-size:2rem;font-weight:900;color:#0f172a;margin-bottom:.65rem;line-height:1.2">Invista no seu futuro.<br><span style="color:#0038A8">Passe no concurso.</span></h2>
+    <p style="font-size:.9rem;color:#64748b;max-width:420px;margin:0 auto;line-height:1.6">Escolha o plano ideal para sua preparação e tenha acesso às ferramentas que realmente fazem diferença.</p>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;max-width:900px">
+
+  <!-- Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.5rem;max-width:960px;margin:0 auto 2.5rem">
+
     <!-- FREE -->
-    <div class="plan-card" style="background:white;border-radius:1.5rem;padding:1.75rem;box-shadow:0 4px 20px rgba(0,56,168,.08);border:2px solid #e5e7eb;position:relative">
-      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:.75rem">Gratuito</div>
-      <div style="font-size:2rem;font-weight:900;color:#1f2937;margin-bottom:.25rem">R$0</div>
-      <div style="font-size:.75rem;color:#9ca3af;margin-bottom:1.25rem">para sempre</div>
-      <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;font-size:.82rem">
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Até 5 matérias</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Até 30 tarefas</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Timer de estudos</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Notas básicas</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Heatmap</span></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Revisão espaçada</span></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Cadernos</span></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Exportar PDF</span></div>
+    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 2px 16px rgba(0,56,168,.06);border:2px solid #e2e8f0;position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 8px 32px rgba(0,56,168,.12)'" onmouseleave="this.style.boxShadow='0 2px 16px rgba(0,56,168,.06)'">
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:1rem">Gratuito</div>
+      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
+        <span style="font-size:2.5rem;font-weight:900;color:#1e293b;line-height:1">R$0</span>
       </div>
-      <button id="btn-plan-free" onclick="selectPlan('free')" style="width:100%;padding:.75rem;border-radius:.85rem;font-weight:700;font-size:.85rem;border:2px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer">Plano atual</button>
+      <div style="font-size:.78rem;color:#94a3b8;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid #f1f5f9">para sempre</div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem">
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Até 5 matérias</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Até 30 tarefas</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Timer de estudos</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Notas básicas</div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Heatmap</span></div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Revisão espaçada</span></div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Cadernos</span></div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Exportar PDF</span></div>
+      </div>
+      <button id="btn-plan-free" onclick="selectPlan('free')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:700;font-size:.88rem;border:2px solid #e2e8f0;background:white;color:#94a3b8;cursor:default">✓ Plano atual</button>
     </div>
+
     <!-- BÁSICO -->
-    <div class="plan-card" style="background:white;border-radius:1.5rem;padding:1.75rem;box-shadow:0 8px 30px rgba(0,56,168,.15);border:2px solid #0038A8;position:relative">
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.3rem .9rem;border-radius:2rem;white-space:nowrap">MAIS POPULAR</div>
-      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#0038A8;margin-bottom:.75rem">Básico</div>
-      <div style="font-size:2rem;font-weight:900;color:#1f2937;margin-bottom:.25rem">R$12,90</div>
-      <div style="font-size:.75rem;color:#9ca3af;margin-bottom:1.25rem">por mês</div>
-      <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;font-size:.82rem">
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Matérias ilimitadas</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Tarefas ilimitadas</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Timer de estudos</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> Notas completas</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> <strong>Heatmap</strong></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> <strong>Revisão espaçada</strong></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#10b981;width:14px"></i> <strong>Gamificação</strong></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Cadernos</span></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-times" style="color:#d1d5db;width:14px"></i> <span style="color:#9ca3af">Exportar PDF</span></div>
+    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 8px 32px rgba(0,56,168,.16);border:2px solid #0038A8;position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 16px 48px rgba(0,56,168,.22)'" onmouseleave="this.style.boxShadow='0 8px 32px rgba(0,56,168,.16)'">
+      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap;letter-spacing:.06em">⭐ MAIS POPULAR</div>
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0038A8;margin-bottom:1rem">Básico</div>
+      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
+        <span style="font-size:2.5rem;font-weight:900;color:#1e293b;line-height:1">R$12,90</span>
       </div>
-      <button id="btn-plan-basico" onclick="selectPlan('basico')" style="width:100%;padding:.75rem;border-radius:.85rem;font-weight:700;font-size:.85rem;border:none;background:#0038A8;color:white;cursor:pointer">Assinar Básico</button>
+      <div style="font-size:.78rem;color:#94a3b8;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid #EEF3FF">por mês • cancele quando quiser</div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem">
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Matérias ilimitadas</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Tarefas ilimitadas</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Timer de estudos</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Notas completas</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Heatmap</strong></div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Revisão espaçada</strong></div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Gamificação completa</strong></div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Cadernos</span></div>
+        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Exportar PDF</span></div>
+      </div>
+      <button id="btn-plan-basico" onclick="selectPlan('basico')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:800;font-size:.9rem;border:none;background:#0038A8;color:white;cursor:pointer;transition:background .15s;letter-spacing:.02em" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'">Assinar Básico →</button>
     </div>
+
     <!-- PRO -->
-    <div class="plan-card" style="background:linear-gradient(135deg,#001A55,#0038A8);border-radius:1.5rem;padding:1.75rem;box-shadow:0 8px 30px rgba(0,56,168,.25);border:2px solid #F9DD16;position:relative">
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#F9DD16;color:#001A55;font-size:.65rem;font-weight:800;padding:.3rem .9rem;border-radius:2rem;white-space:nowrap">COMPLETO</div>
-      <div style="font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#F9DD16;margin-bottom:.75rem">Pro</div>
-      <div style="font-size:2rem;font-weight:900;color:white;margin-bottom:.25rem">R$19,90</div>
-      <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-bottom:1.25rem">por mês</div>
-      <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;font-size:.82rem;color:rgba(255,255,255,.9)">
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#F9DD16;width:14px"></i> Tudo do Básico</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#F9DD16;width:14px"></i> <strong style="color:white">Cadernos ilimitados</strong></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#F9DD16;width:14px"></i> <strong style="color:white">Exportar PDF</strong></div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#F9DD16;width:14px"></i> Suporte prioritário</div>
-        <div style="display:flex;align-items:center;gap:.5rem"><i class="fas fa-check" style="color:#F9DD16;width:14px"></i> Acesso antecipado</div>
+    <div style="background:linear-gradient(145deg,#001A55 0%,#0038A8 100%);border-radius:1.75rem;padding:2rem;box-shadow:0 8px 40px rgba(0,26,85,.35);border:2px solid rgba(249,221,22,.4);position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 16px 60px rgba(0,26,85,.45)'" onmouseleave="this.style.boxShadow='0 8px 40px rgba(0,26,85,.35)'">
+      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#F9DD16;color:#001A55;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap;letter-spacing:.06em">👑 COMPLETO</div>
+      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#F9DD16;margin-bottom:1rem">Pro</div>
+      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
+        <span style="font-size:2.5rem;font-weight:900;color:white;line-height:1">R$19,90</span>
       </div>
-      <button id="btn-plan-pro" onclick="selectPlan('pro')" style="width:100%;padding:.75rem;border-radius:.85rem;font-weight:700;font-size:.85rem;border:none;background:#F9DD16;color:#001A55;cursor:pointer">Assinar Pro</button>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid rgba(255,255,255,.1)">por mês • cancele quando quiser</div>
+      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem;color:rgba(255,255,255,.88)">
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Tudo do Básico</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span><strong style="color:white">Cadernos ilimitados</strong></div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span><strong style="color:white">Exportar PDF</strong></div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Suporte prioritário</div>
+        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Acesso antecipado a novos recursos</div>
+      </div>
+      <button id="btn-plan-pro" onclick="selectPlan('pro')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:800;font-size:.9rem;border:none;background:#F9DD16;color:#001A55;cursor:pointer;transition:background .15s;letter-spacing:.02em" onmouseenter="this.style.background='#E8C800'" onmouseleave="this.style.background='#F9DD16'">Assinar Pro →</button>
     </div>
   </div>
-  <!-- Stripe checkout placeholder -->
-  <div id="stripe-checkout-area" style="margin-top:2rem;display:none">
-    <div style="background:white;border-radius:1.5rem;padding:1.75rem;max-width:480px;box-shadow:0 4px 20px rgba(0,56,168,.1)">
-      <h3 style="font-weight:700;margin-bottom:1rem;font-size:1rem">💳 Finalizar assinatura</h3>
-      <div id="stripe-plan-info" style="background:#EEF3FF;border-radius:.85rem;padding:1rem;margin-bottom:1.25rem;font-size:.85rem;font-weight:600;color:#0038A8"></div>
-      <div style="background:#f9fafb;border-radius:.85rem;padding:1.25rem;text-align:center;color:#6b7280;font-size:.85rem">
-        <i class="fas fa-credit-card" style="font-size:2rem;color:#0038A8;margin-bottom:.75rem;display:block"></i>
-        <p style="font-weight:600;margin-bottom:.5rem">Pagamento via Stripe</p>
-        <p style="font-size:.78rem;line-height:1.5">Você será redirecionado para o checkout seguro do Stripe para completar sua assinatura.</p>
-        <button id="btn-go-stripe" onclick="goToStripeCheckout()" style="margin-top:1rem;padding:.75rem 1.5rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;cursor:pointer;font-size:.88rem"><i class="fas fa-lock" style="margin-right:.4rem"></i> Ir para pagamento seguro</button>
+
+  <!-- Garantia -->
+  <div style="text-align:center;margin-bottom:2rem">
+    <div style="display:inline-flex;align-items:center;gap:.75rem;background:white;border-radius:1.25rem;padding:.85rem 1.5rem;box-shadow:0 2px 12px rgba(0,56,168,.08);font-size:.82rem;color:#475569">
+      <i class="fas fa-shield-alt" style="color:#10b981;font-size:1.1rem"></i>
+      <span><strong>Sem compromisso</strong> — cancele a qualquer momento direto pelo painel</span>
+    </div>
+  </div>
+
+  <!-- Checkout -->
+  <div id="stripe-checkout-area" style="display:none;max-width:520px;margin:0 auto">
+    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 8px 40px rgba(0,56,168,.12);border:2px solid #EEF3FF">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem">
+        <div style="width:40px;height:40px;background:#EEF3FF;border-radius:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-credit-card" style="color:#0038A8"></i></div>
+        <div>
+          <div style="font-weight:800;font-size:.95rem">Finalizar assinatura</div>
+          <div style="font-size:.75rem;color:#94a3b8">Pagamento 100% seguro via Stripe</div>
+        </div>
       </div>
-      <button onclick="document.getElementById('stripe-checkout-area').style.display='none'" style="margin-top:.75rem;width:100%;padding:.65rem;background:none;border:2px solid #e5e7eb;border-radius:.85rem;font-weight:600;font-size:.82rem;cursor:pointer;color:#6b7280">Cancelar</button>
+      <div id="stripe-plan-info" style="background:linear-gradient(135deg,#EEF3FF,#dbeafe);border-radius:1rem;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.88rem;font-weight:700;color:#0038A8;border:1.5px solid #bfdbfe"></div>
+      <div style="background:#f8fafc;border-radius:1rem;padding:1.25rem;margin-bottom:1.25rem;border:1.5px solid #e2e8f0">
+        <div style="display:flex;gap:.75rem;align-items:flex-start;font-size:.82rem;color:#64748b;line-height:1.6">
+          <i class="fas fa-lock" style="color:#10b981;margin-top:.15rem;flex-shrink:0"></i>
+          <span>Você será redirecionado para o ambiente seguro do <strong>Stripe</strong> para inserir seus dados de pagamento. O EstudoBB <strong>não armazena</strong> dados do cartão.</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;margin-bottom:.75rem;font-size:.75rem;color:#94a3b8;justify-content:center">
+        <span><i class="fas fa-lock" style="color:#10b981"></i> SSL 256-bit</span>
+        <span>•</span>
+        <span><i class="fas fa-shield-alt" style="color:#10b981"></i> PCI Compliant</span>
+        <span>•</span>
+        <span><i class="fas fa-undo" style="color:#10b981"></i> Cancele a qualquer hora</span>
+      </div>
+      <button id="btn-go-stripe" onclick="goToStripeCheckout()" style="width:100%;padding:.95rem;background:#0038A8;color:white;border:none;border-radius:1rem;font-weight:800;cursor:pointer;font-size:.92rem;letter-spacing:.02em;transition:background .15s" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'"><i class="fas fa-lock" style="margin-right:.5rem"></i>Ir para pagamento seguro →</button>
+      <button onclick="document.getElementById('stripe-checkout-area').style.display='none'" style="margin-top:.65rem;width:100%;padding:.75rem;background:none;border:2px solid #e2e8f0;border-radius:1rem;font-weight:600;font-size:.82rem;cursor:pointer;color:#94a3b8;transition:border-color .15s" onmouseenter="this.style.borderColor='#94a3b8'" onmouseleave="this.style.borderColor='#e2e8f0'">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1472,12 +1518,16 @@ document.addEventListener('click',e=>{
 // ═══════════════════════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════════════════════
-function navigateTo(n){
+async function navigateTo(n){
   document.querySelectorAll('[id^="screen-"]').forEach(s=>s.style.display='none')
   document.querySelectorAll('.nav-item').forEach(el=>{el.classList.remove('nav-active');el.style.color='rgba(255,255,255,.8)'})
   const screen=document.getElementById(`screen-${n}`),nav=document.getElementById(`nav-${n}`)
   if(screen)screen.style.display='block'
   if(nav)nav.classList.add('nav-active')
+  // Recarrega plano sempre que navega (garante que plano atualizado é usado nos gates)
+  if(_uid && window._fbService) {
+    _userPlan = await window._fbService.getUserPlan(_uid).catch(()=>_userPlan)
+  }
   const map={0:'renderDashboard',1:'renderSubjects',2:'renderTimer',3:'renderProgress',
              4:'renderTimeline',5:'renderDailyOrganizer','books':'renderBooks',
              'notebook':'renderNotebook','recursos':'renderRecursos','heatmap':'renderHeatmap',
@@ -2806,7 +2856,9 @@ const STRIPE_LINKS = {
 
 let _selectedPlan = null
 
-function renderPricing() {
+async function renderPricing() {
+  // Sempre recarrega o plano do Firestore ao abrir a tela
+  _userPlan = await window._fbService.getUserPlan(_uid).catch(()=>_userPlan)
   const labels = { free: 'Free (Gratuito)', basico: 'Básico (R$12,90/mês)', pro: 'Pro (R$19,90/mês)' }
   document.getElementById('current-plan-label').textContent = 'Plano atual: ' + (labels[_userPlan] || 'Free')
   const btns = { free: 'btn-plan-free', basico: 'btn-plan-basico', pro: 'btn-plan-pro' }
@@ -2866,17 +2918,27 @@ async function adminLoadUsers() {
   const loading = document.getElementById('admin-loading')
   const tbody = document.getElementById('admin-users-table')
   loading.style.display = 'block'
+  loading.textContent = 'Carregando...'
   tbody.innerHTML = ''
   try {
-    // Lê usuarios do Firestore via _fbService
-    const { getFirestore, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const { getFirestore, collection, getDocs, getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
     const db2 = getFirestore()
-    const snap = await getDocs(collection(db2, 'users'))
-    _adminUsers = []
-    snap.forEach(d => _adminUsers.push({ uid: d.id, ...d.data() }))
+    // Tenta ler coleção completa (requer regra allow list no Firestore)
+    let snap
+    try {
+      snap = await getDocs(collection(db2, 'users'))
+      _adminUsers = []
+      snap.forEach(d => _adminUsers.push({ uid: d.id, ...d.data() }))
+    } catch(e2) {
+      // Fallback: mostra apenas o próprio usuário admin
+      const selfDoc = await getDoc(doc(db2, 'users', _uid))
+      _adminUsers = selfDoc.exists() ? [{ uid: _uid, ...selfDoc.data() }] : []
+      loading.textContent = '⚠️ Permissão limitada — mostrando apenas seu usuário. Para ver todos, publique as regras do Firestore com "allow list".'
+      loading.style.display = 'block'
+    }
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
-    loading.style.display = 'none'
+    if(_adminUsers.length > 0) loading.style.display = 'none'
   } catch (e) {
     loading.textContent = 'Erro ao carregar: ' + e.message
   }
@@ -2946,11 +3008,27 @@ async function adminChangePlan(uid, plan) {
   try {
     const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
     await setDoc(doc(getFirestore(), 'users', uid), { plan, planUpdatedAt: serverTimestamp() }, { merge: true })
-    alert('Plano atualizado!')
+    // Se alterou o próprio usuário, atualiza sessão imediatamente
+    if (uid === _uid) {
+      _userPlan = plan
+      updatePlanUI()
+    }
+    alert('Plano atualizado! ✅')
     adminLoadUsers()
   } catch (e) {
     alert('Erro: ' + e.message)
   }
+}
+
+// Atualiza toda a UI após mudança de plano
+function updatePlanUI() {
+  // Atualiza badge do plano na tela de preços
+  const labels = { free: 'Free (Gratuito)', basico: 'Básico (R$12,90/mês)', pro: 'Pro (R$19,90/mês)' }
+  const el = document.getElementById('current-plan-label')
+  if (el) el.textContent = 'Plano atual: ' + (labels[_userPlan] || 'Free')
+  // Mostra toast de confirmação
+  const names = { free: 'Free', basico: 'Básico', pro: 'Pro' }
+  showXPToast(0, '🎉 Plano ' + (names[_userPlan] || _userPlan) + ' ativado!')
 }
 
 // Mostrar link Admin no menu apenas para admins
