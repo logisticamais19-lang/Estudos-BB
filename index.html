@@ -394,7 +394,8 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   <div class="nav-desktop" style="max-width:1280px;margin:0 auto;padding:0 1rem;border-top:1px solid rgba(255,255,255,.15);overflow-x:auto">
     <div style="display:flex;align-items:center;gap:.25rem;min-width:max-content">
       <a onclick="navigateTo(0)"          class="nav-item" id="nav-0"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-home"></i><span>Dashboard</span></a>
-      <a onclick="navigateTo(1)"          class="nav-item" id="nav-1"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-book"></i><span>Plano</span></a>
+      <a onclick="navigateTo(1)"          class="nav-item" id="nav-1"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><!-- NOVO: Renomear aba Plano -->
+      <i class="fas fa-book"></i><span>Plano Inteligente</span></a>
       <a onclick="navigateTo(2)"          class="nav-item" id="nav-2"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-stopwatch"></i><span>Timer</span></a>
       <a onclick="navigateTo(3)"          class="nav-item" id="nav-3"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-chart-bar"></i><span>Progresso</span></a>
       <a onclick="navigateTo(4)"          class="nav-item" id="nav-4"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-brain"></i><span>Revisão</span></a>
@@ -457,7 +458,67 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ PLANO ══ -->
 <div id="screen-1" class="screen" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem"><h2 style="font-size:1.4rem;font-weight:800">Plano de Estudos</h2><button onclick="addSubject()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Adicionar matéria</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem"><!-- NOVO: Renomear aba Plano -->
+  <h2 style="font-size:1.4rem;font-weight:800">Plano Inteligente</h2>
+
+<!-- NOVO: Templates de Plano Inteligente -->
+<div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem">
+    <span style="font-size:1.3rem">🎯</span>
+    <div>
+      <h3 style="font-size:1rem;font-weight:800;color:#111827">Planos Prontos para o Concurso BB</h3>
+      <p style="font-size:.75rem;color:#9ca3af;margin-top:.1rem">Selecione um template e carregue automaticamente tarefas, cadernos e revisões</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem">
+
+    <!-- Template 1 -->
+    <div style="border:2px solid #bfdbfe;border-radius:1.25rem;padding:1.25rem;background:#f8faff;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#0038A8';this.style.background='#EEF3FF'" onmouseleave="this.style.borderColor='#bfdbfe';this.style.background='#f8faff'">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">6 MESES</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INICIANTE</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Iniciante BB – 6 meses</h4>
+      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Ideal para quem está começando do zero. Meta diária: 2h</p>
+      <button onclick="loadPlanTemplate(1)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#0038A8;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+    </div>
+
+    <!-- Template 2 -->
+    <div style="border:2px solid #c4b5fd;border-radius:1.25rem;padding:1.25rem;background:#faf8ff;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#7c3aed';this.style.background='#ede9fe'" onmouseleave="this.style.borderColor='#c4b5fd';this.style.background='#faf8ff'">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#7c3aed;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">4 MESES</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INTERMEDIÁRIO</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Intermediário BB – 4 meses</h4>
+      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Para quem já tem base. Meta diária: 3h</p>
+      <button onclick="loadPlanTemplate(2)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#7c3aed;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#6d28d9'" onmouseleave="this.style.background='#7c3aed'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+    </div>
+
+    <!-- Template 3 -->
+    <div style="border:2px solid #86efac;border-radius:1.25rem;padding:1.25rem;background:#f0fdf4;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#16a34a';this.style.background='#dcfce7'" onmouseleave="this.style.borderColor='#86efac';this.style.background='#f0fdf4'">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#16a34a;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">30-45 DIAS</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">INTENSIVO</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Foco Redação + Atualidades</h4>
+      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Intensivo em redação e atualidades do mercado financeiro</p>
+      <button onclick="loadPlanTemplate(3)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#16a34a;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#15803d'" onmouseleave="this.style.background='#16a34a'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+    </div>
+
+    <!-- Template 4 -->
+    <div style="border:2px solid #fca5a5;border-radius:1.25rem;padding:1.25rem;background:#fff7f7;transition:all .2s;cursor:pointer" onmouseenter="this.style.borderColor='#dc2626';this.style.background='#fee2e2'" onmouseleave="this.style.borderColor='#fca5a5';this.style.background='#fff7f7'">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <span style="background:#dc2626;color:white;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:9999px">30 DIAS</span>
+        <span style="font-size:.65rem;color:#9ca3af;font-weight:600">REVISÃO FINAL</span>
+      </div>
+      <h4 style="font-weight:800;font-size:.9rem;color:#111827;margin-bottom:.3rem">Revisão Final – 30 dias antes da prova</h4>
+      <p style="font-size:.75rem;color:#6b7280;line-height:1.5;margin-bottom:.85rem">Revisão intensiva com foco em questões e mapas mentais</p>
+      <button onclick="loadPlanTemplate(4)" style="width:100%;padding:.6rem;border-radius:.75rem;background:#dc2626;color:white;border:none;font-weight:700;font-size:.78rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#b91c1c'" onmouseleave="this.style.background='#dc2626'"><i class="fas fa-download" style="margin-right:.35rem"></i>Carregar este plano</button>
+    </div>
+
+  </div>
+</div>
+<!-- /NOVO: Templates --><button onclick="addSubject()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Adicionar matéria</button></div>
   <div style="background:white;border-radius:1.5rem;padding:.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto"><table style="width:100%;min-width:580px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af"><th style="text-align:left;padding:.75rem 1.25rem">Matéria</th><th style="text-align:center;padding:.75rem">Horas</th><th style="text-align:center;padding:.75rem">Meta</th><th style="text-align:center;padding:.75rem">Progresso</th><th style="text-align:center;padding:.75rem;width:10rem">Ações</th></tr></thead><tbody id="subjects-table"></tbody></table></div>
 </div>
 
@@ -943,8 +1004,9 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 </div></div><!-- /max-w /app -->
 
 <!-- RODAPÉ LGPD -->
-<footer style="position:fixed;bottom:0;left:0;right:0;z-index:40;background:#001A55;color:rgba(255,255,255,.7);text-align:center;padding:.75rem 1rem;font-size:.72rem;line-height:1.6">
-  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5rem 1.5rem">
+<!-- NOVO: Rodapé Motivacional -->
+<footer style="position:fixed;bottom:0;left:0;right:0;z-index:40;background:#001A55;color:rgba(255,255,255,.7);text-align:center;padding:.6rem 1rem;font-size:.72rem;line-height:1.5">
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5rem 1.5rem;margin-bottom:.3rem">
     <span>© 2025 EstudoBB — Todos os direitos reservados</span>
     <span style="opacity:.4">|</span>
     <button onclick="showModal('modal-privacy')" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.72rem;text-decoration:underline;padding:0;transition:color .15s" onmouseenter="this.style.color='white'" onmouseleave="this.style.color='rgba(255,255,255,.7)'"><i class="fas fa-shield-alt" style="margin-right:.3rem"></i>Política de Privacidade</button>
@@ -953,7 +1015,12 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <span style="opacity:.4">|</span>
     <span><i class="fas fa-lock" style="color:#F9DD16;margin-right:.3rem"></i>Dados protegidos pela LGPD</span>
   </div>
+  <div style="font-size:.68rem;color:rgba(255,255,255,.5);font-style:italic;border-top:1px solid rgba(255,255,255,.1);padding-top:.3rem">
+    <span style="color:#F9DD16;font-style:normal;font-weight:700">✨ Você é especial e capaz. Persista no seu sonho de passar no concurso BB!</span>
+    <span style="opacity:.6;margin-left:.5rem">— Jer 29:11: "Planos de fazê-los prosperar... para dar-lhes esperança e um futuro."</span>
+  </div>
 </footer>
+<!-- /NOVO: Rodapé Motivacional -->
 
 <!-- ══ MODAIS ══ -->
 
@@ -2846,7 +2913,8 @@ window.addEventListener('load',()=>{
 
 <!-- MENU MAIS (mobile) -->
 <div id="mobile-nav-more">
-  <a onclick="navigateTo(1);closeMobileMore()"        id="mnav-m-1"       ><i class="fas fa-book"></i><span>Plano</span></a>
+  <!-- NOVO: Renomear aba Plano mobile -->
+  <a onclick="navigateTo(1);closeMobileMore()"        id="mnav-m-1"       ><i class="fas fa-book"></i><span>Plano Inteligente</span></a>
   <a onclick="navigateTo(3);closeMobileMore()"        id="mnav-m-3"       ><i class="fas fa-chart-bar"></i><span>Progresso</span></a>
   <a onclick="navigateTo('books');closeMobileMore()"  id="mnav-m-books"   ><i class="fas fa-book-open"></i><span>Cadernos</span></a>
   <a onclick="navigateTo('notebook');closeMobileMore()" id="mnav-m-notebook"><i class="fas fa-sticky-note"></i><span>Notas</span></a>
@@ -3442,6 +3510,153 @@ window.onFirebaseReady = async function(user) {
   checkAdminAccess()
   updateHeaderUser()
 }
+
+// NOVO: Templates de Plano Inteligente
+const PLAN_TEMPLATES = {
+  1: {
+    name: 'Iniciante BB – 6 meses',
+    dailyGoalH: 2,
+    subjects: [
+      {name:'Língua Portuguesa',target:80,hours:0,progress:0},
+      {name:'Matemática Financeira',target:60,hours:0,progress:0},
+      {name:'Conhecimentos Bancários',target:70,hours:0,progress:0},
+      {name:'Redação',target:40,hours:0,progress:0},
+      {name:'Atualidades',target:30,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Português – Interpretação de Texto',type:'study'},
+      {text:'Matemática Financeira – Juros Compostos',type:'study'},
+      {text:'Conhecimentos Bancários – Sistema Financeiro Nacional',type:'study'},
+      {text:'Redação – Estrutura Dissertativa',type:'study'},
+      {text:'Atualidades – Leitura de Notícias Financeiras',type:'study'}
+    ],
+    books: ['Redação – Tipologia Textual','Matemática Financeira – Juros','Conhecimentos Bancários – SFN'],
+    reviews: ['Interpretação de Texto','Juros Compostos','Sistema Financeiro Nacional','Estrutura Dissertativa']
+  },
+  2: {
+    name: 'Intermediário BB – 4 meses',
+    dailyGoalH: 3,
+    subjects: [
+      {name:'Matemática Financeira',target:60,hours:0,progress:0},
+      {name:'Conhecimentos Bancários',target:70,hours:0,progress:0},
+      {name:'Língua Portuguesa',target:50,hours:0,progress:0},
+      {name:'Redação',target:40,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Matemática Financeira + Conhecimentos Bancários (alternados)',type:'study'},
+      {text:'Português – Gramática Avançada',type:'study'},
+      {text:'Redação – Temas Bancários',type:'study'}
+    ],
+    books: ['Atualidades – Open Banking','Redação – Temas Bancários'],
+    reviews: ['Matemática Financeira','Conhecimentos Bancários','Gramática','Redação Bancária']
+  },
+  3: {
+    name: 'Foco Redação + Atualidades',
+    dailyGoalH: 2,
+    subjects: [
+      {name:'Redação',target:30,hours:0,progress:0},
+      {name:'Atualidades',target:30,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Redação – 1h de produção textual',type:'study'},
+      {text:'Atualidades – 1h de estudo do mercado financeiro',type:'study'}
+    ],
+    books: ['Redação – Estrutura Dissertativa','Atualidades – Mercado Financeiro'],
+    reviews: ['Estrutura Dissertativa','Open Banking','Mercado de Capitais','Redação Argumentativa']
+  },
+  4: {
+    name: 'Revisão Final – 30 dias antes da prova',
+    dailyGoalH: 4,
+    subjects: [
+      {name:'Questões (50%)',target:20,hours:0,progress:0},
+      {name:'Revisão Espaçada (30%)',target:12,hours:0,progress:0},
+      {name:'Redação (20%)',target:8,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'50% – Resolução de questões (banco de questões)',type:'study'},
+      {text:'30% – Revisão espaçada dos tópicos anteriores',type:'study'},
+      {text:'20% – Redação: escreva 1 texto por dia',type:'study'}
+    ],
+    books: [],
+    reviews: ['Revisão Final – Português','Revisão Final – Matemática','Revisão Final – Bancários','Revisão Final – Atualidades','Revisão Final – Redação']
+  }
+}
+
+async function loadPlanTemplate(templateId) {
+  const tpl = PLAN_TEMPLATES[templateId]
+  if (!tpl) return
+  if (!confirm(`Carregar o plano "${tpl.name}"? Isso adicionará matérias, tarefas e revisões à sua conta.`)) return
+
+  // 1. Carregar matérias (adiciona sem remover as existentes)
+  tpl.subjects.forEach(sub => {
+    const exists = subjects.find(s => s.name === sub.name)
+    if (!exists) subjects.push({ id: Date.now() + Math.random(), ...sub })
+  })
+
+  // 2. Atualizar meta diária
+  if (profile) {
+    profile.dailyGoalH = tpl.dailyGoalH
+  }
+
+  // 3. Adicionar tarefas para hoje e próximos dias
+  const today = todayStr()
+  tpl.tasks.forEach((task, i) => {
+    const taskDate = addDays(today, i)
+    const exists = dailyTasks.find(t => t.text === task.text && t.date === taskDate)
+    if (!exists) {
+      dailyTasks.push({
+        id: uid(),
+        text: task.text,
+        done: false,
+        date: taskDate,
+        type: task.type || 'study',
+        priority: 'normal',
+        start: '', end: ''
+      })
+    }
+  })
+
+  // 4. Adicionar revisões espaçadas
+  tpl.reviews.forEach((topic, i) => {
+    const exists = reviewItems.find(r => r.topic === topic)
+    if (!exists) {
+      reviewItems.push({
+        id: uid(),
+        topic,
+        subjectName: tpl.subjects[0]?.name || '—',
+        notes: `Adicionado pelo template: ${tpl.name}`,
+        lastReview: today,
+        nextReview: addDays(today, i + 1),
+        stage: 1
+      })
+    }
+  })
+
+  // 5. Salvar tudo
+  await saveData()
+
+  // 6. Toast + sugestão de cadernos
+  showXPToast(0, `✅ Plano "${tpl.name}" carregado!`)
+
+  // 7. Sugerir cadernos
+  if (tpl.books.length > 0) {
+    const bookList = tpl.books.map(b => `• ${b}`).join('
+')
+    setTimeout(() => {
+      alert(`📚 Cadernos sugeridos para este plano:
+
+${bookList}
+
+Vá em "Cadernos" para criá-los!`)
+    }, 1200)
+  }
+
+  // 8. Re-renderizar
+  renderSubjects()
+  updateHeaderUser()
+  renderDashboard()
+}
+// /NOVO: Templates de Plano Inteligente
 
 // Registrar Service Worker para PWA
 if('serviceWorker' in navigator){
