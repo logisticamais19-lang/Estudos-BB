@@ -2798,6 +2798,7 @@ function openCronoCell(dayIdx, hourIdx) {
 
   const modal = document.createElement('div')
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem'
+  modal.id = 'crono-modal'
   modal.innerHTML = `
     <div style="background:white;border-radius:1.5rem;padding:1.75rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
       <h3 style="font-weight:800;font-size:1rem;margin-bottom:1rem">⏰ ${CRONO_DAYS[dayIdx]} — ${CRONO_HOURS[hourIdx]}</h3>
@@ -2820,9 +2821,9 @@ function openCronoCell(dayIdx, hourIdx) {
         </div>
       </div>
       <div style="display:flex;gap:.5rem;margin-top:1.25rem">
-        <button onclick="saveCronoCell(${dayIdx},${hourIdx});this.closest('[style*=fixed]').remove()" class="btn-bb" style="flex:1;padding:.75rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer">Salvar</button>
-        <button onclick="clearCronoCell(${dayIdx},${hourIdx});this.closest('[style*=fixed]').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;background:#fee2e2;color:#dc2626">Limpar</button>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:600;border:2px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer">✕</button>
+        <button onclick="saveCronoCell(${dayIdx},${hourIdx})" class="btn-bb" style="flex:1;padding:.75rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer">Salvar</button>
+        <button onclick="clearCronoCell(${dayIdx},${hourIdx});document.getElementById('crono-modal').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;background:#fee2e2;color:#dc2626">Limpar</button>
+        <button onclick="document.getElementById('crono-modal').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:600;border:2px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer">✕</button>
       </div>
     </div>`
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove() })
@@ -2847,14 +2848,25 @@ function selectCronoType(typeId) {
 
 function saveCronoCell(dayIdx, hourIdx) {
   if (!_cronograma[dayIdx]) _cronograma[dayIdx] = {}
+  // Read values BEFORE closing modal
   const label = document.getElementById('crono-label-inp')?.value?.trim() || ''
   const subjectName = document.getElementById('crono-subject-sel')?.value || ''
-  _cronograma[dayIdx][hourIdx] = { type: window._cronoTmpType || '', label, subjectName }
+  const type = window._cronoTmpType || ''
+  // Save to memory
+  _cronograma[dayIdx][hourIdx] = { type, label, subjectName }
+  // Persist to localStorage immediately
+  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
+  // Close modal
+  const m = document.getElementById('crono-modal')
+  if (m) m.remove()
+  // Re-render grid
   renderCronograma()
+  showXPToast(0, 'Horário salvo! ✅')
 }
 
 function clearCronoCell(dayIdx, hourIdx) {
   if (_cronograma[dayIdx]) delete _cronograma[dayIdx][hourIdx]
+  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
   renderCronograma()
 }
 
@@ -2868,6 +2880,10 @@ function loadDistribuicao() {
 }
 
 function saveDistribuicao() {
+  subjects.forEach(s => {
+    const inp = document.getElementById('dist-' + s.id)
+    if (inp) _distribuicao[s.id] = parseFloat(inp.value) || 0
+  })
   localStorage.setItem('bb_distribuicao', JSON.stringify(_distribuicao))
   showXPToast(0, 'Distribuição salva! ✅')
   renderDistribuicao()
