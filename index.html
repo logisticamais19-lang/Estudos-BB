@@ -41,7 +41,7 @@
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  const VALID_KEYS = ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books'];
+  const VALID_KEYS = ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books','cronograma','distribuicao'];
   function _ref(uid, key){ return doc(db,'users',uid,'data',key); }
 
   // Camada de serviço — front não acessa db diretamente
@@ -1195,6 +1195,9 @@ async function loadFromFirebase(){
     if(rawData['gamification'])gamification=rawData['gamification']
     notes=get('notes',{list:[]}).list||[]
     books=get('books',{list:[]}).list||[]
+    // Cronograma e distribuição
+    _cronograma=get('cronograma',{data:{}}).data||{}
+    _distribuicao=get('distribuicao',{data:{}}).data||{}
     saveToLocalStorage()
   }catch(e){console.warn('Firebase load failed:',e);loadFromLocalStorage()}
 }
@@ -1212,7 +1215,9 @@ async function saveToFirebase(){
       tasks:{list:dailyTasks},
       gamification,
       notes:{list:notes},
-      books:{list:books}
+      books:{list:books},
+      cronograma:{data:_cronograma},
+      distribuicao:{data:_distribuicao}
     })
     _pendingSync=false
   }catch(e){console.warn('Firebase save failed:',e);saveToLocalStorage();_pendingSync=true}
@@ -1222,6 +1227,7 @@ function saveToLocalStorage(){
   k('profile',profile);k('subjects',subjects);k('daily',dailyLog)
   k('sessions',studySessions);k('reviews',reviewItems);k('tasks',dailyTasks)
   k('gamification',gamification);k('notes',notes);k('books',books)
+  k('cronograma',_cronograma);k('distribuicao',_distribuicao)
 }
 function loadFromLocalStorage(){
   const g=(n,def)=>{try{const v=localStorage.getItem('bb_'+n);return v?JSON.parse(v):def;}catch{return def;}}
@@ -1230,6 +1236,7 @@ function loadFromLocalStorage(){
   reviewItems=g('reviews',[]);dailyTasks=g('tasks',[])
   gamification=g('gamification',{xp:0,level:0,badges:[],stats:{}})
   notes=g('notes',[]);books=g('books',[])
+  _cronograma=g('cronograma',{});_distribuicao=g('distribuicao',{})
   if(dailyLog.date!==todayStr())dailyLog={date:todayStr(),minutes:0}
 }
 async function saveData(){await saveToFirebase()}
@@ -2730,18 +2737,19 @@ const CRONO_TYPES = [
 let _cronograma = {}
 
 function loadCronograma() {
-  try { _cronograma = JSON.parse(localStorage.getItem('bb_cronograma') || '{}') } catch { _cronograma = {} }
+  // _cronograma already loaded from Firebase/localStorage on login
 }
 
-function saveCronograma() {
-  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
+async function saveCronograma() {
+  await saveData()
   showXPToast(0, 'Cronograma salvo! ✅')
 }
 
-function clearCronograma() {
+async function clearCronograma() {
   if (!confirm('Limpar todo o cronograma?')) return
   _cronograma = {}
-  saveCronograma()
+  await saveData()
+  showXPToast(0, 'Cronograma limpo!')
   renderCronograma()
 }
 
@@ -2854,8 +2862,8 @@ function saveCronoCell(dayIdx, hourIdx) {
   const type = window._cronoTmpType || ''
   // Save to memory
   _cronograma[dayIdx][hourIdx] = { type, label, subjectName }
-  // Persist to localStorage immediately
-  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
+  // Persist to Firebase + localStorage
+  saveData()
   // Close modal
   const m = document.getElementById('crono-modal')
   if (m) m.remove()
@@ -2866,7 +2874,7 @@ function saveCronoCell(dayIdx, hourIdx) {
 
 function clearCronoCell(dayIdx, hourIdx) {
   if (_cronograma[dayIdx]) delete _cronograma[dayIdx][hourIdx]
-  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
+  saveData()
   renderCronograma()
 }
 
@@ -2876,15 +2884,15 @@ function clearCronoCell(dayIdx, hourIdx) {
 let _distribuicao = {} // { subjectId: horasSemana }
 
 function loadDistribuicao() {
-  try { _distribuicao = JSON.parse(localStorage.getItem('bb_distribuicao') || '{}') } catch { _distribuicao = {} }
+  // _distribuicao already loaded from Firebase/localStorage on login
 }
 
-function saveDistribuicao() {
+async function saveDistribuicao() {
   subjects.forEach(s => {
     const inp = document.getElementById('dist-' + s.id)
     if (inp) _distribuicao[String(s.id)] = parseFloat(inp.value) || 0
   })
-  localStorage.setItem('bb_distribuicao', JSON.stringify(_distribuicao))
+  await saveData()
   showXPToast(0, 'Distribuição salva! ✅')
   renderDistribuicao()
 }
