@@ -525,6 +525,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 </div>
 <!-- /NOVO: Templates -->
     <div style="background:white;border-radius:1.5rem;padding:.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto"><table style="width:100%;min-width:580px;border-collapse:collapse"><thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af"><th style="text-align:left;padding:.75rem 1.25rem">Matéria</th><th style="text-align:center;padding:.75rem">Horas</th><th style="text-align:center;padding:.75rem">Meta</th><th style="text-align:center;padding:.75rem">Progresso</th><th style="text-align:center;padding:.75rem;width:10rem">Ações</th></tr></thead><tbody id="subjects-table"></tbody></table>
+  </div>
 </div>
 
 <!-- ══ TIMER ══ -->
@@ -1596,7 +1597,12 @@ async function doLogin(){
   const email=document.getElementById('login-email').value.trim()
   const pass=document.getElementById('login-pass').value
   if(!email||!pass){showAuthError('login-error','Preencha e-mail e senha.');return}
-  const fb=window._firebase;if(!fb){showAuthError('login-error','Firebase não configurado.');return}
+  const fb=window._firebase
+  if(!fb){
+    // Firebase module blocked or failed to load (ex: ad-blocker, firewall)
+    showAuthError('login-error','Erro de conexão. Desative extensões como ad-blocker ou tente outro navegador.')
+    return
+  }
   try{await fb.signInWithEmailAndPassword(email,pass)}
   catch(e){
     shakeEl('login-email')
@@ -2910,14 +2916,38 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 // ═══════════════════════════════════════════════════
 window.addEventListener('load',()=>{
   setOnlineStatus(navigator.onLine);loadFromLocalStorage()
+  // Offline-first: se tem dados locais, mostra app em 800ms sem esperar Firebase
+  if(profile){
+    setTimeout(()=>{
+      if(!_firebaseReady){
+        document.getElementById('app-loading').style.display='none'
+        document.getElementById('auth-screen').style.display='none'
+        document.getElementById('app').style.display='block'
+        updateHeaderUser();navigateTo(0)
+      }
+    },800)
+  }
   // BUG #1 FIX: usa flag em vez de wrapper de onFirebaseReady
   const _loadTimeout=setTimeout(()=>{
     if(!_firebaseReady&&document.getElementById('app-loading').style.display!=='none'){
       document.getElementById('app-loading').style.display='none'
-      if(profile){document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';updateHeaderUser();navigateTo(0)}
-      else document.getElementById('auth-screen').style.display='flex'
+      if(profile){
+        document.getElementById('auth-screen').style.display='none'
+        document.getElementById('app').style.display='block'
+        updateHeaderUser();navigateTo(0)
+      } else {
+        document.getElementById('auth-screen').style.display='flex'
+        // Show connection warning if firebase didn't load
+        if(!window._firebase){
+          const warn=document.createElement('p')
+          warn.style.cssText='color:#f59e0b;font-size:.75rem;text-align:center;margin-top:.75rem;padding:.5rem 1rem;background:#fffbeb;border-radius:.5rem'
+          warn.textContent='⚠️ Problema de conexão. Desative extensões (ad-blocker) ou tente outro navegador.'
+          const card=document.querySelector('.auth-card')
+          if(card&&!card.querySelector('.conn-warn')){warn.className='conn-warn';card.appendChild(warn)}
+        }
+      }
     }
-  },5000)
+  },3000)
   const _origSignOut=window.onFirebaseSignOut
   window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
@@ -3692,7 +3722,7 @@ Vá em "Cadernos" para criá-los!`)
 
 // Registrar Service Worker para PWA
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(()=>{})
+  navigator.serviceWorker.register('/sw.js?v=5').catch(()=>{})
 }
 </script>
 </body>
