@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Bloqueia tudo por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Plano não pode ser alterado diretamente pelo cliente
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['name','dailyGoalH','monthlyGoalH','createdAt','updatedAt','plan','planUpdatedAt'])
+        && (!request.resource.data.keys().hasAny(['plan']) ||
+            resource == null ||
+            request.resource.data.plan == resource.data.plan);
+
+      // Sub-coleção de dados (profile, subjects, etc.)
+      match /data/{docId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null
+          && request.auth.uid == userId
+          && docId in ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books'];
+      }
+
+      match /planner/{plannerId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /tasks/{taskId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /progress/{progressId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}
