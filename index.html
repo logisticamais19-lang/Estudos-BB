@@ -61,7 +61,7 @@
       try{const s=await getDoc(doc(db,'users',uid));return s.exists()?(s.data().plan||'free'):'free';}catch{return 'free';}
     },
     async initUser(uid,data){
-      return setDoc(doc(db,'users',uid),{...data},{merge:true}); // NÃO sobrescreve plan
+      return setDoc(doc(db,'users',uid),{plan:'free',...data},{merge:true});
     }
   };
 
@@ -269,12 +269,12 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   transition:transform .1s,box-shadow .1s;flex-shrink:0;
 }
 .heatmap-cell:hover{transform:scale(1.4);box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:1;position:relative;}
-.heatmap-level-0{background:#f0f4ff}
-.heatmap-level-1{background:#c7d9ff}
-.heatmap-level-2{background:#7ba8ff}
-.heatmap-level-3{background:#F9DD16}
-.heatmap-level-4{background:#f59e0b}
-.heatmap-level-5{background:#0038A8}
+.heatmap-level-0{background:#eef2ff}
+.heatmap-level-1{background:#bfdbfe}
+.heatmap-level-2{background:#60a5fa}
+.heatmap-level-3{background:#2563eb}
+.heatmap-level-4{background:#1d4ed8}
+.heatmap-level-5{background:#1e3a8a}
 .heatmap-month-label{font-size:.62rem;color:#9ca3af;font-weight:600;margin-bottom:.3rem;text-align:center;}
 .heatmap-week{display:flex;flex-direction:column;gap:2px;}
 .heatmap-tooltip{
@@ -380,18 +380,16 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
         <div id="user-menu" style="display:none;position:absolute;right:0;top:calc(100% + .5rem);background:white;border-radius:1rem;box-shadow:0 20px 50px rgba(0,0,0,.2);padding:.75rem;min-width:180px;z-index:100;border:1px solid #f3f4f6">
           <p id="menu-username" style="font-weight:700;font-size:.85rem;color:#111827;padding-bottom:.6rem;border-bottom:1px solid #f3f4f6;margin-bottom:.6rem"></p>
           <p id="menu-email" style="font-size:.7rem;color:#9ca3af;margin-bottom:.6rem;margin-top:-.4rem"></p>
-          <div id="menu-plan-badge" style="display:inline-flex;align-items:center;gap:.4rem;background:#EEF3FF;border-radius:2rem;padding:.25rem .75rem;font-size:.7rem;font-weight:800;color:#0038A8;margin-bottom:.6rem"><i class="fas fa-crown"></i><span id="menu-plan-text">Free</span></div>
-          <button onclick="navigateTo('settings');toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.5rem .2rem;cursor:pointer;color:#374151;font-size:.82rem;border-radius:.5rem;transition:background .15s" onmouseenter="this.style.background='#f9fafb'" onmouseleave="this.style.background='none'"><i class="fas fa-cog" style="color:#0038A8;width:16px"></i> Configurações</button>
-          <button onclick="navigateTo('rewards');toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.5rem .2rem;cursor:pointer;color:#374151;font-size:.82rem;border-radius:.5rem;transition:background .15s" onmouseenter="this.style.background='#f9fafb'" onmouseleave="this.style.background='none'"><i class="fas fa-trophy" style="color:#F9DD16;width:16px"></i> Recompensas</button>
-          <button onclick="navigateTo('pricing');toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.5rem .2rem;cursor:pointer;color:#374151;font-size:.82rem;border-radius:.5rem;transition:background .15s" onmouseenter="this.style.background='#f9fafb'" onmouseleave="this.style.background='none'"><i class="fas fa-crown" style="color:#f59e0b;width:16px"></i> Ver Planos</button>
+          <button onclick="navigateTo('settings');toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.4rem .2rem;cursor:pointer;color:#374151;font-size:.82rem"><i class="fas fa-cog" style="color:#0038A8;width:14px"></i> Configurações</button>
+          <button onclick="navigateTo('rewards');toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.4rem .2rem;cursor:pointer;color:#374151;font-size:.82rem"><i class="fas fa-trophy" style="color:#F9DD16;width:14px"></i> Recompensas</button>
           <div style="border-top:1px solid #f3f4f6;margin:.6rem 0"></div>
-          <button onclick="doLogout()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.5rem .2rem;cursor:pointer;color:#dc2626;font-size:.82rem;border-radius:.5rem;transition:background .15s" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='none'"><i class="fas fa-sign-out-alt" style="width:16px"></i> Sair</button>
+          <button onclick="doLogout()" style="display:flex;align-items:center;gap:.5rem;width:100%;background:none;border:none;padding:.4rem .2rem;cursor:pointer;color:#dc2626;font-size:.82rem"><i class="fas fa-sign-out-alt" style="width:14px"></i> Sair</button>
         </div>
       </div>
     </div>
   </div>
   <!-- NAV -->
-  <div class="nav-desktop" style="max-width:1280px;margin:0 auto;padding:0 1rem;border-top:1px solid rgba(255,255,255,.15);overflow-x:hidden">
+  <div class="nav-desktop" style="max-width:1280px;margin:0 auto;padding:0 1rem;border-top:1px solid rgba(255,255,255,.15);overflow-x:auto">
     <div style="display:flex;align-items:center;gap:.25rem;min-width:max-content">
       <a onclick="navigateTo(0)"          class="nav-item" id="nav-0"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-home"></i><span>Dashboard</span></a>
       <a onclick="navigateTo(1)"          class="nav-item" id="nav-1"        style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-book"></i><span>Plano</span></a>
@@ -404,8 +402,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
       <a onclick="navigateTo('recursos')" class="nav-item" id="nav-recursos" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-graduation-cap"></i><span>Recursos</span></a>
       <a onclick="navigateTo('heatmap')"   class="nav-item" id="nav-heatmap"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-fire"></i><span>Heatmap</span></a>
       <a onclick="navigateTo('rewards')"  class="nav-item" id="nav-rewards"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-trophy"></i><span>Recompensas</span></a>
-      <a onclick="navigateTo('settings')" class="nav-item" id="nav-settings" style="display:none"></a>
-      <a onclick="navigateTo('pricing')" class="nav-item" id="nav-pricing" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:#F9DD16"><i class="fas fa-crown"></i><span>Planos</span></a>
+      <a onclick="navigateTo('settings')" class="nav-item" id="nav-settings" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-cog"></i><span>Config.</span></a>
     </div>
   </div>
 </div>
@@ -496,42 +493,108 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ AGENDA com Calendário ══ -->
 <div id="screen-5" class="screen" style="display:none">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
-    <div><h2 style="font-size:1.4rem;font-weight:800">Agenda</h2><p id="agenda-date-label" style="font-size:.82rem;color:#0038A8;font-weight:600;margin-top:.2rem"></p></div>
-    <button onclick="openAddTaskModal()" class="btn-y" style="padding:.65rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Nova tarefa</button>
+  <!-- Abas da Agenda -->
+  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap">
+    <button onclick="switchAgendaTab('agenda')" id="agenda-tab-agenda" style="padding:.55rem 1.1rem;border-radius:.85rem;font-size:.82rem;font-weight:700;border:none;cursor:pointer;background:#0038A8;color:white;display:flex;align-items:center;gap:.4rem"><i class="fas fa-calendar-day"></i> Agenda</button>
+    <button onclick="switchAgendaTab('cronograma')" id="agenda-tab-cronograma" style="padding:.55rem 1.1rem;border-radius:.85rem;font-size:.82rem;font-weight:700;border:none;cursor:pointer;background:white;color:#374151;box-shadow:0 2px 8px rgba(0,56,168,.08);display:flex;align-items:center;gap:.4rem"><i class="fas fa-table"></i> Cronograma</button>
+    <button onclick="switchAgendaTab('distribuicao')" id="agenda-tab-distribuicao" style="padding:.55rem 1.1rem;border-radius:.85rem;font-size:.82rem;font-weight:700;border:none;cursor:pointer;background:white;color:#374151;box-shadow:0 2px 8px rgba(0,56,168,.08);display:flex;align-items:center;gap:.4rem"><i class="fas fa-chart-pie"></i> Distribuição</button>
+    <div style="flex:1"></div>
+    <button onclick="openAddTaskModal()" id="btn-nova-tarefa" class="btn-y" style="padding:.55rem 1.1rem;border-radius:.85rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem"><i class="fas fa-plus"></i> Nova tarefa</button>
   </div>
-  <div style="display:grid;grid-template-columns:300px 1fr;gap:1.25rem;align-items:start">
-    <div style="display:flex;flex-direction:column;gap:1rem">
-      <!-- Calendário -->
-      <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
-          <button onclick="calPrevMonth()" style="background:#EEF3FF;border:none;border-radius:.65rem;width:32px;height:32px;cursor:pointer;color:#0038A8;font-weight:700;font-size:1rem">‹</button>
-          <div style="font-weight:700;font-size:.9rem;color:#111827" id="cal-month-label"></div>
-          <button onclick="calNextMonth()" style="background:#EEF3FF;border:none;border-radius:.65rem;width:32px;height:32px;cursor:pointer;color:#0038A8;font-weight:700;font-size:1rem">›</button>
+
+  <!-- ── TAB: AGENDA ── -->
+  <div id="agenda-panel-agenda">
+    <div style="margin-bottom:1rem"><p id="agenda-date-label" style="font-size:.82rem;color:#0038A8;font-weight:600"></p></div>
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:1.25rem;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem">
+            <button onclick="calPrevMonth()" style="background:#EEF3FF;border:none;border-radius:.65rem;width:32px;height:32px;cursor:pointer;color:#0038A8;font-weight:700;font-size:1rem">‹</button>
+            <div style="font-weight:700;font-size:.9rem;color:#111827" id="cal-month-label"></div>
+            <button onclick="calNextMonth()" style="background:#EEF3FF;border:none;border-radius:.65rem;width:32px;height:32px;cursor:pointer;color:#0038A8;font-weight:700;font-size:1rem">›</button>
+          </div>
+          <div class="cal-grid" style="margin-bottom:.3rem" id="cal-weekdays"></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div style="display:flex;align-items:center;gap:.65rem;margin-top:.75rem;font-size:.65rem;color:#9ca3af;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;background:#0038A8;border-radius:50%;display:inline-block"></span>Hoje</span>
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:8px;height:8px;background:#0038A8;border-radius:50%;display:inline-block;opacity:.4"></span>Com tarefa</span>
+            <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;border:2px solid #F9DD16;border-radius:50%;display:inline-block"></span>Selecionado</span>
+          </div>
         </div>
-        <div class="cal-grid" style="margin-bottom:.3rem" id="cal-weekdays"></div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <div style="display:flex;align-items:center;gap:.65rem;margin-top:.75rem;font-size:.65rem;color:#9ca3af;flex-wrap:wrap">
-          <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;background:#0038A8;border-radius:50%;display:inline-block"></span>Hoje</span>
-          <span style="display:flex;align-items:center;gap:.25rem"><span style="width:8px;height:8px;background:#0038A8;border-radius:50%;display:inline-block;opacity:.4"></span>Com tarefa</span>
-          <span style="display:flex;align-items:center;gap:.25rem"><span style="width:10px;height:10px;border:2px solid #F9DD16;border-radius:50%;display:inline-block"></span>Selecionado</span>
+        <div style="background:white;border-radius:1.5rem;padding:1.1rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+          <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:.75rem">Resumo</p>
+          <div id="tasks-summary"></div>
         </div>
       </div>
-      <!-- Resumo -->
-      <div style="background:white;border-radius:1.5rem;padding:1.1rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-        <p style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:.75rem">Resumo</p>
-        <div id="tasks-summary"></div>
+      <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+        <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap">
+          <button onclick="filterTasks('all')"      id="filter-all"      style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#0038A8;color:white">Todas</button>
+          <button onclick="filterTasks('study')"    id="filter-study"    style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">📚 Estudo</button>
+          <button onclick="filterTasks('personal')" id="filter-personal" style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">🏃 Pessoal</button>
+          <button onclick="filterTasks('work')"     id="filter-work"     style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">💼 CLT</button>
+        </div>
+        <div id="daily-tasks" style="display:flex;flex-direction:column;gap:.65rem"></div>
       </div>
     </div>
-    <!-- Tarefas -->
-    <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-      <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap">
-        <button onclick="filterTasks('all')"      id="filter-all"      style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#0038A8;color:white">Todas</button>
-        <button onclick="filterTasks('study')"    id="filter-study"    style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">📚 Estudo</button>
-        <button onclick="filterTasks('personal')" id="filter-personal" style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">🏃 Pessoal</button>
-        <button onclick="filterTasks('work')"     id="filter-work"     style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">💼 CLT</button>
+  </div>
+
+  <!-- ── TAB: CRONOGRAMA SEMANAL ── -->
+  <div id="agenda-panel-cronograma" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:800">📅 Grade Semanal de Estudos</h3>
+        <p style="font-size:.78rem;color:#9ca3af;margin-top:.2rem">Defina seus blocos fixos de estudo por dia e horário</p>
       </div>
-      <div id="daily-tasks" style="display:flex;flex-direction:column;gap:.65rem"></div>
+      <div style="display:flex;gap:.5rem">
+        <button onclick="saveCronograma()" class="btn-bb" style="padding:.6rem 1.1rem;border-radius:.85rem;font-weight:700;font-size:.8rem;border:none;cursor:pointer"><i class="fas fa-save" style="margin-right:.3rem"></i>Salvar</button>
+        <button onclick="clearCronograma()" style="padding:.6rem 1.1rem;border-radius:.85rem;font-weight:700;font-size:.8rem;border:none;cursor:pointer;background:#fee2e2;color:#dc2626"><i class="fas fa-trash" style="margin-right:.3rem"></i>Limpar</button>
+      </div>
+    </div>
+    <!-- Grade -->
+    <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto">
+      <div id="cronograma-grid"></div>
+    </div>
+    <!-- Legenda de cores -->
+    <div style="background:white;border-radius:1.25rem;padding:1rem 1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-top:1rem">
+      <p style="font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:.65rem">Categorias</p>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#dbeafe;border-radius:.3rem;border:2px solid #0038A8;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">📚 Estudo</span></div>
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#dcfce7;border-radius:.3rem;border:2px solid #16a34a;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">🏃 Pessoal</span></div>
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#ede9fe;border-radius:.3rem;border:2px solid #7c3aed;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">💼 CLT</span></div>
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#fef3c7;border-radius:.3rem;border:2px solid #d97706;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">🍽️ Refeição</span></div>
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#f3f4f6;border-radius:.3rem;border:2px solid #9ca3af;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">😴 Descanso</span></div>
+        <span style="font-size:.72rem;color:#9ca3af;align-self:center">• Clique em um horário para editar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: DISTRIBUIÇÃO POR MATÉRIA ── -->
+  <div id="agenda-panel-distribuicao" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+      <div>
+        <h3 style="font-size:1.1rem;font-weight:800">📊 Distribuição Semanal por Matéria</h3>
+        <p style="font-size:.78rem;color:#9ca3af;margin-top:.2rem">Defina quantas horas por semana dedicar a cada matéria</p>
+      </div>
+      <button onclick="saveDistribuicao()" class="btn-bb" style="padding:.6rem 1.1rem;border-radius:.85rem;font-weight:700;font-size:.8rem;border:none;cursor:pointer"><i class="fas fa-save" style="margin-right:.3rem"></i>Salvar</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem">
+      <!-- Metas por matéria -->
+      <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+        <h4 style="font-size:.85rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">⏱ Horas por semana</h4>
+        <div id="distribuicao-subjects" style="display:flex;flex-direction:column;gap:.75rem"></div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1.5px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.8rem;color:#6b7280;font-weight:600">Total semanal</span>
+          <span id="distribuicao-total" style="font-size:1.1rem;font-weight:900;color:#0038A8">0h</span>
+        </div>
+      </div>
+      <!-- Gráfico visual -->
+      <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+        <h4 style="font-size:.85rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">📈 Distribuição visual</h4>
+        <div id="distribuicao-chart" style="display:flex;flex-direction:column;gap:.6rem"></div>
+        <div style="margin-top:1.25rem;background:#EEF3FF;border-radius:1rem;padding:.85rem 1rem">
+          <p style="font-size:.75rem;color:#0038A8;font-weight:600;line-height:1.5">💡 <strong>Sugestão:</strong> Dedique mais tempo às matérias com menor progresso para equilibrar sua preparação.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -613,74 +676,66 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ HEATMAP DE ESTUDOS ══ -->
 <div id="screen-heatmap" class="screen" style="display:none">
+
+  <!-- Tooltip flutuante -->
   <div id="heatmap-tooltip" class="heatmap-tooltip"></div>
 
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-    <div>
-      <h2 style="font-size:1.5rem;font-weight:900;display:flex;align-items:center;gap:.6rem;margin-bottom:.2rem">
-        <span style="background:linear-gradient(135deg,#f97316,#ef4444);border-radius:.65rem;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0"><i class="fas fa-fire"></i></span>
-        Heatmap de Estudos
-      </h2>
-      <p style="font-size:.78rem;color:#9ca3af;margin-left:44px">Histórico dos últimos 12 meses — cada célula é um dia</p>
-    </div>
-  </div>
+  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem">
+    <i class="fas fa-fire" style="color:#f97316"></i> Heatmap de Estudos
+  </h2>
+  <p style="font-size:.78rem;color:#9ca3af;margin-bottom:1.5rem">Seu histórico de dedicação nos últimos 12 meses — cada quadrado é um dia</p>
 
   <!-- Cards de resumo -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-bottom:1.75rem" id="heatmap-summary-cards"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem" id="heatmap-summary-cards"></div>
 
-  <!-- Grid principal -->
-  <div style="background:white;border-radius:1.75rem;padding:1.75rem;box-shadow:0 4px 24px rgba(0,56,168,.09);margin-bottom:1.25rem">
-    <!-- Legenda topo -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem">
-      <span style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em">Atividade anual</span>
-      <div style="display:flex;align-items:center;gap:.4rem">
-        <span style="font-size:.68rem;color:#9ca3af">Menos</span>
-        <div class="heatmap-cell heatmap-level-0" style="width:11px;height:11px"></div>
-        <div class="heatmap-cell heatmap-level-1" style="width:11px;height:11px"></div>
-        <div class="heatmap-cell heatmap-level-2" style="width:11px;height:11px"></div>
-        <div class="heatmap-cell heatmap-level-3" style="width:11px;height:11px"></div>
-        <div class="heatmap-cell heatmap-level-4" style="width:11px;height:11px"></div>
-        <div class="heatmap-cell heatmap-level-5" style="width:11px;height:11px"></div>
-        <span style="font-size:.68rem;color:#9ca3af">Mais</span>
+  <!-- Legenda -->
+  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Menos</span>
+    <div class="heatmap-cell heatmap-level-0"></div>
+    <div class="heatmap-cell heatmap-level-1"></div>
+    <div class="heatmap-cell heatmap-level-2"></div>
+    <div class="heatmap-cell heatmap-level-3"></div>
+    <div class="heatmap-cell heatmap-level-4"></div>
+    <div class="heatmap-cell heatmap-level-5"></div>
+    <span style="font-size:.72rem;color:#9ca3af;font-weight:600">Mais</span>
+    <span style="font-size:.68rem;color:#d1d5db;margin-left:.5rem">
+      □ 0h &nbsp; 🟦 1-30min &nbsp; 🔵 30-60min &nbsp; 💙 1-2h &nbsp; 🟣 2-3h &nbsp; 🌑 3h+
+    </span>
+  </div>
+
+  <!-- Meses label + grid -->
+  <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);overflow-x:auto">
+    <div id="heatmap-months-label" style="display:flex;gap:2px;margin-bottom:.3rem;padding-left:32px"></div>
+    <div style="display:flex;gap:.5rem;align-items:flex-start">
+      <!-- Dias da semana -->
+      <div style="display:flex;flex-direction:column;gap:2px;margin-top:0;padding-top:0;flex-shrink:0">
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Seg</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Qua</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Sex</div>
+        <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
       </div>
-    </div>
-    <!-- Meses + grid -->
-    <div style="overflow-x:auto;padding-bottom:.5rem">
-      <div id="heatmap-months-label" style="display:flex;gap:2px;margin-bottom:.3rem;padding-left:32px"></div>
-      <div style="display:flex;gap:.5rem;align-items:flex-start">
-        <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Seg</div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Qua</div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px">Sex</div>
-          <div style="height:13px;font-size:.55rem;color:#9ca3af;line-height:13px"></div>
-        </div>
-        <div id="heatmap-grid" style="display:flex;gap:2px;"></div>
-      </div>
+      <!-- Grid de semanas -->
+      <div id="heatmap-grid" style="display:flex;gap:2px;"></div>
     </div>
   </div>
 
-  <!-- Bottom grid: top dias + horas por mês lado a lado -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
-    <!-- Top dias -->
-    <div style="background:white;border-radius:1.75rem;padding:1.5rem;box-shadow:0 4px 24px rgba(0,56,168,.09)">
-      <h3 style="font-size:.85rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
-        <span style="background:#fef3c7;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem">🏅</span>
-        Melhores dias
-      </h3>
-      <div id="heatmap-top-days" style="display:flex;flex-direction:column;gap:.5rem"></div>
-    </div>
-    <!-- Horas por mês -->
-    <div style="background:white;border-radius:1.75rem;padding:1.5rem;box-shadow:0 4px 24px rgba(0,56,168,.09)">
-      <h3 style="font-size:.85rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
-        <span style="background:#EEF3FF;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem">📊</span>
-        Horas por mês
-      </h3>
-      <div id="heatmap-monthly-bars" style="display:flex;flex-direction:column;gap:.6rem"></div>
-    </div>
+  <!-- Top dias de estudo -->
+  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+      <i class="fas fa-medal" style="color:#f59e0b"></i> Seus melhores dias de estudo
+    </h3>
+    <div id="heatmap-top-days" style="display:flex;flex-direction:column;gap:.5rem"></div>
+  </div>
+
+  <!-- Distribuição por mês -->
+  <div style="margin-top:1.5rem;background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+      <i class="fas fa-chart-bar" style="color:#0038A8"></i> Horas por mês
+    </h3>
+    <div id="heatmap-monthly-bars" style="display:flex;flex-direction:column;gap:.6rem"></div>
   </div>
 </div>
 
@@ -696,288 +751,34 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ CONFIGURAÇÕES ══ -->
 <div id="screen-settings" class="screen" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-    <h2 style="font-size:1.4rem;font-weight:800">⚙️ Configurações</h2>
-  </div>
-
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.25rem">
-
-    <!-- PERFIL -->
+  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.25rem">⚙️ Configurações</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
     <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-      <h3 style="font-weight:800;margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
-        <span style="background:#EEF3FF;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center"><i class="fas fa-user" style="color:#0038A8;font-size:.75rem"></i></span> Perfil
-      </h3>
-      <div style="display:flex;flex-direction:column;gap:.75rem">
-        <div>
-          <label style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Nome</label>
-          <input id="settings-name" type="text" style="margin-top:.35rem;width:100%;padding:.7rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.88rem;font-weight:600">
-        </div>
+      <h3 style="font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem"><i class="fas fa-user-circle" style="color:#0038A8"></i> Perfil</h3>
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Nome</label><input id="settings-name" type="text" style="margin-top:.3rem;width:100%;padding:.65rem .9rem;border:2px solid #e5e7eb;border-radius:.75rem;font-size:.85rem"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
-          <div>
-            <label style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Meta diária (h)</label>
-            <input id="settings-daily" type="number" min="1" max="24" style="margin-top:.35rem;width:100%;padding:.7rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.88rem;font-weight:600">
-          </div>
-          <div>
-            <label style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Meta mensal (h)</label>
-            <input id="settings-monthly" type="number" min="10" max="744" style="margin-top:.35rem;width:100%;padding:.7rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.88rem;font-weight:600">
-          </div>
+          <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Meta diária (h)</label><input id="settings-daily" type="number" min="1" max="12" style="margin-top:.3rem;width:100%;padding:.65rem .9rem;border:2px solid #e5e7eb;border-radius:.75rem;font-size:.85rem"></div>
+          <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Meta mensal (h)</label><input id="settings-monthly" type="number" min="10" max="300" style="margin-top:.3rem;width:100%;padding:.65rem .9rem;border:2px solid #e5e7eb;border-radius:.75rem;font-size:.85rem"></div>
         </div>
-        <button onclick="saveSettings()" class="btn-bb" style="padding:.8rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;margin-top:.1rem;font-size:.88rem">Salvar Alterações</button>
+        <button onclick="saveSettings()" class="btn-bb" style="padding:.75rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;margin-top:.25rem">Salvar Alterações</button>
       </div>
     </div>
-
-    <!-- PLANO ATUAL -->
-    <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-      <h3 style="font-weight:800;margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
-        <span style="background:#FEF3C7;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center"><i class="fas fa-crown" style="color:#f59e0b;font-size:.75rem"></i></span> Meu Plano
-      </h3>
-      <div id="settings-plan-info" style="background:linear-gradient(135deg,#EEF3FF,#dbeafe);border-radius:1rem;padding:1rem;margin-bottom:1rem">
-        <div style="font-size:.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Plano atual</div>
-        <div id="settings-plan-name" style="font-size:1.3rem;font-weight:900;color:#0038A8">Free</div>
-        <div id="settings-plan-desc" style="font-size:.75rem;color:#6b7280;margin-top:.2rem">Acesso básico ao EstudoBB</div>
-      </div>
-      <button onclick="navigateTo('pricing')" style="width:100%;padding:.8rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:.4rem">
-        <i class="fas fa-crown"></i> Ver Planos e Fazer Upgrade
-      </button>
-    </div>
-
-    <!-- NOTIFICAÇÕES (visual premium) -->
-    <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-      <h3 style="font-weight:800;margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">
-        <span style="background:#f0fdf4;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center"><i class="fas fa-bell" style="color:#16a34a;font-size:.75rem"></i></span> Preferências
-      </h3>
-      <div style="display:flex;flex-direction:column;gap:.85rem">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:.85rem;font-weight:600">Lembretes de revisão</div>
-            <div style="font-size:.72rem;color:#9ca3af">Notificar revisões pendentes</div>
-          </div>
-          <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer">
-            <input type="checkbox" id="pref-reviews" checked style="opacity:0;width:0;height:0" onchange="savePref('reviews',this.checked)">
-            <span style="position:absolute;inset:0;background:#0038A8;border-radius:9999px;transition:.3s"></span>
-            <span style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:.3s"></span>
-          </label>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:.85rem;font-weight:600">Sons de XP</div>
-            <div style="font-size:.72rem;color:#9ca3af">Efeitos ao ganhar pontos</div>
-          </div>
-          <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer">
-            <input type="checkbox" id="pref-sounds" style="opacity:0;width:0;height:0" onchange="savePref('sounds',this.checked)">
-            <span style="position:absolute;inset:0;background:#e5e7eb;border-radius:9999px;transition:.3s"></span>
-            <span style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:.3s"></span>
-          </label>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:.85rem;font-weight:600">Modo compacto</div>
-            <div style="font-size:.72rem;color:#9ca3af">Reduz espaçamento visual</div>
-          </div>
-          <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer">
-            <input type="checkbox" id="pref-compact" style="opacity:0;width:0;height:0" onchange="savePref('compact',this.checked)">
-            <span style="position:absolute;inset:0;background:#e5e7eb;border-radius:9999px;transition:.3s"></span>
-            <span style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:white;border-radius:50%;transition:.3s"></span>
-          </label>
-        </div>
+    <div style="background:linear-gradient(135deg,#0038A8,#002B85);border-radius:1.5rem;padding:1.5rem;color:white">
+      <h3 style="font-weight:700;margin-bottom:.75rem;color:#F9DD16">📱 EstudoBB v5.0</h3>
+      <p style="font-size:.8rem;opacity:.8;line-height:1.5">Cadernos por matéria • Calendário • PDF • Recursos • Firebase • Revisão espaçada • Gamificação</p>
+      <div id="settings-user-email" style="margin-top:.75rem;font-size:.72rem;opacity:.6"></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem">
+        <button onclick="showModal('modal-privacy')" style="background:rgba(255,255,255,.15);border:none;color:white;font-size:.72rem;font-weight:600;padding:.4rem .85rem;border-radius:.65rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.25)'" onmouseleave="this.style.background='rgba(255,255,255,.15)'"><i class="fas fa-shield-alt" style="margin-right:.3rem"></i>Privacidade</button>
+        <button onclick="showModal('modal-terms')" style="background:rgba(255,255,255,.15);border:none;color:white;font-size:.72rem;font-weight:600;padding:.4rem .85rem;border-radius:.65rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.25)'" onmouseleave="this.style.background='rgba(255,255,255,.15)'"><i class="fas fa-file-contract" style="margin-right:.3rem"></i>Termos de Uso</button>
       </div>
     </div>
-
-    <!-- SOBRE O APP -->
-    <div style="background:linear-gradient(135deg,#001A55,#0038A8);border-radius:1.5rem;padding:1.5rem;color:white">
-      <h3 style="font-weight:800;margin-bottom:.5rem;color:#F9DD16;font-size:.95rem">📱 EstudoBB v5.0</h3>
-      <p style="font-size:.78rem;opacity:.8;line-height:1.6;margin-bottom:.75rem">Planner inteligente para concursos bancários — Cadernos • Timer • Revisão Espaçada • Heatmap • Gamificação • PDF</p>
-      <div id="settings-user-email" style="font-size:.72rem;opacity:.55;margin-bottom:1rem"></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-        <button onclick="showModal('modal-privacy')" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;font-size:.72rem;font-weight:600;padding:.45rem .9rem;border-radius:.65rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.22)'" onmouseleave="this.style.background='rgba(255,255,255,.12)'"><i class="fas fa-shield-alt" style="margin-right:.3rem"></i>Privacidade</button>
-        <button onclick="showModal('modal-terms')" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;font-size:.72rem;font-weight:600;padding:.45rem .9rem;border-radius:.65rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.22)'" onmouseleave="this.style.background='rgba(255,255,255,.12)'"><i class="fas fa-file-contract" style="margin-right:.3rem"></i>Termos</button>
-        <button onclick="navigator.share&&navigator.share({title:'EstudoBB',url:'https://estudobb.com.br'})" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;font-size:.72rem;font-weight:600;padding:.45rem .9rem;border-radius:.65rem;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='rgba(255,255,255,.22)'" onmouseleave="this.style.background='rgba(255,255,255,.12)'"><i class="fas fa-share-alt" style="margin-right:.3rem"></i>Compartilhar</button>
-      </div>
-    </div>
-
     <!-- ZONA DE PERIGO -->
     <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08);border:2px solid #fee2e2">
-      <h3 style="font-weight:800;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;color:#dc2626;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">
-        <span style="background:#fee2e2;border-radius:.5rem;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center"><i class="fas fa-exclamation-triangle" style="font-size:.75rem"></i></span> Zona de Perigo
-      </h3>
-      <p style="font-size:.78rem;color:#6b7280;margin-bottom:1rem;line-height:1.6">Ao excluir sua conta, todos os seus dados (progresso, cadernos, anotações, revisões) serão <strong>permanentemente deletados</strong> e não poderão ser recuperados.</p>
-      <button onclick="showDeleteAccountModal()" style="background:#dc2626;color:white;border:none;padding:.8rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .15s;width:100%;justify-content:center" onmouseenter="this.style.background='#b91c1c'" onmouseleave="this.style.background='#dc2626'"><i class="fas fa-trash-alt"></i> Excluir minha conta e todos os dados</button>
+      <h3 style="font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;color:#dc2626"><i class="fas fa-exclamation-triangle"></i> Zona de Perigo</h3>
+      <p style="font-size:.78rem;color:#6b7280;margin-bottom:1rem;line-height:1.5">Ao excluir sua conta, todos os seus dados (progresso, cadernos, anotações, revisões) serão <strong>permanentemente deletados</strong> e não poderão ser recuperados.</p>
+      <button onclick="showDeleteAccountModal()" style="background:#dc2626;color:white;border:none;padding:.75rem 1.25rem;border-radius:.85rem;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .15s" onmouseenter="this.style.background='#b91c1c'" onmouseleave="this.style.background='#dc2626'"><i class="fas fa-trash-alt"></i> Excluir minha conta e todos os dados</button>
     </div>
-
-  </div>
-</div>
-
-
-<!-- ══ SCREEN: PLANOS ══ -->
-<div id="screen-pricing" class="screen" style="display:none">
-
-  <!-- Hero header -->
-  <div style="text-align:center;margin-bottom:2.5rem;padding:2rem 1rem">
-    <div style="display:inline-flex;align-items:center;gap:.5rem;background:#EEF3FF;border:1.5px solid #bfdbfe;border-radius:2rem;padding:.4rem 1.1rem;font-size:.75rem;font-weight:700;color:#0038A8;margin-bottom:1.25rem">
-      <i class="fas fa-check-circle"></i> <span id="current-plan-label">Plano atual: Free (Gratuito)</span>
-    </div>
-    <h2 style="font-size:2rem;font-weight:900;color:#0f172a;margin-bottom:.65rem;line-height:1.2">Invista no seu futuro.<br><span style="color:#0038A8">Passe no concurso.</span></h2>
-    <p style="font-size:.9rem;color:#64748b;max-width:420px;margin:0 auto;line-height:1.6">Escolha o plano ideal para sua preparação e tenha acesso às ferramentas que realmente fazem diferença.</p>
-  </div>
-
-  <!-- Cards -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.5rem;max-width:960px;margin:0 auto 2.5rem">
-
-    <!-- FREE -->
-    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 2px 16px rgba(0,56,168,.06);border:2px solid #e2e8f0;position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 8px 32px rgba(0,56,168,.12)'" onmouseleave="this.style.boxShadow='0 2px 16px rgba(0,56,168,.06)'">
-      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:1rem">Gratuito</div>
-      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
-        <span style="font-size:2.5rem;font-weight:900;color:#1e293b;line-height:1">R$0</span>
-      </div>
-      <div style="font-size:.78rem;color:#94a3b8;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid #f1f5f9">para sempre</div>
-      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem">
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Até 5 matérias</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Até 30 tarefas</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Timer de estudos</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Notas básicas</div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Heatmap</span></div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Revisão espaçada</span></div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Cadernos</span></div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Exportar PDF</span></div>
-      </div>
-      <button id="btn-plan-free" onclick="selectPlan('free')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:700;font-size:.88rem;border:2px solid #e2e8f0;background:white;color:#94a3b8;cursor:default">✓ Plano atual</button>
-    </div>
-
-    <!-- BÁSICO -->
-    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 8px 32px rgba(0,56,168,.16);border:2px solid #0038A8;position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 16px 48px rgba(0,56,168,.22)'" onmouseleave="this.style.boxShadow='0 8px 32px rgba(0,56,168,.16)'">
-      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap;letter-spacing:.06em">⭐ MAIS POPULAR</div>
-      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0038A8;margin-bottom:1rem">Básico</div>
-      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
-        <span style="font-size:2.5rem;font-weight:900;color:#1e293b;line-height:1">R$12,90</span>
-      </div>
-      <div style="font-size:.78rem;color:#94a3b8;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid #EEF3FF">por mês • cancele quando quiser</div>
-      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem">
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Matérias ilimitadas</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Tarefas ilimitadas</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Timer de estudos</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#16a34a;font-size:.6rem"></i></span>Notas completas</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Heatmap</strong></div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Revisão espaçada</strong></div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#0038A8;font-size:.6rem"></i></span><strong>Gamificação completa</strong></div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Cadernos</span></div>
-        <div style="display:flex;align-items:center;gap:.65rem;opacity:.4"><span style="width:20px;height:20px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-times" style="color:#94a3b8;font-size:.6rem"></i></span><span>Exportar PDF</span></div>
-      </div>
-      <button id="btn-plan-basico" onclick="selectPlan('basico')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:800;font-size:.9rem;border:none;background:#0038A8;color:white;cursor:pointer;transition:background .15s;letter-spacing:.02em" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'">Assinar Básico →</button>
-    </div>
-
-    <!-- PRO -->
-    <div style="background:linear-gradient(145deg,#001A55 0%,#0038A8 100%);border-radius:1.75rem;padding:2rem;box-shadow:0 8px 40px rgba(0,26,85,.35);border:2px solid rgba(249,221,22,.4);position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 16px 60px rgba(0,26,85,.45)'" onmouseleave="this.style.boxShadow='0 8px 40px rgba(0,26,85,.35)'">
-      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#F9DD16;color:#001A55;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap;letter-spacing:.06em">👑 COMPLETO</div>
-      <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#F9DD16;margin-bottom:1rem">Pro</div>
-      <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem">
-        <span style="font-size:2.5rem;font-weight:900;color:white;line-height:1">R$19,90</span>
-      </div>
-      <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1.5px solid rgba(255,255,255,.1)">por mês • cancele quando quiser</div>
-      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem;font-size:.83rem;color:rgba(255,255,255,.88)">
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Tudo do Básico</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span><strong style="color:white">Cadernos ilimitados</strong></div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span><strong style="color:white">Exportar PDF</strong></div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Suporte prioritário</div>
-        <div style="display:flex;align-items:center;gap:.65rem"><span style="width:20px;height:20px;background:rgba(249,221,22,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check" style="color:#F9DD16;font-size:.6rem"></i></span>Acesso antecipado a novos recursos</div>
-      </div>
-      <button id="btn-plan-pro" onclick="selectPlan('pro')" style="width:100%;padding:.85rem;border-radius:1rem;font-weight:800;font-size:.9rem;border:none;background:#F9DD16;color:#001A55;cursor:pointer;transition:background .15s;letter-spacing:.02em" onmouseenter="this.style.background='#E8C800'" onmouseleave="this.style.background='#F9DD16'">Assinar Pro →</button>
-    </div>
-  </div>
-
-  <!-- Garantia -->
-  <div style="text-align:center;margin-bottom:2rem">
-    <div style="display:inline-flex;align-items:center;gap:.75rem;background:white;border-radius:1.25rem;padding:.85rem 1.5rem;box-shadow:0 2px 12px rgba(0,56,168,.08);font-size:.82rem;color:#475569">
-      <i class="fas fa-shield-alt" style="color:#10b981;font-size:1.1rem"></i>
-      <span><strong>Sem compromisso</strong> — cancele a qualquer momento direto pelo painel</span>
-    </div>
-  </div>
-
-  <!-- Checkout -->
-  <div id="stripe-checkout-area" style="display:none;max-width:520px;margin:0 auto">
-    <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 8px 40px rgba(0,56,168,.12);border:2px solid #EEF3FF">
-      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem">
-        <div style="width:40px;height:40px;background:#EEF3FF;border-radius:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-credit-card" style="color:#0038A8"></i></div>
-        <div>
-          <div style="font-weight:800;font-size:.95rem">Finalizar assinatura</div>
-          <div style="font-size:.75rem;color:#94a3b8">Pagamento 100% seguro via Stripe</div>
-        </div>
-      </div>
-      <div id="stripe-plan-info" style="background:linear-gradient(135deg,#EEF3FF,#dbeafe);border-radius:1rem;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:.88rem;font-weight:700;color:#0038A8;border:1.5px solid #bfdbfe"></div>
-      <div style="background:#f8fafc;border-radius:1rem;padding:1.25rem;margin-bottom:1.25rem;border:1.5px solid #e2e8f0">
-        <div style="display:flex;gap:.75rem;align-items:flex-start;font-size:.82rem;color:#64748b;line-height:1.6">
-          <i class="fas fa-lock" style="color:#10b981;margin-top:.15rem;flex-shrink:0"></i>
-          <span>Você será redirecionado para o ambiente seguro do <strong>Stripe</strong> para inserir seus dados de pagamento. O EstudoBB <strong>não armazena</strong> dados do cartão.</span>
-        </div>
-      </div>
-      <div style="display:flex;gap:.5rem;margin-bottom:.75rem;font-size:.75rem;color:#94a3b8;justify-content:center">
-        <span><i class="fas fa-lock" style="color:#10b981"></i> SSL 256-bit</span>
-        <span>•</span>
-        <span><i class="fas fa-shield-alt" style="color:#10b981"></i> PCI Compliant</span>
-        <span>•</span>
-        <span><i class="fas fa-undo" style="color:#10b981"></i> Cancele a qualquer hora</span>
-      </div>
-      <button id="btn-go-stripe" onclick="goToStripeCheckout()" style="width:100%;padding:.95rem;background:#0038A8;color:white;border:none;border-radius:1rem;font-weight:800;cursor:pointer;font-size:.92rem;letter-spacing:.02em;transition:background .15s" onmouseenter="this.style.background='#002B85'" onmouseleave="this.style.background='#0038A8'"><i class="fas fa-lock" style="margin-right:.5rem"></i>Ir para pagamento seguro →</button>
-      <button onclick="document.getElementById('stripe-checkout-area').style.display='none'" style="margin-top:.65rem;width:100%;padding:.75rem;background:none;border:2px solid #e2e8f0;border-radius:1rem;font-weight:600;font-size:.82rem;cursor:pointer;color:#94a3b8;transition:border-color .15s" onmouseenter="this.style.borderColor='#94a3b8'" onmouseleave="this.style.borderColor='#e2e8f0'">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SCREEN: ADMIN ══ -->
-<div id="screen-admin" class="screen" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-    <h2 style="font-size:1.4rem;font-weight:800">🛡️ Painel Admin</h2>
-    <div style="display:flex;gap:.5rem">
-      <button onclick="adminLoadUsers()" style="padding:.6rem 1.1rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="margin-right:.3rem"></i>Atualizar</button>
-    </div>
-  </div>
-  <!-- Stats -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem" id="admin-stats-grid">
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center">
-      <div id="stat-total" style="font-size:2rem;font-weight:900;color:#0038A8">—</div>
-      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Total usuários</div>
-    </div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center">
-      <div id="stat-free" style="font-size:2rem;font-weight:900;color:#6b7280">—</div>
-      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Free</div>
-    </div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center">
-      <div id="stat-basico" style="font-size:2rem;font-weight:900;color:#0038A8">—</div>
-      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Básico</div>
-    </div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center">
-      <div id="stat-pro" style="font-size:2rem;font-weight:900;color:#F9DD16;background:#001A55;border-radius:.85rem">—</div>
-      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-top:.25rem">Pro</div>
-    </div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center">
-      <div id="stat-mrr" style="font-size:1.5rem;font-weight:900;color:#10b981">—</div>
-      <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">MRR (estimado)</div>
-    </div>
-  </div>
-  <!-- Search -->
-  <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-    <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
-      <input id="admin-search" type="text" placeholder="Buscar por email ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:200px;padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem">
-      <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white">
-        <option value="">Todos os planos</option>
-        <option value="free">Free</option>
-        <option value="basico">Básico</option>
-        <option value="pro">Pro</option>
-      </select>
-    </div>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:.82rem">
-        <thead>
-          <tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af">
-            <th style="text-align:left;padding:.75rem 1rem">Usuário</th>
-            <th style="text-align:center;padding:.75rem">Plano</th>
-            <th style="text-align:center;padding:.75rem">Desde</th>
-            <th style="text-align:center;padding:.75rem">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="admin-users-table"></tbody>
-      </table>
-    </div>
-    <div id="admin-loading" style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem">Clique em "Atualizar" para carregar usuários.</div>
   </div>
 </div>
 
@@ -998,18 +799,6 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ MODAIS ══ -->
 
-
-
-<!-- ══ MODAL: PLAN GATE ══ -->
-<div id="modal-plan-gate" class="modal-overlay" style="display:none">
-  <div class="modal-box" style="max-width:380px;text-align:center">
-    <div style="font-size:3rem;margin-bottom:.75rem">🔒</div>
-    <h3 style="font-weight:800;font-size:1.1rem;margin-bottom:.5rem">Recurso Premium</h3>
-    <p style="font-size:.85rem;color:#6b7280;line-height:1.6;margin-bottom:1.25rem">Este recurso está disponível no plano <strong id="plan-gate-name">Básico</strong>.</p>
-    <button onclick="navigateTo('pricing');closeModal('modal-plan-gate')" class="btn-bb" style="width:100%;padding:.85rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;margin-bottom:.65rem;font-size:.9rem"><i class="fas fa-crown" style="margin-right:.4rem"></i>Ver Planos</button>
-    <button onclick="closeModal('modal-plan-gate')" style="width:100%;padding:.75rem;border-radius:.85rem;font-weight:600;font-size:.85rem;border:2px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer">Agora não</button>
-  </div>
-</div>
 
 <!-- ══ POLÍTICA DE PRIVACIDADE ══ -->
 <div id="modal-privacy" class="modal-overlay" style="display:none">
@@ -1339,23 +1128,6 @@ let currentRecursoFilter='all'
 // Firebase
 let _uid=null,_isOnline=navigator.onLine,_pendingSync=false,_userPlan='free'
 
-// ── Plan gates ──
-const PLAN_FEATURES={
-  free:    {subjects:5,tasks:30,heatmap:false,books:false,reviews:false,rewards:false,export:false,notebook:true},
-  basico:  {subjects:999,tasks:999,heatmap:true,books:false,reviews:true,rewards:true,export:false,notebook:true},
-  pro:     {subjects:999,tasks:999,heatmap:true,books:true,reviews:true,rewards:true,export:true,notebook:true}
-}
-function canUse(feature){return !!(PLAN_FEATURES[_userPlan]||PLAN_FEATURES.free)[feature]}
-function requirePlan(feature,minPlan='basico'){
-  if(canUse(feature))return true
-  const names={basico:'Básico (R$12,90/mês)',pro:'Pro (R$19,90/mês)'}
-  showPlanGate(names[minPlan]||minPlan);return false
-}
-function showPlanGate(planName){
-  document.getElementById('plan-gate-name').textContent=planName
-  showModal('modal-plan-gate')
-}
-
 // ═══════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════
@@ -1590,17 +1362,6 @@ function updateHeaderUser(){
   document.getElementById('menu-username').textContent=profile.name
   document.getElementById('menu-email').textContent=profile.email||window._currentUser?.email||''
   document.getElementById('settings-user-email').textContent='Conta: '+(profile.email||'')
-  // Atualiza badge do plano no menu do usuário
-  const planNames={free:'Free',basico:'Básico',pro:'Pro ⭐'}
-  const planColors={free:'#EEF3FF',basico:'#dbeafe',pro:'#FEF3C7'}
-  const planTextColors={free:'#0038A8',basico:'#1d4ed8',pro:'#92400e'}
-  const badge=document.getElementById('menu-plan-badge')
-  const txt=document.getElementById('menu-plan-text')
-  if(badge&&txt){
-    txt.textContent=planNames[_userPlan]||'Free'
-    badge.style.background=planColors[_userPlan]||planColors.free
-    badge.style.color=planTextColors[_userPlan]||planTextColors.free
-  }
 }
 function toggleUserMenu(){const m=document.getElementById('user-menu');m.style.display=m.style.display==='block'?'none':'block'}
 document.addEventListener('click',e=>{
@@ -1611,22 +1372,16 @@ document.addEventListener('click',e=>{
 // ═══════════════════════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════════════════════
-async function navigateTo(n){
+function navigateTo(n){
   document.querySelectorAll('[id^="screen-"]').forEach(s=>s.style.display='none')
   document.querySelectorAll('.nav-item').forEach(el=>{el.classList.remove('nav-active');el.style.color='rgba(255,255,255,.8)'})
   const screen=document.getElementById(`screen-${n}`),nav=document.getElementById(`nav-${n}`)
   if(screen)screen.style.display='block'
   if(nav)nav.classList.add('nav-active')
-  // Recarrega plano apenas para telas gateadas
-  const gatedScreens = ['heatmap','books','rewards','pricing','4']
-  if(_uid && window._fbService && gatedScreens.includes(String(n))) {
-    _userPlan = await window._fbService.getUserPlan(_uid).catch(()=>_userPlan)
-  }
   const map={0:'renderDashboard',1:'renderSubjects',2:'renderTimer',3:'renderProgress',
              4:'renderTimeline',5:'renderDailyOrganizer','books':'renderBooks',
              'notebook':'renderNotebook','recursos':'renderRecursos','heatmap':'renderHeatmap',
-             'rewards':'renderRewards','settings':'renderSettings',
-             'pricing':'renderPricing','admin':'renderAdmin'}
+             'rewards':'renderRewards','settings':'renderSettings'}
   const fn=map[n];if(fn&&window[fn])window[fn]()
 }
 
@@ -1726,7 +1481,7 @@ function renderSubjects(){
   subjects.forEach((sub,i)=>{
     const tr=document.createElement('tr');tr.style.cssText='border-bottom:1px solid #f3f4f6;'
     tr.onmouseenter=()=>tr.style.background='#fafafa';tr.onmouseleave=()=>tr.style.background=''
-    tr.innerHTML=`<td style="padding:.85rem 1.25rem;font-weight:600;font-size:.88rem">${_esc(sub.name)}</td><td style="text-align:center;padding:.85rem;font-size:.85rem">${_esc(String(sub.hours))}h</td><td style="text-align:center;padding:.85rem;font-size:.85rem">${_esc(String(sub.target))}h</td>
+    tr.innerHTML=`<td style="padding:.85rem 1.25rem;font-weight:600;font-size:.88rem">${sub.name}</td><td style="text-align:center;padding:.85rem;font-size:.85rem">${sub.hours}h</td><td style="text-align:center;padding:.85rem;font-size:.85rem">${sub.target}h</td>
     <td style="text-align:center;padding:.85rem"><div style="display:flex;align-items:center;justify-content:center;gap:.5rem"><div style="width:80px;height:6px;background:#f3f4f6;border-radius:9999px;overflow:hidden"><div style="height:100%;width:${sub.progress}%;background:linear-gradient(90deg,#0038A8,#F9DD16)"></div></div><span style="font-weight:700;font-size:.8rem">${sub.progress}%</span></div></td>
     <td style="text-align:center;padding:.85rem"><div style="display:flex;justify-content:center;gap:.65rem">
       <button onclick="logSession(${sub.id},30)" style="color:#0038A8;background:none;border:none;cursor:pointer;font-size:.75rem;font-weight:700;padding:.25rem .5rem;border-radius:.4rem" onmouseenter="this.style.background='#EEF3FF'" onmouseleave="this.style.background='none'"><i class="fas fa-plus"></i>+30min</button>
@@ -1736,10 +1491,7 @@ function renderSubjects(){
     tbody.appendChild(tr)
   })
 }
-function addSubject(){
-  const limits=PLAN_FEATURES[_userPlan]||PLAN_FEATURES.free
-  if(subjects.length>=limits.subjects){showPlanGate('Básico (R$12,90/mês)');return}
-  const name=prompt('Nome da matéria:');if(!name?.trim())return;subjects.push({id:Date.now(),name:name.trim(),hours:0,target:20,progress:0});saveData();renderSubjects()}
+function addSubject(){const name=prompt('Nome da matéria:');if(!name?.trim())return;subjects.push({id:Date.now(),name:name.trim(),hours:0,target:20,progress:0});saveData();renderSubjects()}
 function editSubject(i){const t=prompt(`Meta de horas para "${subjects[i].name}":`,subjects[i].target);if(t&&!isNaN(t)){subjects[i].target=parseInt(t);saveData();renderSubjects()}}
 function deleteSubject(i){if(confirm('Remover matéria?')){subjects.splice(i,1);saveData();renderSubjects()}}
 async function logSession(subjectId,minutes){
@@ -1864,7 +1616,7 @@ function renderTimeline(){
   document.getElementById('today-review-count').textContent=todayItems.length?`${todayItems.length} revisão(ões) pendente(s)`:'✅ Tudo em dia!'
   document.getElementById('today-reviews-list').innerHTML=todayItems.length?todayItems.map((r)=>{
     const idx=reviewItems.indexOf(r)
-    return `<div style="display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;background:${r.nextReview<today?'#FEF2F2':'#EEF3FF'};border-radius:.85rem;border:1.5px solid ${r.nextReview<today?'#fca5a5':'#bfdbfe'}"><div style="flex:1;min-width:0"><p style="font-weight:700;font-size:.85rem">${_esc(r.topic)}</p><p style="font-size:.7rem;color:#9ca3af">${r.subjectName} • Estágio ${r.stage}/6</p></div><button onclick="openReviewModal(${idx})" class="btn-bb" style="padding:.4rem .85rem;border-radius:.65rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer"><i class="fas fa-brain"></i> Revisar</button></div>`}).join(''):`<p style="font-size:.82rem;color:#10b981;font-weight:600;text-align:center;padding:.5rem">🎉 Nenhuma revisão pendente!</p>`
+    return `<div style="display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;background:${r.nextReview<today?'#FEF2F2':'#EEF3FF'};border-radius:.85rem;border:1.5px solid ${r.nextReview<today?'#fca5a5':'#bfdbfe'}"><div style="flex:1;min-width:0"><p style="font-weight:700;font-size:.85rem">${r.topic}</p><p style="font-size:.7rem;color:#9ca3af">${r.subjectName} • Estágio ${r.stage}/6</p></div><button onclick="openReviewModal(${idx})" class="btn-bb" style="padding:.4rem .85rem;border-radius:.65rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer"><i class="fas fa-brain"></i> Revisar</button></div>`}).join(''):`<p style="font-size:.82rem;color:#10b981;font-weight:600;text-align:center;padding:.5rem">🎉 Nenhuma revisão pendente!</p>`
   const strip=document.getElementById('timeline-strip');strip.innerHTML=''
   for(let i=0;i<14;i++){
     const d=addDays(today,i),items=reviewItems.filter(r=>r.nextReview===d)
@@ -1878,7 +1630,7 @@ function renderTimeline(){
   reviewItems.slice().sort((a,b)=>a.nextReview.localeCompare(b.nextReview)).forEach(r=>{
     const idx=reviewItems.indexOf(r),isOverdue=r.nextReview<today
     const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.85rem 1.25rem;border-bottom:1px solid #f3f4f6;'
-    div.innerHTML=`<div style="flex:1;min-width:0"><p style="font-weight:600;font-size:.85rem">${_esc(r.topic)}</p><p style="font-size:.7rem;color:#9ca3af;margin-top:.1rem">${_esc(r.subjectName)} • Próxima: ${fmtDate(r.nextReview)}${isOverdue?' ⚠️':''} • Estágio ${r.stage}/6</p></div><div style="display:flex;gap:.4rem"><button onclick="openReviewModal(${idx})" style="padding:.35rem .7rem;border-radius:.55rem;font-size:.72rem;font-weight:700;background:#EEF3FF;color:#0038A8;border:none;cursor:pointer"><i class="fas fa-brain"></i></button><button onclick="deleteReview(${idx})" style="padding:.35rem .7rem;border-radius:.55rem;font-size:.72rem;background:#fee2e2;color:#dc2626;border:none;cursor:pointer"><i class="fas fa-trash"></i></button></div>`
+    div.innerHTML=`<div style="flex:1;min-width:0"><p style="font-weight:600;font-size:.85rem">${r.topic}</p><p style="font-size:.7rem;color:#9ca3af;margin-top:.1rem">${r.subjectName} • Próxima: ${fmtDate(r.nextReview)}${isOverdue?' ⚠️':''} • Estágio ${r.stage}/6</p></div><div style="display:flex;gap:.4rem"><button onclick="openReviewModal(${idx})" style="padding:.35rem .7rem;border-radius:.55rem;font-size:.72rem;font-weight:700;background:#EEF3FF;color:#0038A8;border:none;cursor:pointer"><i class="fas fa-brain"></i></button><button onclick="deleteReview(${idx})" style="padding:.35rem .7rem;border-radius:.55rem;font-size:.72rem;background:#fee2e2;color:#dc2626;border:none;cursor:pointer"><i class="fas fa-trash"></i></button></div>`
     list.appendChild(div)
   })
 }
@@ -1905,7 +1657,10 @@ function deleteReview(index){if(confirm('Remover tópico?')){reviewItems.splice(
 // ═══════════════════════════════════════════════════
 // CALENDÁRIO + AGENDA
 // ═══════════════════════════════════════════════════
-function renderDailyOrganizer(){renderCalendar();updateAgendaDateLabel();renderTaskList();renderTasksSummary()}
+function renderDailyOrganizer(){
+  switchAgendaTab(_agendaTab||'agenda')
+  renderCalendar();updateAgendaDateLabel();renderTaskList();renderTasksSummary()
+}
 function updateAgendaDateLabel(){
   const d=new Date(agendaSelectedDate+'T00:00:00'),isToday=agendaSelectedDate===todayStr()
   document.getElementById('agenda-date-label').textContent=(isToday?'📅 Hoje — ':'')+d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
@@ -1992,16 +1747,15 @@ async function removeTask(i){dailyTasks.splice(i,1);await saveData();renderDaily
 // CADERNOS POR MATÉRIA
 // ═══════════════════════════════════════════════════
 function renderBooks(){
-  if(!requirePlan('books','pro'))return;
   const grid=document.getElementById('books-grid');grid.innerHTML=''
   if(!books.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af"><div style="font-size:3rem;margin-bottom:1rem">📚</div><p style="font-weight:600;font-size:1rem">Nenhum caderno ainda</p><p style="font-size:.82rem;margin-top:.25rem">Clique em "Novo caderno" para criar!</p></div>`;return}
   books.forEach(book=>{
     const div=document.createElement('div');div.className='subject-book';div.style.background=book.color||'#0038A8'
     div.onclick=()=>openBook(book.id)
-    div.innerHTML=`<div class="book-spine"><div class="book-spine-text">${_esc(book.name)}</div></div>
+    div.innerHTML=`<div class="book-spine"><div class="book-spine-text">${book.name}</div></div>
     <div class="book-cover">${book.coverImg?`<img class="book-cover-img" src="${book.coverImg}" alt="">`:''}
       <div class="book-emoji-big">${book.emoji||'📚'}</div>
-      <div class="book-title">${_esc(book.name)}</div>
+      <div class="book-title">${book.name}</div>
       <div class="book-meta">${book.pages?book.pages.length:1} página(s)</div>
     </div>
     <button class="book-del" onclick="event.stopPropagation();deleteBook('${book.id}')" style="position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.4);border:none;color:white;border-radius:.4rem;width:24px;height:24px;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s"><i class="fas fa-trash"></i></button>`
@@ -2068,7 +1822,7 @@ function renderBookTabs(){
   const bar=document.getElementById('book-tabs-bar');bar.innerHTML=''
   book.pages.forEach((page,idx)=>{
     const tab=document.createElement('div');tab.className='book-tab'+(page.id===currentPageId?' active':'')
-    tab.innerHTML=`<span onclick="switchBookPage('${page.id}')" style="flex:1">${_esc(page.title)}</span>
+    tab.innerHTML=`<span onclick="switchBookPage('${page.id}')" style="flex:1">${page.title}</span>
     ${book.pages.length>1?`<button onclick="event.stopPropagation();renameBookPage('${page.id}')" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:.65rem;padding:.1rem" title="Renomear"><i class="fas fa-pen"></i></button>
     <button onclick="event.stopPropagation();deleteBookPage('${page.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.65rem;padding:.1rem" title="Excluir"><i class="fas fa-times"></i></button>`:''}`
     bar.appendChild(tab)
@@ -2415,7 +2169,6 @@ function mmToStaticSVG(block){
 }
 
 async function exportBookPDF(){
-  if(!requirePlan('export','pro'))return;
   const book=books.find(b=>b.id===currentBookId); if(!book) return
   syncEditableBlocks()
   const page=book.pages.find(p=>p.id===currentPageId)||book.pages[0]
@@ -2642,7 +2395,6 @@ function filterRecursos(tipo){
 // 🔥 HEATMAP DE ESTUDOS
 // ═══════════════════════════════════════════════════
 function renderHeatmap(){
-  if(!requirePlan('heatmap','basico'))return;
   // ── Agrupa minutos por data ──
   const dayMap = {}
   studySessions.forEach(s => {
@@ -2828,7 +2580,6 @@ function renderHeatmap(){
 }
 
 function renderRewards(){
-  if(!requirePlan('rewards','basico'))return;
   const xp=gamification.xp,li=getCurrentLevel(xp),lv=LEVELS[li]
   const pct=lv.maxXP===Infinity?100:Math.round(((xp-lv.minXP)/(lv.maxXP-lv.minXP))*100),next=LEVELS[li+1]
   document.getElementById('rewards-level-name').textContent=`${lv.icon} ${lv.name}`
@@ -2899,8 +2650,7 @@ window.addEventListener('load',()=>{
   <a onclick="navigateTo('recursos');closeMobileMore()" id="mnav-m-recursos"><i class="fas fa-graduation-cap"></i><span>Recursos</span></a>
   <a onclick="navigateTo('heatmap');closeMobileMore()"  id="mnav-m-heatmap" ><i class="fas fa-fire"></i><span>Heatmap</span></a>
   <a onclick="navigateTo('rewards');closeMobileMore()"  id="mnav-m-rewards" ><i class="fas fa-trophy"></i><span>Recomp.</span></a>
-  <a onclick="navigateTo('settings');closeMobileMore()" id="mnav-m-settings" style="display:none"></a>
-  <a onclick="navigateTo('pricing');closeMobileMore()" id="mnav-m-pricing" style="color:#F9DD16"><i class="fas fa-crown"></i><span>Planos</span></a>
+  <a onclick="navigateTo('settings');closeMobileMore()" id="mnav-m-settings"><i class="fas fa-cog"></i><span>Config.</span></a>
 </div>
 
 <script>
@@ -2932,269 +2682,271 @@ window.navigateTo=function(n){
   const mEl=mMap[n]?document.getElementById(mMap[n]):null
   if(mEl)mEl.classList.add('nav-active')
   else{
-    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings','pricing':'mnav-m-pricing','admin':'mnav-m-admin'}
+    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings'}
     const mEl2=moreMap[n]?document.getElementById(moreMap[n]):null
     if(mEl2)mEl2.classList.add('nav-active')
   }
 }
 
-function renderSettings(){
-  // Atualiza info do plano na tela de configurações
-  const names={free:'Free (Gratuito)',basico:'Básico',pro:'Pro ⭐'}
-  const descs={free:'Acesso básico ao EstudoBB',basico:'Heatmap, revisão e gamificação desbloqueados',pro:'Acesso completo — todos os recursos liberados'}
-  const colors={free:'linear-gradient(135deg,#EEF3FF,#dbeafe)',basico:'linear-gradient(135deg,#dbeafe,#bfdbfe)',pro:'linear-gradient(135deg,#FEF3C7,#fde68a)'}
-  const textColors={free:'#0038A8',basico:'#1d4ed8',pro:'#92400e'}
-  const el=document.getElementById('settings-plan-name')
-  const desc=document.getElementById('settings-plan-desc')
-  const box=document.getElementById('settings-plan-info')
-  if(el) el.textContent=names[_userPlan]||'Free'
-  if(el) el.style.color=textColors[_userPlan]||textColors.free
-  if(desc) desc.textContent=descs[_userPlan]||descs.free
-  if(box) box.style.background=colors[_userPlan]||colors.free
-  // Carrega preferências salvas
-  const prefs=JSON.parse(localStorage.getItem('bb_prefs')||'{}')
-  const rv=document.getElementById('pref-reviews')
-  const snd=document.getElementById('pref-sounds')
-  const cmp=document.getElementById('pref-compact')
-  if(rv) rv.checked=prefs.reviews!==false
-  if(snd) snd.checked=!!prefs.sounds
-  if(cmp) cmp.checked=!!prefs.compact
-}
-function savePref(key,val){
-  const prefs=JSON.parse(localStorage.getItem('bb_prefs')||'{}')
-  prefs[key]=val
-  localStorage.setItem('bb_prefs',JSON.stringify(prefs))
-}
-
 // ═══════════════════════════════════════════════════
-// PLANOS & PAGAMENTO
+// AGENDA TABS
 // ═══════════════════════════════════════════════════
+let _agendaTab = 'agenda'
 
-// Stripe price IDs (configurar após criar produtos no Stripe)
-const STRIPE_LINKS = {
-  basico: 'https://buy.stripe.com/SUBSTITUA_PELO_LINK_BASICO',
-  pro:    'https://buy.stripe.com/SUBSTITUA_PELO_LINK_PRO'
-}
-
-let _selectedPlan = null
-
-async function renderPricing() {
-  // Sempre recarrega o plano do Firestore ao abrir a tela
-  _userPlan = await window._fbService.getUserPlan(_uid).catch(()=>_userPlan)
-  const labels = { free: 'Free (Gratuito)', basico: 'Básico (R$12,90/mês)', pro: 'Pro (R$19,90/mês)' }
-  document.getElementById('current-plan-label').textContent = 'Plano atual: ' + (labels[_userPlan] || 'Free')
-  const btns = { free: 'btn-plan-free', basico: 'btn-plan-basico', pro: 'btn-plan-pro' }
-  Object.entries(btns).forEach(([plan, id]) => {
-    const btn = document.getElementById(id)
-    if (!btn) return
-    if (plan === _userPlan) {
-      btn.textContent = '✓ Plano atual'
-      btn.style.background = '#e5e7eb'
-      btn.style.color = '#6b7280'
-      btn.style.cursor = 'default'
-    } else if (plan === 'free') {
-      btn.textContent = _userPlan !== 'free' ? 'Fazer downgrade' : '✓ Plano atual'
+function switchAgendaTab(tab) {
+  _agendaTab = tab
+  const tabs = ['agenda','cronograma','distribuicao']
+  tabs.forEach(t => {
+    const panel = document.getElementById('agenda-panel-' + t)
+    const btn = document.getElementById('agenda-tab-' + t)
+    if (panel) panel.style.display = t === tab ? 'block' : 'none'
+    if (btn) {
+      btn.style.background = t === tab ? '#0038A8' : 'white'
+      btn.style.color = t === tab ? 'white' : '#374151'
+      btn.style.boxShadow = t === tab ? 'none' : '0 2px 8px rgba(0,56,168,.08)'
     }
   })
-}
-
-function selectPlan(plan) {
-  if (plan === _userPlan) return
-  if (plan === 'free') { alert('Para cancelar sua assinatura, entre em contato: suporte@estudobb.com.br'); return }
-  _selectedPlan = plan
-  const names = { basico: 'Plano Básico — R$12,90/mês', pro: 'Plano Pro — R$19,90/mês' }
-  document.getElementById('stripe-plan-info').textContent = '📦 ' + (names[plan] || plan)
-  document.getElementById('stripe-checkout-area').style.display = 'block'
-  document.getElementById('stripe-checkout-area').scrollIntoView({ behavior: 'smooth' })
-}
-
-function goToStripeCheckout() {
-  if (!_selectedPlan || !STRIPE_LINKS[_selectedPlan]) {
-    alert('Link de pagamento não configurado ainda. Configure o Stripe primeiro.')
-    return
-  }
-  const url = STRIPE_LINKS[_selectedPlan] + '?client_reference_id=' + (_uid || '')
-  window.open(url, '_blank')
+  const btnTask = document.getElementById('btn-nova-tarefa')
+  if (btnTask) btnTask.style.display = tab === 'agenda' ? 'flex' : 'none'
+  if (tab === 'cronograma') renderCronograma()
+  if (tab === 'distribuicao') renderDistribuicao()
 }
 
 // ═══════════════════════════════════════════════════
-// ADMIN
+// CRONOGRAMA SEMANAL
 // ═══════════════════════════════════════════════════
+const CRONO_DAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+const CRONO_HOURS = ['05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00']
+const CRONO_TYPES = [
+  {id:'',label:'Livre',bg:'white',border:'#e5e7eb',text:'#9ca3af'},
+  {id:'study',label:'📚 Estudo',bg:'#dbeafe',border:'#0038A8',text:'#1d4ed8'},
+  {id:'personal',label:'🏃 Pessoal',bg:'#dcfce7',border:'#16a34a',text:'#15803d'},
+  {id:'work',label:'💼 CLT',bg:'#ede9fe',border:'#7c3aed',text:'#6d28d9'},
+  {id:'meal',label:'🍽️ Refeição',bg:'#fef3c7',border:'#d97706',text:'#92400e'},
+  {id:'rest',label:'😴 Descanso',bg:'#f3f4f6',border:'#9ca3af',text:'#6b7280'},
+]
 
-const ADMIN_UIDS = ['2WKwdCPEJoMocxRv8cOdZn31kjn2'] // logisticamais19@gmail.com
+// cronograma[day][hour] = {type, label}
+let _cronograma = {}
 
-function isAdmin() { return ADMIN_UIDS.includes(_uid) }
-
-let _adminUsers = []
-
-function renderAdmin() {
-  if (!isAdmin()) {
-    navigateTo(0)
-    return
-  }
-  adminLoadUsers()
+function loadCronograma() {
+  try { _cronograma = JSON.parse(localStorage.getItem('bb_cronograma') || '{}') } catch { _cronograma = {} }
 }
 
-async function adminSavePlan(uid) {
-  const sel = document.getElementById('sel-' + uid)
-  if (!sel) return
-  const plan = sel.value
-  if (!plan) return
-  await adminChangePlan(uid, plan)
+function saveCronograma() {
+  localStorage.setItem('bb_cronograma', JSON.stringify(_cronograma))
+  showXPToast(0, 'Cronograma salvo! ✅')
 }
 
-async function adminLoadUsers() {
-  if (!isAdmin()) return
-  const loading = document.getElementById('admin-loading')
-  const tbody = document.getElementById('admin-users-table')
-  loading.style.display = 'block'
-  loading.textContent = 'Carregando...'
-  tbody.innerHTML = ''
-  try {
-    const { getFirestore, collection, getDocs, getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const db2 = getFirestore()
-    // Tenta ler coleção completa (requer regra allow list no Firestore)
-    let snap
-    try {
-      snap = await getDocs(collection(db2, 'users'))
-      _adminUsers = []
-      snap.forEach(d => _adminUsers.push({ uid: d.id, ...d.data() }))
-    } catch(e2) {
-      // Fallback: mostra apenas o próprio usuário admin
-      const selfDoc = await getDoc(doc(db2, 'users', _uid))
-      _adminUsers = selfDoc.exists() ? [{ uid: _uid, ...selfDoc.data() }] : []
-      loading.textContent = '⚠️ Permissão limitada — mostrando apenas seu usuário. Para ver todos, publique as regras do Firestore com "allow list".'
-      loading.style.display = 'block'
-    }
-    adminRenderTable(_adminUsers)
-    adminUpdateStats(_adminUsers)
-    if(_adminUsers.length > 0) loading.style.display = 'none'
-  } catch (e) {
-    loading.textContent = 'Erro ao carregar: ' + e.message
-  }
+function clearCronograma() {
+  if (!confirm('Limpar todo o cronograma?')) return
+  _cronograma = {}
+  saveCronograma()
+  renderCronograma()
 }
 
-function adminRenderTable(users) {
-  const tbody = document.getElementById('admin-users-table')
-  tbody.innerHTML = ''
-  if (!users.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#9ca3af">Nenhum usuário encontrado.</td></tr>'
-    return
-  }
-  const planColors = { free: '#6b7280', basico: '#0038A8', pro: '#F9DD16' }
-  const planBg = { free: '#f3f4f6', basico: '#EEF3FF', pro: '#001A55' }
-  users.forEach(u => {
-    const tr = document.createElement('tr')
-    tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
-    const plan = u.plan || 'free'
-    const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
-    tr.innerHTML = `
-      <td style="padding:.85rem 1rem">
-        <div style="font-weight:600;font-size:.85rem">${_esc(u.name || '—')}</div>
-        <div style="font-size:.7rem;color:#9ca3af">${_esc(u.uid)}</div>
-      </td>
-      <td style="text-align:center;padding:.75rem">
-        <span style="padding:.25rem .75rem;border-radius:2rem;font-size:.72rem;font-weight:700;background:${planBg[plan]};color:${planColors[plan]}">${plan.toUpperCase()}</span>
-      </td>
-      <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
-      <td style="text-align:center;padding:.75rem">
-        <div style="display:flex;gap:.4rem;align-items:center">
-          <select id="sel-${_esc(u.uid)}" style="padding:.35rem .6rem;border:1.5px solid #e5e7eb;border-radius:.6rem;font-size:.75rem;background:white;cursor:pointer">
-            <option value="${plan}">${plan.toUpperCase()} (atual)</option>
-            ${plan!=='free'?'<option value="free">→ Free</option>':''}
-            ${plan!=='basico'?'<option value="basico">→ Básico</option>':''}
-            ${plan!=='pro'?'<option value="pro">→ Pro</option>':''}
-          </select>
-          <button onclick="adminSavePlan('${_esc(u.uid)}')" style="padding:.35rem .7rem;background:#0038A8;color:white;border:none;border-radius:.6rem;font-size:.72rem;font-weight:700;cursor:pointer">Salvar</button>
+function renderCronograma() {
+  loadCronograma()
+  const grid = document.getElementById('cronograma-grid')
+  if (!grid) return
+
+  const days = CRONO_DAYS
+  const hours = CRONO_HOURS
+  const cellW = 110
+  const cellH = 48
+
+  let html = `<table style="border-collapse:collapse;min-width:${cellW * (days.length+1)}px">`
+
+  // Header dias
+  html += '<thead><tr>'
+  html += `<th style="width:60px;padding:.4rem .6rem;font-size:.65rem;color:#9ca3af;font-weight:700;text-align:right;border-bottom:2px solid #f3f4f6">Horário</th>`
+  days.forEach((d,di) => {
+    const isWeekend = di === 0 || di === 6
+    html += `<th style="width:${cellW}px;padding:.4rem;font-size:.75rem;font-weight:800;color:${isWeekend?'#dc2626':'#111827'};border-bottom:2px solid #f3f4f6;text-align:center">${d}</th>`
+  })
+  html += '</tr></thead><tbody>'
+
+  hours.forEach((hour, hi) => {
+    html += '<tr>'
+    html += `<td style="padding:.3rem .6rem;font-size:.68rem;font-weight:700;color:#9ca3af;text-align:right;border-bottom:1px solid #f9fafb;white-space:nowrap">${hour}</td>`
+
+    days.forEach((d, di) => {
+      const cell = (_cronograma[di] && _cronograma[di][hi]) || {type:'',label:''}
+      const ct = CRONO_TYPES.find(t => t.id === cell.type) || CRONO_TYPES[0]
+      const subjectLabel = cell.subjectName ? `<div style="font-size:.58rem;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(cell.subjectName)}</div>` : ''
+      html += `<td style="padding:2px;border-bottom:1px solid #f9fafb;border-left:1px solid #f9fafb">
+        <div onclick="openCronoCell(${di},${hi})" style="background:${ct.bg};border:1.5px solid ${ct.border};border-radius:.5rem;height:${cellH-6}px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.2rem .3rem;transition:all .12s;font-size:.65rem;font-weight:700;color:${ct.text};text-align:center" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+          ${cell.label ? `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:${cellW-12}px">${_esc(cell.label)}</div>` : (cell.type ? `<div>${ct.label}</div>` : '<div style="opacity:.25;font-size:.7rem">+</div>')}
+          ${subjectLabel}
         </div>
       </td>`
-    tbody.appendChild(tr)
+    })
+    html += '</tr>'
   })
+
+  html += '</tbody></table>'
+  grid.innerHTML = html
 }
 
-function adminUpdateStats(users) {
-  const total = users.length
-  const byPlan = { free: 0, basico: 0, pro: 0 }
-  users.forEach(u => { const p = u.plan || 'free'; byPlan[p] = (byPlan[p] || 0) + 1 })
-  const mrr = (byPlan.basico * 12.9) + (byPlan.pro * 19.9)
-  document.getElementById('stat-total').textContent = total
-  document.getElementById('stat-free').textContent = byPlan.free
-  document.getElementById('stat-basico').textContent = byPlan.basico
-  document.getElementById('stat-pro').textContent = byPlan.pro
-  document.getElementById('stat-mrr').textContent = 'R$' + mrr.toFixed(2)
+function openCronoCell(dayIdx, hourIdx) {
+  if (!_cronograma[dayIdx]) _cronograma[dayIdx] = {}
+  const cur = _cronograma[dayIdx][hourIdx] || {type:'',label:'',subjectName:''}
+
+  // Modal simples inline
+  const types = CRONO_TYPES
+  const subjectOptions = subjects.map(s => `<option value="${_esc(s.name)}" ${cur.subjectName===s.name?'selected':''}>${_esc(s.name)}</option>`).join('')
+
+  const modal = document.createElement('div')
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem'
+  modal.innerHTML = `
+    <div style="background:white;border-radius:1.5rem;padding:1.75rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <h3 style="font-weight:800;font-size:1rem;margin-bottom:1rem">⏰ ${CRONO_DAYS[dayIdx]} — ${CRONO_HOURS[hourIdx]}</h3>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase">Tipo</label>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem" id="crono-type-btns">
+            ${types.map(t => `<button type="button" onclick="selectCronoType('${t.id}')" id="ctype-${t.id||'livre'}" style="padding:.3rem .7rem;border-radius:.5rem;font-size:.72rem;font-weight:700;border:2px solid ${t.border};background:${cur.type===t.id?t.bg:'white'};color:${t.text};cursor:pointer">${t.label||'Livre'}</button>`).join('')}
+          </div>
+        </div>
+        <div id="crono-subject-row" style="${cur.type==='study'?'':'display:none'}">
+          <label style="font-size:.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase">Matéria</label>
+          <select id="crono-subject-sel" style="margin-top:.35rem;width:100%;padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white">
+            <option value="">Selecione...</option>${subjectOptions}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase">Descrição (opcional)</label>
+          <input id="crono-label-inp" type="text" value="${_esc(cur.label||'')}" maxlength="30" placeholder="Ex: Português, Almoço..." style="margin-top:.35rem;width:100%;padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem">
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;margin-top:1.25rem">
+        <button onclick="saveCronoCell(${dayIdx},${hourIdx});this.closest('[style*=fixed]').remove()" class="btn-bb" style="flex:1;padding:.75rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer">Salvar</button>
+        <button onclick="clearCronoCell(${dayIdx},${hourIdx});this.closest('[style*=fixed]').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer;background:#fee2e2;color:#dc2626">Limpar</button>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="padding:.75rem 1rem;border-radius:.85rem;font-weight:600;border:2px solid #e5e7eb;background:white;color:#6b7280;cursor:pointer">✕</button>
+      </div>
+    </div>`
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove() })
+  document.body.appendChild(modal)
+  // Store temp selected type
+  window._cronoTmpType = cur.type || ''
 }
 
-function adminFilterUsers() {
-  const q = document.getElementById('admin-search').value.toLowerCase()
-  const planF = document.getElementById('admin-filter-plan').value
-  const filtered = _adminUsers.filter(u => {
-    const matchQ = !q || (u.uid || '').toLowerCase().includes(q) || (u.name || '').toLowerCase().includes(q)
-    const matchP = !planF || (u.plan || 'free') === planF
-    return matchQ && matchP
-  })
-  adminRenderTable(filtered)
-}
-
-async function adminChangePlan(uid, plan) {
-  if (!plan || !isAdmin()) return
-  if (!confirm(`Alterar plano de ${uid} para "${plan}"?`)) return
-  try {
-    // Usa o mesmo firebase já inicializado na página
-    const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const db2 = getFirestore()
-    // Salva APENAS o campo plan — não toca em nenhum outro dado
-    await setDoc(doc(db2, 'users', uid), { plan: plan, planUpdatedAt: serverTimestamp() }, { merge: true })
-    // Verifica se salvou corretamente
-    const { getDoc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const check = await getDoc(doc(db2, 'users', uid))
-    const savedPlan = check.data()?.plan
-    if (savedPlan !== plan) throw new Error('Plano não foi salvo corretamente: ' + savedPlan)
-    // Atualiza sessão se for o próprio admin
-    if (uid === _uid) {
-      _userPlan = plan
-      updatePlanUI()
+function selectCronoType(typeId) {
+  window._cronoTmpType = typeId
+  const types = CRONO_TYPES
+  types.forEach(t => {
+    const btn = document.getElementById('ctype-' + (t.id || 'livre'))
+    if (btn) {
+      const ct = types.find(x => x.id === t.id) || types[0]
+      btn.style.background = typeId === t.id ? ct.bg : 'white'
     }
-    alert(`✅ Plano alterado para "${plan}" com sucesso!`)
-    adminLoadUsers()
-  } catch (e) {
-    alert('❌ Erro ao alterar plano: ' + e.message)
-    console.error('adminChangePlan error:', e)
+  })
+  const subRow = document.getElementById('crono-subject-row')
+  if (subRow) subRow.style.display = typeId === 'study' ? 'block' : 'none'
+}
+
+function saveCronoCell(dayIdx, hourIdx) {
+  if (!_cronograma[dayIdx]) _cronograma[dayIdx] = {}
+  const label = document.getElementById('crono-label-inp')?.value?.trim() || ''
+  const subjectName = document.getElementById('crono-subject-sel')?.value || ''
+  _cronograma[dayIdx][hourIdx] = { type: window._cronoTmpType || '', label, subjectName }
+  renderCronograma()
+}
+
+function clearCronoCell(dayIdx, hourIdx) {
+  if (_cronograma[dayIdx]) delete _cronograma[dayIdx][hourIdx]
+  renderCronograma()
+}
+
+// ═══════════════════════════════════════════════════
+// DISTRIBUIÇÃO POR MATÉRIA
+// ═══════════════════════════════════════════════════
+let _distribuicao = {} // { subjectId: horasSemana }
+
+function loadDistribuicao() {
+  try { _distribuicao = JSON.parse(localStorage.getItem('bb_distribuicao') || '{}') } catch { _distribuicao = {} }
+}
+
+function saveDistribuicao() {
+  localStorage.setItem('bb_distribuicao', JSON.stringify(_distribuicao))
+  showXPToast(0, 'Distribuição salva! ✅')
+  renderDistribuicao()
+}
+
+function renderDistribuicao() {
+  loadDistribuicao()
+  const container = document.getElementById('distribuicao-subjects')
+  const chart = document.getElementById('distribuicao-chart')
+  const totalEl = document.getElementById('distribuicao-total')
+  if (!container || !chart) return
+
+  if (!subjects.length) {
+    container.innerHTML = '<p style="font-size:.82rem;color:#9ca3af;font-style:italic">Adicione matérias no Plano de Estudos primeiro.</p>'
+    chart.innerHTML = ''
+    return
+  }
+
+  // Inputs por matéria
+  container.innerHTML = subjects.map(sub => {
+    const val = _distribuicao[sub.id] || 0
+    return `<div style="display:flex;align-items:center;gap:.75rem">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(sub.name)}</div>
+        <div style="font-size:.68rem;color:#9ca3af">Progresso atual: ${sub.progress}%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.35rem;flex-shrink:0">
+        <button onclick="adjustDist(${sub.id},-0.5)" style="width:26px;height:26px;border-radius:.45rem;border:none;background:#f3f4f6;cursor:pointer;font-weight:800;font-size:.9rem;color:#374151">−</button>
+        <input type="number" id="dist-${sub.id}" value="${val}" min="0" max="40" step="0.5" onchange="updateDist(${sub.id},this.value)" style="width:52px;padding:.35rem .4rem;border:2px solid #e5e7eb;border-radius:.65rem;font-size:.85rem;font-weight:700;text-align:center">
+        <button onclick="adjustDist(${sub.id},0.5)" style="width:26px;height:26px;border-radius:.45rem;border:none;background:#EEF3FF;cursor:pointer;font-weight:800;font-size:.9rem;color:#0038A8">+</button>
+        <span style="font-size:.72rem;color:#9ca3af;width:16px">h</span>
+      </div>
+    </div>`
+  }).join('')
+
+  // Total
+  const total = subjects.reduce((a, s) => a + (parseFloat(_distribuicao[s.id]) || 0), 0)
+  if (totalEl) totalEl.textContent = total.toFixed(1) + 'h'
+
+  // Gráfico de barras
+  const maxH = Math.max(...subjects.map(s => parseFloat(_distribuicao[s.id]) || 0), 1)
+  const colors = ['#0038A8','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2','#db2777','#065f46']
+  chart.innerHTML = subjects.map((sub, i) => {
+    const h = parseFloat(_distribuicao[sub.id]) || 0
+    const pct = Math.round(h / maxH * 100)
+    const totalPct = total ? Math.round(h / total * 100) : 0
+    const color = colors[i % colors.length]
+    return `<div>
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:.2rem">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${_esc(sub.name)}</span>
+        <span style="color:${color};font-weight:800;flex-shrink:0">${h}h <span style="color:#9ca3af;font-weight:500">(${totalPct}%)</span></span>
+      </div>
+      <div style="height:10px;background:#f3f4f6;border-radius:9999px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:9999px;transition:width .6s ease"></div>
+      </div>
+    </div>`
+  }).join('')
+
+  // Sugestão automática baseada em progresso
+  const leastProgress = subjects.slice().sort((a,b) => a.progress - b.progress)[0]
+  if (leastProgress && chart) {
+    const tip = document.createElement('div')
+    tip.style.cssText = 'margin-top:.75rem;background:#FEF3C7;border-radius:.85rem;padding:.75rem 1rem;font-size:.75rem;color:#92400e;font-weight:600'
+    tip.innerHTML = `⚠️ <strong>${_esc(leastProgress.name)}</strong> tem o menor progresso (${leastProgress.progress}%). Considere aumentar as horas desta matéria.`
+    chart.appendChild(tip)
   }
 }
 
-// Atualiza toda a UI após mudança de plano
-function updatePlanUI() {
-  // Atualiza badge do plano na tela de preços
-  const labels = { free: 'Free (Gratuito)', basico: 'Básico (R$12,90/mês)', pro: 'Pro (R$19,90/mês)' }
-  const el = document.getElementById('current-plan-label')
-  if (el) el.textContent = 'Plano atual: ' + (labels[_userPlan] || 'Free')
-  // Mostra toast de confirmação
-  const names = { free: 'Free', basico: 'Básico', pro: 'Pro' }
-  showXPToast(0, '🎉 Plano ' + (names[_userPlan] || _userPlan) + ' ativado!')
+function updateDist(subId, val) {
+  _distribuicao[subId] = Math.max(0, Math.min(40, parseFloat(val) || 0))
+  renderDistribuicao()
 }
 
-// Mostrar link Admin no menu apenas para admins
-function checkAdminAccess() {
-  if (!isAdmin()) return
-  // Adicionar item admin na nav desktop
-  const navSettings = document.getElementById('nav-settings')
-  if (navSettings && !document.getElementById('nav-admin')) {
-    const a = document.createElement('a')
-    a.id = 'nav-admin'
-    a.className = 'nav-item'
-    a.onclick = () => navigateTo('admin')
-    a.style.cssText = navSettings.style.cssText
-    a.style.color = '#ef4444'
-    a.innerHTML = '<i class="fas fa-shield-alt"></i><span>Admin</span>'
-    navSettings.parentNode.insertBefore(a, navSettings.nextSibling)
-  }
-}
-
-// Chamar checkAdminAccess após login
-const _origOnFirebaseReady = window.onFirebaseReady
-window.onFirebaseReady = async function(user) {
-  await _origOnFirebaseReady(user)
-  checkAdminAccess()
+function adjustDist(subId, delta) {
+  const cur = parseFloat(_distribuicao[subId]) || 0
+  _distribuicao[subId] = Math.max(0, Math.min(40, Math.round((cur + delta) * 2) / 2))
+  const inp = document.getElementById('dist-' + subId)
+  if (inp) inp.value = _distribuicao[subId]
+  renderDistribuicao()
 }
 
 // Registrar Service Worker para PWA
