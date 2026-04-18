@@ -1,71 +1,45 @@
-const admin = require('firebase-admin');
-const db    = admin.firestore;
+const admin = require('firebase-admin')
 
-const VALID_KEYS = ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books'];
+const VALID_KEYS = [
+  'profile','subjects','daily','sessions','reviews','tasks',
+  'gamification','notes','books','cronograma','distribuicao'
+]
 
-/**
- * Carrega todos os documentos de dados do usuário
- */
-async function loadUserData(uid) {
-  const refs  = VALID_KEYS.map(k => db().collection('users').doc(uid).collection('data').doc(k));
-  const snaps = await Promise.all(refs.map(r => r.get()));
-  const result = {};
-  snaps.forEach((snap, i) => {
-    result[VALID_KEYS[i]] = snap.exists ? snap.data() : null;
-  });
-  return result;
+function ref(uid, key) {
+  return admin.firestore().doc(`users/${uid}/data/${key}`)
 }
 
-/**
- * Salva um documento de dados do usuário
- */
-async function saveUserDoc(uid, key, data) {
-  if (!VALID_KEYS.includes(key)) throw new Error('Chave inválida.');
-  const ref = db().collection('users').doc(uid).collection('data').doc(key);
-  await ref.set(data, { merge: false });
-  return true;
+async function loadAll(uid) {
+  const snaps = await Promise.all(VALID_KEYS.map(k => ref(uid, k).get()))
+  const result = {}
+  snaps.forEach((s, i) => { result[VALID_KEYS[i]] = s.exists ? s.data() : null })
+  return result
 }
 
-/**
- * Salva múltiplos documentos em batch
- */
-async function saveUserDataBatch(uid, payload) {
-  const batch = db().batch();
-  for (const [key, data] of Object.entries(payload)) {
-    if (!VALID_KEYS.includes(key)) continue;
-    const ref = db().collection('users').doc(uid).collection('data').doc(key);
-    batch.set(ref, data);
+async function save(uid, key, data) {
+  if (!VALID_KEYS.includes(key)) throw new Error('Chave inválida: ' + key)
+  return ref(uid, key).set(data, { merge: true })
+}
+
+async function saveAll(uid, payload) {
+  const entries = Object.entries(payload).filter(([k]) => VALID_KEYS.includes(k))
+  return Promise.all(entries.map(([k, v]) => ref(uid, k).set(v)))
+}
+
+async function getUserPlan(uid) {
+  try {
+    const snap = await admin.firestore().doc(`users/${uid}`).get()
+    return snap.exists ? (snap.data().plan || 'free') : 'free'
+  } catch {
+    return 'free'
   }
-  await batch.commit();
-  return true;
 }
 
-/**
- * Lê o perfil do usuário (inclui plano)
- */
-async function getUserProfile(uid) {
-  const ref  = db().collection('users').doc(uid);
-  const snap = await ref.get();
-  return snap.exists ? snap.data() : null;
+async function initUser(uid, data) {
+  return admin.firestore().doc(`users/${uid}`).set(
+    { plan: 'free', createdAt: admin.firestore.FieldValue.serverTimestamp(), ...data },
+    { merge: true }
+  )
 }
 
-/**
- * Cria/atualiza perfil do usuário (inclui plano padrão)
- */
-async function upsertUserProfile(uid, data) {
-  const ref = db().collection('users').doc(uid);
-  await ref.set({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-}
-
-/**
- * Deleta todos os dados do usuário
- */
-async function deleteUserData(uid) {
-  const batch = db().batch();
-  const refs  = VALID_KEYS.map(k => db().collection('users').doc(uid).collection('data').doc(k));
-  refs.forEach(r => batch.delete(r));
-  batch.delete(db().collection('users').doc(uid));
-  await batch.commit();
-}
-
-module.exports = { loadUserData, saveUserDoc, saveUserDataBatch, getUserProfile, upsertUserProfile, deleteUserData };
+module.exports = { VALID_KEYS, loadAll, save, saveAll, getUserPlan, initUser }
