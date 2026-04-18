@@ -3529,7 +3529,7 @@ async function adminLoadUsers() {
   if (tbody) tbody.innerHTML = ''
   try {
     const token = await window._currentUser.getIdToken()
-    const res = await fetch('/api/admin/users', { headers: { Authorization: 'Bearer ' + token } })
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/users', { headers: { Authorization: 'Bearer ' + token } })
     if (!res.ok) throw new Error(await res.text())
     _adminUsers = await res.json()
     adminRenderTable(_adminUsers)
@@ -3621,7 +3621,7 @@ async function adminChangePlan(uid, plan) {
   if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
     const token = await window._currentUser.getIdToken()
-    const res = await fetch('/api/admin/' + uid + '/plan', {
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid + '/plan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ plan })
@@ -3823,7 +3823,7 @@ async function adminDeleteUser(uid) {
   if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
     const token = await window._currentUser.getIdToken()
-    const res = await fetch('/api/admin/' + uid, {
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid, {
       method: 'DELETE',
       headers: { Authorization: 'Bearer ' + token }
     })
