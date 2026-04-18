@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const authenticate = require('../middleware/auth')
+const { authenticate } = require('../middleware/auth')
 const adminCtrl = require('../controllers/adminController')
 
 const ADMIN_UIDS = ['2WKwdCPEJoMocxRv8cOdZn31kjn2']
