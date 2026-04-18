@@ -13,9 +13,9 @@
 <meta name="theme-color" content="#0038A8">
 <meta name="description" content="Planner inteligente para concurso do Banco do Brasil">
 <title>EstudoBB • Planner Inteligente</title>
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="apple-touch-icon" href="/icon-192.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="icon-192.svg">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -361,7 +361,6 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 <div class="bb-header" style="color:white;box-shadow:0 4px 24px rgba(0,0,0,.25);position:sticky;top:0;z-index:50">
   <div style="max-width:1280px;margin:0 auto;padding:.75rem 1rem 0;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
     <div style="display:flex;align-items:center;gap:.65rem;flex-shrink:0">
-      <a href="/" style="display:flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.1);border-radius:.6rem;padding:.35rem .65rem;font-size:.65rem;font-weight:600;color:rgba(255,255,255,.7);text-decoration:none;transition:background .15s;margin-right:.25rem" onmouseenter="this.style.background='rgba(255,255,255,.18)'" onmouseleave="this.style.background='rgba(255,255,255,.1)'" title="Página inicial"><i class="fas fa-home" style="font-size:.7rem"></i></a>
       <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
         <rect width="38" height="38" rx="9" fill="rgba(255,255,255,.15)"/>
         <path d="M19 5 L31 9.5 L31 19 Q31 28 19 33 Q7 28 7 19 L7 9.5 Z" fill="rgba(255,255,255,.2)"/>
@@ -1641,15 +1640,15 @@ async function confirmDeleteAccount(){
       const {deleteDoc,doc:fdoc,getFirestore:gfs}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
       const {getApp}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js')
       const _delDb=gfs(getApp())
-      const keys=['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books']
+      const keys=['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books','cronograma','distribuicao']
       await Promise.allSettled(keys.map(k=>deleteDoc(fdoc(_delDb,'users',_uid,'data',k))))
     }
-    const lsKeys=['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books']
+    const lsKeys=['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books','cronograma','distribuicao']
     lsKeys.forEach(k=>localStorage.removeItem('bb_'+k))
-    const {deleteUser}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js')
-    const {getAuth:gAuth,getApp:gApp2}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js').catch(()=>({}))
-    const currentUser=window._currentUser
-    if(currentUser){const {deleteUser:du}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js');await du(currentUser);}
+    if(window._currentUser){
+      const {deleteUser:du}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js')
+      await du(window._currentUser)
+    }
     closeModal('modal-delete-account')
     alert('Sua conta e todos os dados foram excluídos com sucesso.')
   }catch(e){
@@ -3449,17 +3448,32 @@ async function renderPricing() {
   if (el) el.textContent = 'Plano atual: ' + (planLabels[_userPlan] || 'Free')
   setPricingPeriod(_pricingPeriod)
 
-  // Update buttons based on current plan
   const base = _planBase ? _planBase(_userPlan) : _userPlan
   ;['free','basico','pro'].forEach(plan => {
     const btn = document.getElementById('btn-plan-' + plan)
     if (!btn) return
-    if (plan === 'free' && _userPlan === 'free') {
-      btn.textContent = '✓ Plano atual'; btn.style.cursor = 'default'
-    } else if (plan !== 'free' && (base === plan)) {
-      btn.textContent = '✓ Plano ativo'; btn.style.background = '#e5e7eb'; btn.style.color = '#6b7280'; btn.style.cursor = 'default'
-    } else if (plan === 'free') {
-      btn.textContent = _userPlan !== 'free' ? 'Fazer downgrade' : '✓ Plano atual'
+    const isCurrent = base === plan || (_userPlan === 'free' && plan === 'free')
+    if (isCurrent) {
+      btn.textContent = '✓ Plano ativo'
+      btn.style.background = '#e5e7eb'
+      btn.style.color = '#6b7280'
+      btn.style.cursor = 'default'
+      btn.onmouseenter = null
+      btn.onmouseleave = null
+    } else {
+      const labels = { basico:'Assinar Básico →', pro:'Assinar Pro →', free:'Fazer downgrade' }
+      const colors = {
+        basico: { bg:'#0038A8', hover:'#002B85', color:'white' },
+        pro:    { bg:'#F9DD16', hover:'#E8C800', color:'#001A55' },
+        free:   { bg:'white',   hover:'white',   color:'#94a3b8' }
+      }
+      const c = colors[plan]
+      btn.textContent = labels[plan]
+      btn.style.background = c.bg
+      btn.style.color = c.color
+      btn.style.cursor = plan === 'free' ? 'default' : 'pointer'
+      btn.onmouseenter = plan !== 'free' ? () => { btn.style.background = c.hover } : null
+      btn.onmouseleave = plan !== 'free' ? () => { btn.style.background = c.bg }   : null
     }
   })
 }
@@ -3514,30 +3528,15 @@ async function adminLoadUsers() {
   if (loading) { loading.style.display = 'block'; loading.textContent = 'Carregando...' }
   if (tbody) tbody.innerHTML = ''
   try {
-    // Tenta getDocs via import dinâmico (requer regras admin no Firestore)
-    const { getFirestore, collection, getDocs, getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const db2 = getFirestore()
-    try {
-      const snap = await getDocs(collection(db2, 'users'))
-      _adminUsers = []
-      snap.forEach(d => _adminUsers.push({ uid: d.id, ...d.data() }))
-    } catch(e2) {
-      // Fallback: carrega apenas o próprio usuário via _fbService
-      try {
-        const selfData = await window._fbService.loadAll(_uid)
-        const selfUser = { uid: _uid, plan: await window._fbService.getUserPlan(_uid).catch(()=>'free'), name: selfData?.profile?.name || '—', email: selfData?.profile?.email || '', createdAt: null }
-        _adminUsers = [selfUser]
-        if (loading) loading.textContent = '⚠️ Para listar todos os usuários, configure a Cloud Function /admin/users ou as Firestore Rules com a claim admin=true no Firebase Authentication.'
-      } catch(e3) {
-        _adminUsers = []
-        if (loading) loading.textContent = '⚠️ Para listar todos os usuários, configure a Cloud Function /admin/users ou as Firestore Rules com a claim admin=true no Firebase Authentication.'
-      }
-    }
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('/api/admin/users', { headers: { Authorization: 'Bearer ' + token } })
+    if (!res.ok) throw new Error(await res.text())
+    _adminUsers = await res.json()
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
-    if (_adminUsers.length > 0 && loading) loading.style.display = 'none'
+    if (loading) loading.style.display = 'none'
   } catch (e) {
-    if (loading) loading.textContent = 'Erro: ' + e.message
+    if (loading) { loading.style.display = 'block'; loading.textContent = 'Erro: ' + e.message }
   }
 }
 
@@ -3552,7 +3551,6 @@ function adminRenderTable(users) {
   const planBg  = { free:'#f3f4f6', basico:'#EEF3FF', basicoAnual:'#dbeafe', pro:'#001A55', proAnual:'#001A55' }
   const planFg  = { free:'#6b7280', basico:'#0038A8', basicoAnual:'#1d4ed8', pro:'#F9DD16', proAnual:'#F9DD16' }
   const planLbl = { free:'FREE', basico:'BÁSICO', basicoAnual:'BÁSICO ANUAL', pro:'PRO', proAnual:'PRO ANUAL' }
-  // BUG #8 FIX: usa data-uid em vez de onclick inline para evitar problemas com UIDs especiais
   users.forEach(u => {
     const tr = document.createElement('tr')
     tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
@@ -3580,14 +3578,10 @@ function adminRenderTable(users) {
             ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
           </select>
           <button class="admin-save-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
+          <button class="admin-del-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
         </div>
       </td>`
     tbody.appendChild(tr)
-  })
-  // BUG #8 FIX: delegador de eventos centralizado no tbody
-  tbody.addEventListener('click', e => {
-    const btn = e.target.closest('.admin-save-btn')
-    if (btn) adminSavePlan(btn.dataset.uid)
   })
 }
 
@@ -3626,9 +3620,13 @@ async function adminChangePlan(uid, plan) {
   const btn = document.querySelector(`.admin-save-btn[data-uid="${_esc(uid)}"]`)
   if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
-    // Usa import único e sem verificação extra (mais rápido)
-    const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    await setDoc(doc(getFirestore(),'users',uid), { plan, planUpdatedAt: serverTimestamp() }, { merge:true })
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('/api/admin/' + uid + '/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
     // Atualiza local sem recarregar tudo
     if (userObj) userObj.plan = plan
     if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
@@ -3641,7 +3639,6 @@ async function adminChangePlan(uid, plan) {
       sel.options[0].value = plan
     }
     showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
-    // Recarrega stats
     adminUpdateStats(_adminUsers)
     setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
   } catch (e) {
@@ -3820,9 +3817,39 @@ async function loadPlanTemplate(templateId) {
 }
 // /NOVO: Templates de Plano Inteligente
 
+async function adminDeleteUser(uid) {
+  if (!confirm('Excluir permanentemente este usuário?')) return
+  const btn = document.querySelector(`.admin-del-btn[data-uid="${uid}"]`)
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
+  try {
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('/api/admin/' + uid, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
+    _adminUsers = _adminUsers.filter(u => u.uid !== uid)
+    adminRenderTable(_adminUsers)
+    adminUpdateStats(_adminUsers)
+    showXPToast(0, '✅ Usuário excluído.')
+  } catch(e) {
+    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
+    setTimeout(() => { if (btn) { btn.textContent = 'Excluir'; btn.disabled = false } }, 2500)
+    alert('❌ Erro: ' + e.message)
+  }
+}
+
+// Delegador global da tabela admin (save + delete)
+document.getElementById('admin-users-table')?.addEventListener('click', e => {
+  const save = e.target.closest('.admin-save-btn')
+  const del  = e.target.closest('.admin-del-btn')
+  if (save) adminSavePlan(save.dataset.uid)
+  if (del)  adminDeleteUser(del.dataset.uid)
+})
+
 // Registrar Service Worker para PWA
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js?v=6').catch(()=>{})
+  navigator.serviceWorker.register('/sw.js?v=5').catch(()=>{})
 }
 </script>
 </body>
