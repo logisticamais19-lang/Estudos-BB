@@ -334,7 +334,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     </div>
     <div id="form-signup" style="display:none">
       <div style="display:flex;flex-direction:column;gap:.85rem">
-        <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.08em">Nome *</label><div class="pass-wrap" style="margin-top:.3rem"><input id="signup-name" type="text" placeholder="João Silva" maxlength="50" style="width:100%"></div></div>
+        <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.08em">Nome e Sobrenome *</label><div class="pass-wrap" style="margin-top:.3rem"><input id="signup-name" type="text" placeholder="João Silva" maxlength="80" style="width:100%"></div></div>
         <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.08em">E-mail *</label><div class="pass-wrap" style="margin-top:.3rem"><input id="signup-email" type="email" placeholder="seu@email.com" style="width:100%"></div></div>
         <div><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.08em">Senha *</label><div class="pass-wrap"><input id="signup-pass" type="password" placeholder="Mínimo 6 caracteres"><button type="button" class="eye-btn" onclick="toggleEye('signup-pass','eye-signup')"><i id="eye-signup" class="fas fa-eye"></i></button></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
@@ -1557,7 +1557,8 @@ async function doSignup(){
   const email=document.getElementById('signup-email').value.trim()
   const pass=document.getElementById('signup-pass').value
   const terms=document.getElementById('signup-terms')
-  if(!name){shakeEl('signup-name');showAuthError('signup-error','Nome é obrigatório.');return}
+  if(!name){shakeEl('signup-name');showAuthError('signup-error','Nome e sobrenome são obrigatórios.');return}
+  if(name.trim().split(/\s+/).length < 2){shakeEl('signup-name');showAuthError('signup-error','Por favor, informe nome e sobrenome.');return}
   if(!email){shakeEl('signup-email');showAuthError('signup-error','E-mail é obrigatório.');return}
   if(pass.length<6){shakeEl('signup-pass');showAuthError('signup-error','Senha mínima: 6 caracteres.');return}
   if(terms&&!terms.checked){
@@ -1567,16 +1568,51 @@ async function doSignup(){
     shakeEl('terms-label');return
   }
   const fb=window._firebase;if(!fb){showAuthError('signup-error','Firebase não configurado.');return}
+  // Disable button while processing
+  const signupBtn = document.querySelector('#form-signup .btn-bb')
+  if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = 'Criando conta...' }
   try{
     const cred=await fb.createUserWithEmailAndPassword(email,pass)
     profile={name,email,dailyGoalH:parseInt(document.getElementById('signup-daily').value)||2,monthlyGoalH:parseInt(document.getElementById('signup-monthly').value)||60}
     _uid=cred.user.uid
-    await window._fbService.initUser(_uid,{plan:'free'})
+    await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
+    // ✅ Mostrar tela de sucesso e voltar para login
+    showSignupSuccess(name)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
     showAuthError('signup-error',msgs[e.code]||'Erro: '+e.message)
+    if (signupBtn) { signupBtn.disabled = false; signupBtn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:.5rem"></i>CRIAR CONTA' }
+  }
+}
+
+function showSignupSuccess(name) {
+  const firstName = name.split(' ')[0]
+  const formSignup = document.getElementById('form-signup')
+  if (!formSignup) return
+  // Replace form content with success message
+  formSignup.innerHTML = `
+    <div style="text-align:center;padding:1rem 0">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(16,185,129,.3)">
+        <i class="fas fa-check" style="color:white;font-size:1.6rem"></i>
+      </div>
+      <h3 style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:.4rem">Conta criada com sucesso! 🎉</h3>
+      <p style="font-size:.85rem;color:#6b7280;line-height:1.6;margin-bottom:.3rem">Bem-vindo(a), <strong style="color:#0038A8">${_esc(firstName)}</strong>!</p>
+      <p style="font-size:.82rem;color:#9ca3af;margin-bottom:1.5rem">Sua conta foi criada. Faça login para começar seus estudos.</p>
+      <button onclick="switchAuthTab('login');document.getElementById('login-email').value='${_esc(email)}'" class="btn-bb" style="width:100%;padding:.9rem;border-radius:.85rem;font-weight:700;font-size:.95rem;border:none;cursor:pointer">
+        <i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>Ir para o Login
+      </button>
+    </div>`
+  // Restore form on next signup tab click
+  const tabSignup = document.getElementById('tab-signup')
+  if (tabSignup) {
+    const origSwitch = tabSignup.onclick
+    tabSignup.onclick = () => {
+      formSignup.innerHTML = ''
+      switchAuthTab('signup')
+      tabSignup.onclick = origSwitch
+    }
   }
 }
 function showDeleteAccountModal(){
@@ -3488,7 +3524,7 @@ async function adminLoadUsers() {
       // Fallback: carrega apenas o próprio usuário via _fbService
       try {
         const selfData = await window._fbService.loadAll(_uid)
-        const selfUser = { uid: _uid, plan: await window._fbService.getUserPlan(_uid).catch(()=>'free'), name: selfData?.profile?.name || '—', createdAt: null }
+        const selfUser = { uid: _uid, plan: await window._fbService.getUserPlan(_uid).catch(()=>'free'), name: selfData?.profile?.name || '—', email: selfData?.profile?.email || '', createdAt: null }
         _adminUsers = [selfUser]
         if (loading) loading.textContent = '⚠️ Para listar todos os usuários, configure a Cloud Function /admin/users ou as Firestore Rules com a claim admin=true no Firebase Authentication.'
       } catch(e3) {
@@ -3524,8 +3560,9 @@ function adminRenderTable(users) {
     const safeUid = _esc(u.uid)
     tr.innerHTML = `
       <td style="padding:.85rem 1rem">
-        <div style="font-weight:600;font-size:.85rem">${_esc(u.name||'—')}</div>
-        <div style="font-size:.68rem;color:#9ca3af">${safeUid}</div>
+        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}</div>
+        <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
+        <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
       </td>
       <td style="text-align:center;padding:.75rem">
         <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
@@ -3579,22 +3616,38 @@ function adminFilterUsers() {
 
 async function adminChangePlan(uid, plan) {
   if (!plan || !isAdmin()) return
-  if (!confirm(`Alterar plano de ${uid} para "${plan}"?`)) return
+  // Encontra nome do usuário para confirmar
+  const userObj = _adminUsers.find(u => u.uid === uid)
+  const userName = userObj?.name || uid
+  const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
+  if (!confirm(`Alterar plano de:\n${userName}\npara: ${planLblMap[plan]||plan}?`)) return
+  // Feedback visual imediato
+  const btn = document.querySelector(`.admin-save-btn[data-uid="${_esc(uid)}"]`)
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
+    // Usa import único e sem verificação extra (mais rápido)
     const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    await setDoc(doc(getFirestore(),'users',uid), { plan, planUpdatedAt:serverTimestamp() }, { merge:true })
-    const { getDoc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const check = await getDoc(doc(getFirestore(),'users',uid))
-    if (check.data()?.plan !== plan) throw new Error('Plano não foi salvo corretamente')
-    if (uid === _uid) {
-      _userPlan = plan
-      updateHeaderUser()
-      showXPToast(0, '🎉 Plano ' + plan + ' ativado!')
+    await setDoc(doc(getFirestore(),'users',uid), { plan, planUpdatedAt: serverTimestamp() }, { merge:true })
+    // Atualiza local sem recarregar tudo
+    if (userObj) userObj.plan = plan
+    if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
+    if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
+    // Atualiza só a linha da tabela visualmente
+    const sel = document.getElementById('sel-' + _esc(uid))
+    if (sel) {
+      const planLbl = {free:'FREE',basico:'BÁSICO',basicoAnual:'BÁSICO ANUAL',pro:'PRO',proAnual:'PRO ANUAL'}
+      sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
+      sel.options[0].value = plan
     }
-    alert(`✅ Plano alterado para "${plan}"!`)
-    adminLoadUsers()
+    showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
+    // Recarrega stats
+    adminUpdateStats(_adminUsers)
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
   } catch (e) {
-    alert('❌ Erro: ' + e.message)
+    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
+    console.error('adminChangePlan error:', e)
+    alert('❌ Erro ao salvar: ' + e.message)
   }
 }
 
