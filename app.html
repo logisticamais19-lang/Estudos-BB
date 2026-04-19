@@ -713,6 +713,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <span id="book-page-title" style="font-weight:700;font-size:.9rem;color:#111827"></span>
     <div style="margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap">
       <button onclick="addPageBlock('text')"    style="padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer;background:#dbeafe;color:#1d4ed8;display:flex;align-items:center;gap:.3rem"><i class="fas fa-font"></i> Texto</button>
+      <button onclick="addPageBlock('draw')" style="padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer;background:#dbeafe;color:#1d4ed8;display:flex;align-items:center;gap:.3rem">🎨 Desenho</button>
       <button onclick="addPageBlock('image')"   style="padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer;background:#dcfce7;color:#15803d;display:flex;align-items:center;gap:.3rem"><i class="fas fa-image"></i> Imagem</button>
       <button onclick="addPageBlock('table')"   style="padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer;background:#ede9fe;color:#6d28d9;display:flex;align-items:center;gap:.3rem"><i class="fas fa-table"></i> Tabela</button>
       <button onclick="addPageBlock('mindmap')" style="padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer;background:#fef3c7;color:#92400e;display:flex;align-items:center;gap:.3rem"><i class="fas fa-project-diagram"></i> Mapa</button>
@@ -2249,7 +2250,19 @@ function renderBlock(block){
   actions.innerHTML=`<button class="block-btn" style="background:#EEF3FF;color:#0038A8" onclick="moveBlock('${block.id}',-1)" title="↑"><i class="fas fa-arrow-up"></i></button><button class="block-btn" style="background:#EEF3FF;color:#0038A8" onclick="moveBlock('${block.id}',1)" title="↓"><i class="fas fa-arrow-down"></i></button><button class="block-btn" style="background:#fee2e2;color:#dc2626" onclick="deleteBlock('${block.id}')" title="Excluir"><i class="fas fa-trash"></i></button>`
   div.appendChild(actions)
   let content=''
-  if(block.type==='text'){
+  if(block.type==='draw'){
+  const did='bdc-'+block.id;
+  content=`<div style="padding:.5rem 0">
+    <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;align-items:center">
+      <input type="color" id="bdc-col-${block.id}" value="#0038A8" style="width:32px;height:32px;border:none;cursor:pointer;border-radius:.4rem" title="Cor">
+      <input type="range" id="bdc-sz-${block.id}" min="1" max="30" value="4" style="width:80px" title="Espessura">
+      <button onclick="bookDraw('pencil','${block.id}')" style="padding:.3rem .6rem;border-radius:.5rem;font-size:.72rem;font-weight:700;border:2px solid #0038A8;cursor:pointer;background:#0038A8;color:white" title="Lápis">✏️</button>
+      <button onclick="bookDraw('eraser','${block.id}')" style="padding:.3rem .6rem;border-radius:.5rem;font-size:.72rem;border:2px solid #ccc;cursor:pointer;background:white" title="Borracha">🧹</button>
+      <button onclick="bookDraw('clear','${block.id}')" style="padding:.3rem .6rem;border-radius:.5rem;font-size:.72rem;border:none;cursor:pointer;background:#fee2e2;color:#dc2626" title="Limpar">Limpar</button>
+    </div>
+    <canvas id="${did}" width="700" height="300" style="border:2px solid #e5e7eb;border-radius:.85rem;max-width:100%;display:block;cursor:crosshair;touch-action:none;background:white"></canvas>
+  </div>`;
+} else if(block.type==='text'){
     content=`<div class="text-toolbar"><button onclick="execFmt('bold')"><b>B</b></button><button onclick="execFmt('italic')"><i>I</i></button><button onclick="execFmt('underline')"><u>U</u></button><button onclick="execFmt('formatBlock','H1')"><b>H1</b></button><button onclick="execFmt('formatBlock','H2')"><b>H2</b></button><button onclick="execFmt('insertUnorderedList')"><i class="fas fa-list-ul"></i></button><button onclick="execFmt('insertOrderedList')"><i class="fas fa-list-ol"></i></button><button onclick="execFmt('hiliteColor','#FFF9C4')" style="background:#FFF9C4"><i class="fas fa-highlighter"></i></button></div>
     <div class="page-editable" contenteditable="true" data-placeholder="Digite seu texto aqui..." oninput="updateBlockContent('${block.id}',this.innerHTML)">${block.content||''}</div>`
   } else if(block.type==='image'){
@@ -3843,6 +3856,31 @@ document.getElementById('admin-users-table')?.addEventListener('click', e => {
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js?v=5').catch(()=>{})
 }
+
+// Cadernos: funcao de desenho por bloco
+window.bookDraw=(function(){
+  const _s={};
+  return function(cmd,bid){
+    const cv=document.getElementById('bdc-'+bid);
+    if(!cv)return;
+    if(!_s[bid])_s[bid]={on:false,tool:'pencil'};
+    const s=_s[bid];
+    const ctx=cv.getContext('2d');
+    if(cmd==='pencil')s.tool='pencil';
+    else if(cmd==='eraser')s.tool='eraser';
+    else if(cmd==='clear'){ctx.clearRect(0,0,cv.width,cv.height);return;}
+    if(cv._init)return;
+    cv._init=true;
+    const gp=(e,c)=>{const r=c.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:(t.clientX-r.left)*(c.width/r.width),y:(t.clientY-r.top)*(c.height/r.height)};};
+    cv.addEventListener('mousedown',e=>{s.on=true;const p=gp(e,cv);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+    cv.addEventListener('mousemove',e=>{if(!s.on)return;const p=gp(e,cv);const sz=+(document.getElementById('bdc-sz-'+bid)?.value||4);const col=document.getElementById('bdc-col-'+bid)?.value||'#0038A8';ctx.lineWidth=sz;ctx.lineCap='round';ctx.lineJoin='round';if(s.tool==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.strokeStyle='rgba(0,0,0,1)';}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=col;}ctx.lineTo(p.x,p.y);ctx.stroke();});
+    cv.addEventListener('mouseup',()=>s.on=false);
+    cv.addEventListener('mouseleave',()=>s.on=false);
+    cv.addEventListener('touchstart',e=>{s.on=true;const p=gp(e,cv);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+    cv.addEventListener('touchmove',e=>{if(!s.on)return;const p=gp(e,cv);const sz=+(document.getElementById('bdc-sz-'+bid)?.value||4);const col=document.getElementById('bdc-col-'+bid)?.value||'#0038A8';ctx.lineWidth=sz;ctx.lineCap='round';ctx.lineJoin='round';if(s.tool==='eraser'){ctx.globalCompositeOperation='destination-out';ctx.strokeStyle='rgba(0,0,0,1)';}else{ctx.globalCompositeOperation='source-over';ctx.strokeStyle=col;}ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();},{passive:false});
+    cv.addEventListener('touchend',()=>s.on=false);
+  };
+})();
 </script>
 </body>
 </html>
