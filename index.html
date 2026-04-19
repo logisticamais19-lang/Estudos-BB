@@ -500,12 +500,12 @@ function toggleFaq(el) { el.classList.toggle('open'); }
 let isAnual = true;
 const pricing = {
   basico: {
-    mensal: { val:'12,90', sub:'/mês', de:'', desc:'Para quem leva o concurso a sério', btn:'Assinar Básico →' },
-    anual:  { val:'10,75', sub:'/mês no anual', de:'R$12,90/mês no mensal', desc:'Pague R$129/ano · economize R$26', btn:'Assinar Básico Anual →' }
+    mensal: { val:'12,90', sub:'/mês', de:'', desc:'Para quem leva o concurso a sério', btn:'Assinar Básico →', url:'https://buy.stripe.com/28EfZbdaKaOP6u65pH4ko04' },
+    anual:  { val:'10,75', sub:'/mês no anual', de:'R$12,90/mês no mensal', desc:'Pague R$129/ano · economize R$26', btn:'Assinar Básico Anual →', url:'https://buy.stripe.com/6oU00dgmW1ef19M05n4ko05' }
   },
   pro: {
-    mensal: { val:'19,90', sub:'/mês', de:'', desc:'Experiência completa', btn:'Assinar Pro →' },
-    anual:  { val:'16,58', sub:'/mês no anual', de:'R$19,90/mês no mensal', desc:'Pague R$199/ano · economize R$40', btn:'Assinar Pro Anual →' }
+    mensal: { val:'19,90', sub:'/mês', de:'', desc:'Experiência completa', btn:'Assinar Pro →', url:'https://buy.stripe.com/aFabIVdaKe11cSu2dv4ko06' },
+    anual:  { val:'16,58', sub:'/mês no anual', de:'R$19,90/mês no mensal', desc:'Pague R$199/ano · economize R$40', btn:'Assinar Pro Anual →', url:'https://buy.stripe.com/28E4gtgmW5uv5q219r4ko07' }
   }
 };
 
@@ -528,7 +528,7 @@ function switchPricing() {
     if (sub)  sub.textContent  = d.sub;
     if (de)   de.textContent   = d.de;
     if (desc) desc.textContent = d.desc;
-    if (btn)  btn.textContent  = d.btn;
+    if (btn) { btn.textContent = d.btn; if (d.url) { btn.href = d.url; btn.target = "_blank"; } }
   });
 }
 
