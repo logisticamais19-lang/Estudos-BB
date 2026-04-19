@@ -366,12 +366,14 @@
   <p class="section-label">Planos e preços</p>
   <h2 class="section-title">Invista no seu futuro.<br><em>Passe no concurso.</em></h2>
   <p class="section-sub">Escolha anual e economize 2 meses — pague 10, use 12.</p>
+
   <div class="toggle-wrap">
     <span class="toggle-label" id="lbl-mensal">Mensal</span>
     <div class="toggle-switch annual" id="toggle" onclick="switchPricing()"><div class="toggle-knob"></div></div>
     <span class="toggle-label active" id="lbl-anual">Anual</span>
     <span class="save-badge">🎉 Economize 2 meses!</span>
   </div>
+
   <div class="anual-hero" id="pro-anual-hero">
     <div class="anual-hero-badge">👑 MELHOR ESCOLHA</div>
     <div class="anual-hero-left">
@@ -394,11 +396,13 @@
       <li><span class="ck">✓</span> Acesso antecipado a novidades</li>
     </ul>
   </div>
+
   <div class="price-grid">
+    <!-- FREE -->
     <div class="price-card">
       <p class="price-plan">Gratuito</p>
       <div class="price-val">R$<span>0</span><sub>/mês</sub></div>
-      <div class="price-de" id="free-de">&nbsp;</div>
+      <div class="price-de">&nbsp;</div>
       <p class="price-desc">Para dar o primeiro passo</p>
       <ul class="price-list">
         <li><span class="ck">✓</span> Até 5 matérias</li>
@@ -411,8 +415,9 @@
       </ul>
       <a href="/app" class="btn-price outline">Começar grátis</a>
     </div>
+    <!-- BÁSICO -->
     <div class="price-card featured">
-      <div class="price-popular" id="basico-pop">⭐ MAIS POPULAR</div>
+      <div class="price-popular">⭐ MAIS POPULAR</div>
       <p class="price-plan">Básico</p>
       <div class="price-val"><sup>R$</sup><span id="basico-val">10,75</span><sub id="basico-sub">/mês no anual</sub></div>
       <div class="price-de" id="basico-de">R$12,90/mês no mensal</div>
@@ -427,6 +432,7 @@
       </ul>
       <a href="/app" class="btn-price gold" id="basico-btn">Assinar Básico Anual →</a>
     </div>
+    <!-- PRO -->
     <div class="price-card">
       <p class="price-plan">👑 Pro</p>
       <div class="price-val"><sup>R$</sup><span id="pro-val">16,58</span><sub id="pro-sub">/mês no anual</sub></div>
@@ -439,9 +445,10 @@
         <li><span class="ck">✓</span> Suporte prioritário</li>
         <li><span class="ck">✓</span> Acesso antecipado</li>
       </ul>
-        <a href="/app" id="pro-btn" class="btn-price gold">Assinar Pro Anual →</a>
+      <a href="/app" class="btn-price gold" id="pro-btn">Assinar Pro Anual →</a>
     </div>
   </div>
+
   <div class="economia-bar">
     <strong>💡 Quanto você economiza no anual?</strong>
     <div class="economia-chips">
@@ -451,6 +458,7 @@
     </div>
     <span>Pague 10 meses e use por 12 🎉</span>
   </div>
+
   <p style="text-align:center;margin-top:24px;font-size:13px;color:var(--cinza-texto)">🔒 Pagamento seguro via Stripe · Cancele quando quiser · Dados protegidos pela LGPD</p>
 </section>
 
@@ -506,25 +514,20 @@ function switchPricing() {
   document.getElementById('toggle').className = 'toggle-switch ' + mode;
   document.getElementById('lbl-mensal').classList.toggle('active', !isAnual);
   document.getElementById('lbl-anual').classList.toggle('active', isAnual);
-  document.getElementById('pro-anual-hero').style.display = isAnual ? 'flex' : 'none';
+  const hero = document.getElementById('pro-anual-hero');
+  if (hero) hero.style.display = isAnual ? 'flex' : 'none';
   ['basico','pro'].forEach(p => {
     const d = pricing[p][mode];
-    document.getElementById(p+'-val').textContent = d.val;
-    document.getElementById(p+'-sub').textContent = d.sub;
-    document.getElementById(p+'-de').textContent = d.de;
-    document.getElementById(p+'-desc').textContent = d.desc;
+    const val = document.getElementById(p+'-val');
+    const sub = document.getElementById(p+'-sub');
+    const de  = document.getElementById(p+'-de');
+    const desc = document.getElementById(p+'-desc');
     const btn = document.getElementById(p+'-btn');
-    if (btn) {
-      btn.textContent = d.btn;
-      btn.style.background = p === 'pro' ? '#FFD700' : '';
-      btn.style.color = p === 'pro' ? '#003087' : '';
-      btn.style.display = 'block';
-      btn.style.padding = '13px';
-      btn.style.borderRadius = '10px';
-      btn.style.textAlign = 'center';
-      btn.style.fontWeight = '700';
-      btn.style.textDecoration = 'none';
-    }
+    if (val)  val.textContent  = d.val;
+    if (sub)  sub.textContent  = d.sub;
+    if (de)   de.textContent   = d.de;
+    if (desc) desc.textContent = d.desc;
+    if (btn)  btn.textContent  = d.btn;
   });
 }
 
