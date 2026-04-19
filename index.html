@@ -491,7 +491,18 @@ function switchPricing() {
     document.getElementById(p+'-sub').textContent = d.sub;
     document.getElementById(p+'-de').textContent = d.de;
     document.getElementById(p+'-desc').textContent = d.desc;
-    document.getElementById(p+'-btn').textContent = d.btn;
+    const btn = document.getElementById(p+'-btn');
+    if (btn) {
+      btn.textContent = d.btn;
+      btn.style.background = p === 'pro' ? '#FFD700' : '';
+      btn.style.color = p === 'pro' ? '#003087' : '';
+      btn.style.display = 'block';
+      btn.style.padding = '13px';
+      btn.style.borderRadius = '10px';
+      btn.style.textAlign = 'center';
+      btn.style.fontWeight = '700';
+      btn.style.textDecoration = 'none';
+    }
   });
 }
 
