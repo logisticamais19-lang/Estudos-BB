@@ -3,7 +3,7 @@ const router = express.Router()
 const { authenticate } = require('../middleware/auth')
 const adminCtrl = require('../controllers/adminController')
 
-const ADMIN_UIDS = ['2WKwdCPEJoMocxRv8cOdZn31kjn2']
+const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 
 function checkAdmin(req, res, next) {
   if (!ADMIN_UIDS.includes(req.uid)) {
