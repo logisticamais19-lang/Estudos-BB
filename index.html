@@ -183,6 +183,21 @@
   .btn-price.gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,215,0,.4); }
   .btn-price.white-outline { border: 2px solid rgba(255,255,255,.3); color: var(--branco); }
   .btn-price.white-outline:hover { background: rgba(255,255,255,.1); }
+  #pro-btn {
+    display: block !important;
+    background: #FFD700 !important;
+    color: #003087 !important;
+    text-align: center !important;
+    padding: 13px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    margin-top: 16px !important;
+    font-family: 'Sora', sans-serif !important;
+  }
+  #pro-btn:hover { background: #E8C800 !important; }
+  .price-card { display: flex; flex-direction: column; }
+  .price-card .price-list { flex: 1; }
   .economia-bar { max-width: 900px; margin: 36px auto 0; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 14px; padding: 18px 28px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; text-align: center; }
   .economia-bar strong { font-family: 'Sora', sans-serif; font-size: 15px; color: #78350F; }
   .economia-bar span { font-size: 13px; color: #92400E; }
@@ -317,13 +332,20 @@
   <div class="feat-grid">
     <div class="feat-card"><div class="feat-icon">📋</div><h3>Plano Inteligente</h3><p>Defina metas por matéria, carregue templates prontos para o BB e acompanhe cada hora de estudo com barra de progresso.</p><span class="feat-tag">✓ Gratuito</span></div>
     <div class="feat-card"><div class="feat-icon">⏱️</div><h3>Timer Pomodoro</h3><p>25, 50 ou 90 minutos. Sessões vinculadas à matéria. Cada minuto estudado conta para seu progresso e XP.</p><span class="feat-tag">✓ Gratuito</span></div>
-    <div class="feat-card"><div class="feat-icon">🔁</div><h3>Revisão Espaçada</h3><p>Cadastre tópicos e o algoritmo agenda automaticamente cada revisão. Nunca mais esqueça o que estudou.</p><span class="feat-tag">⭐ Básico+</span></div>
-    <div class="feat-card"><div class="feat-icon">📚</div><h3>Cadernos + PDF</h3><p>Crie seus próprios cadernos digitais com texto, tabelas, imagens e mapas mentais. Exporte em PDF para revisar offline.</p><span class="feat-tag">👑 Pro</span></div>
-    <div class="feat-card"><div class="feat-icon">📅</div><h3>Agenda & Cronograma</h3><p>Calendário mensal, grade semanal de horários fixos e distribuição de horas por matéria. Tudo sincronizado.</p><span class="feat-tag">✓ Gratuito</span></div>
-    <div class="feat-card"><div class="feat-icon">🔥</div><h3>Heatmap de Estudos</h3><p>Visualize sua consistência dos últimos 12 meses. Cada quadrado é um dia. Streaks, recordes e seus melhores dias.</p><span class="feat-tag">⭐ Básico+</span></div>
-    <div class="feat-card"><div class="feat-icon">🏆</div><h3>Gamificação</h3><p>Ganhe XP, suba de nível, desbloqueie badges e mantenha seu streak. Estudar nunca foi tão motivante.</p><span class="feat-tag">⭐ Básico+</span></div>
-    <div class="feat-card"><div class="feat-icon">📝</div><h3>Notas Rápidas</h3><p>Texto, mapa mental, desenho à mão livre e tabelas. Anote qualquer ideia durante o estudo sem perder o foco.</p><span class="feat-tag">✓ Gratuito</span></div>
-    <div class="feat-card"><div class="feat-icon">🎓</div><h3>Recursos Gratuitos</h3><p>Links curados de vídeo-aulas, apostilas oficiais do BB, simulados e legislação. Tudo em um só lugar.</p><span class="feat-tag">✓ Gratuito</span></div>
+    <div class="price-card" style="display:flex;flex-direction:column">
+      <p class="price-plan">👑 Pro</p>
+      <div class="price-val"><sup>R$</sup><span id="pro-val">16,58</span><sub id="pro-sub">/mês no anual</sub></div>
+      <div class="price-de" id="pro-de">R$19,90/mês no mensal</div>
+      <p class="price-desc" id="pro-desc">Pague R$199/ano · economize R$40</p>
+      <ul class="price-list" style="flex:1">
+        <li><span class="ck">✓</span> Tudo do Básico</li>
+        <li><span class="ck">✓</span> Cadernos ilimitados</li>
+        <li><span class="ck">✓</span> Exportar PDF</li>
+        <li><span class="ck">✓</span> Suporte prioritário</li>
+        <li><span class="ck">✓</span> Acesso antecipado</li>
+      </ul>
+      <a href="/app" id="pro-btn" class="btn-price gold" style="background:#FFD700;color:#003087;margin-top:auto">Assinar Pro Anual →</a>
+    </div>
   </div>
 </section>
 
