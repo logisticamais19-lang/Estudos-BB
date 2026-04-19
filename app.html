@@ -3559,7 +3559,7 @@ function adminRenderTable(users) {
     const safeUid = _esc(u.uid)
     tr.innerHTML = `
       <td style="padding:.85rem 1rem">
-        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}</div>
+        <div style="display:flex;align-items:center;gap:.4rem">${ADMIN_UIDS.includes(u.uid)?'<span style="background:#F9DD16;color:#001A55;font-size:.6rem;font-weight:900;padding:.1rem .45rem;border-radius:.3rem">👑 ADM</span>':''}<div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name && u.name !== '—' ? u.name : (u.email ? u.email.split('@')[0] : '—'))}</div>
         <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
         <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
       </td>

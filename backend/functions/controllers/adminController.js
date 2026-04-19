@@ -9,17 +9,23 @@ const DATA_KEYS = [
 async function listUsers(req, res) {
   try {
     const snap = await admin.firestore().collection('users').get()
-    const users = []
-    snap.forEach(doc => {
+    const promises = snap.docs.map(async doc => {
       const d = doc.data()
-      users.push({
-        uid:       doc.id,
-        name:      d.name      || '—',
-        email:     d.email     || '',
-        plan:      d.plan      || 'free',
-        createdAt: d.createdAt || null
-      })
+      let name  = d.name  || ''
+      let email = d.email || ''
+      if (!name || !email) {
+        try {
+          const profileSnap = await admin.firestore().doc(`users/${doc.id}/data/profile`).get()
+          if (profileSnap.exists) {
+            const p = profileSnap.data()
+            if (!name)  name  = p.name  || ''
+            if (!email) email = p.email || ''
+          }
+        } catch(e) {}
+      }
+      return { uid: doc.id, name: name || '—', email: email || '', plan: d.plan || 'free', createdAt: d.createdAt || null }
     })
+    const users = await Promise.all(promises)
     res.json(users)
   } catch (e) {
     res.status(500).json({ error: e.message })
@@ -29,11 +35,9 @@ async function listUsers(req, res) {
 async function changePlan(req, res) {
   const { uid } = req.params
   const { plan } = req.body
-
   if (!plan || !VALID_PLANS.includes(plan)) {
-    return res.status(400).json({ error: `Plano inválido. Use: ${VALID_PLANS.join(', ')}` })
+    return res.status(400).json({ error: `Plano invalido. Use: ${VALID_PLANS.join(', ')}` })
   }
-
   try {
     await admin.firestore().doc(`users/${uid}`).set(
       { plan, planUpdatedAt: admin.firestore.FieldValue.serverTimestamp() },
@@ -47,32 +51,13 @@ async function changePlan(req, res) {
 
 async function deleteUser(req, res) {
   const { uid } = req.params
-
-  // ETAPA 1 — deletar docs da subcoleção data
   try {
     const batch = admin.firestore().batch()
-    DATA_KEYS.forEach(k => {
-      batch.delete(admin.firestore().doc(`users/${uid}/data/${k}`))
-    })
+    DATA_KEYS.forEach(k => { batch.delete(admin.firestore().doc(`users/${uid}/data/${k}`)) })
     await batch.commit()
-  } catch (e) {
-    console.warn(`deleteUser: erro ao deletar subcoleção de ${uid}:`, e.message)
-  }
-
-  // ETAPA 2 — deletar doc users/:uid
-  try {
-    await admin.firestore().doc(`users/${uid}`).delete()
-  } catch (e) {
-    console.warn(`deleteUser: erro ao deletar doc do usuário ${uid}:`, e.message)
-  }
-
-  // ETAPA 3 — deletar no Firebase Auth
-  try {
-    await admin.auth().deleteUser(uid)
-  } catch (e) {
-    console.warn(`deleteUser: erro ao deletar auth de ${uid}:`, e.message)
-  }
-
+  } catch (e) { console.warn('deleteUser subcollection:', e.message) }
+  try { await admin.firestore().doc(`users/${uid}`).delete() } catch (e) { console.warn('deleteUser doc:', e.message) }
+  try { await admin.auth().deleteUser(uid) } catch (e) { console.warn('deleteUser auth:', e.message) }
   res.json({ ok: true, uid })
 }
 
