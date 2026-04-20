@@ -1578,7 +1578,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
-    showSignupSuccess(name)
+    showSignupSuccess(name, email)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
@@ -1587,7 +1587,7 @@ async function doSignup(){
   }
 }
 
-function showSignupSuccess(name) {
+function showSignupSuccess(name, email) {
   const firstName = name.split(' ')[0]
   const formSignup = document.getElementById('form-signup')
   if (!formSignup) return
@@ -1677,7 +1677,13 @@ async function doLogin(){
     showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
   }
 }
-async function doLogout(){toggleUserMenu();const fb=window._firebase;if(fb)await fb.signOut();else location.reload()}
+async function doLogout(){
+  toggleUserMenu();
+  try{if(window._firebase)await window._firebase.signOut();}catch(e){console.warn(e);}
+  document.getElementById('app').style.display='none';
+  document.getElementById('app-loading').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+}
 function showResetPassword(){
   document.getElementById('reset-input-panel').style.display='block'
   document.getElementById('reset-success-panel').style.display='none'
@@ -3027,17 +3033,7 @@ window.addEventListener('load',()=>{
   window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
 
-window.onFirebaseReady=function(user){
-  var el=document.getElementById('app-loading');
-  if(el)el.style.display='none';
-  window._currentUser=user||null;
-  if(typeof updateHeaderUser==='function')updateHeaderUser();
-};
-window.onFirebaseSignOut=function(){
-  var el=document.getElementById('app-loading');
-  if(el)el.style.display='none';
-  window._currentUser=null;
-};
+// onFirebaseReady e onFirebaseSignOut definidos na linha ~1452 (único ponto correto)
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
 <nav id="mobile-nav">
