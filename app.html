@@ -23,7 +23,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-           signOut, onAuthStateChanged, sendPasswordResetEmail }
+           signOut, onAuthStateChanged, sendPasswordResetEmail,
+           setPersistence, browserSessionPersistence }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -39,6 +40,7 @@
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  await setPersistence(auth, browserSessionPersistence);
   const db   = getFirestore(app);
 
   const VALID_KEYS = ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books','cronograma','distribuicao'];
@@ -1670,7 +1672,7 @@ async function doLogin(){
     showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
   }
 }
-async function doLogout(){try{const fb=window._firebase;if(fb&&fb.signOut)await fb.signOut();}catch(e){console.warn(e);}window.location.href='/';}
+async function doLogout(){try{const fb=window._firebase;if(fb&&fb.signOut)await fb.signOut();}catch(e){console.warn(e);}window.location.href='/app';}
 function showResetPassword(){
   document.getElementById('reset-input-panel').style.display='block'
   document.getElementById('reset-success-panel').style.display='none'
