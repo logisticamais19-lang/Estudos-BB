@@ -1578,7 +1578,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
-    showSignupSuccess(name)
+    showSignupSuccess(name, email)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
@@ -1587,7 +1587,7 @@ async function doSignup(){
   }
 }
 
-function showSignupSuccess(name) {
+function showSignupSuccess(name, email) {
   const firstName = name.split(' ')[0]
   const formSignup = document.getElementById('form-signup')
   if (!formSignup) return
