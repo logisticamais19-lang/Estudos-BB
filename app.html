@@ -3026,6 +3026,18 @@ window.addEventListener('load',()=>{
   const _origSignOut=window.onFirebaseSignOut
   window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
+
+window.onFirebaseReady=function(user){
+  var el=document.getElementById('app-loading');
+  if(el)el.style.display='none';
+  window._currentUser=user||null;
+  if(typeof updateHeaderUser==='function')updateHeaderUser();
+};
+window.onFirebaseSignOut=function(){
+  var el=document.getElementById('app-loading');
+  if(el)el.style.display='none';
+  window._currentUser=null;
+};
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
 <nav id="mobile-nav">
