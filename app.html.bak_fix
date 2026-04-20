@@ -23,7 +23,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-           signOut, onAuthStateChanged, sendPasswordResetEmail, setPersistence, browserSessionPersistence }
+           signOut, onAuthStateChanged, sendPasswordResetEmail,
+           setPersistence, browserSessionPersistence }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -39,7 +40,7 @@
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  setPersistence(auth, browserSessionPersistence).catch(()=>{});
+  await setPersistence(auth, browserSessionPersistence);
   const db   = getFirestore(app);
 
   const VALID_KEYS = ['profile','subjects','daily','sessions','reviews','tasks','gamification','notes','books','cronograma','distribuicao'];
