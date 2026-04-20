@@ -1578,7 +1578,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
-    showSignupSuccess(name, email)
+    showSignupSuccess(name)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
@@ -1587,21 +1587,7 @@ async function doSignup(){
   }
 }
 
-function showSignupSuccess(name, email) {
-  const firstName = name.split(' ')[0]
-  const toast = document.createElement('div')
-  toast.style.cssText = 'position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:1rem 2rem;border-radius:1rem;font-weight:700;font-size:.95rem;z-index:99999;box-shadow:0 8px 30px rgba(16,185,129,.4);text-align:center'
-  toast.innerHTML = '✅ Conta criada! Bem-vindo(a), ' + firstName + '!'
-  document.body.appendChild(toast)
-  setTimeout(() => {
-    toast.remove()
-    switchAuthTab('login')
-    const loginEmail = document.getElementById('login-email')
-    if (loginEmail) loginEmail.value = email
-  }, 2500)
-  // REMOVE old body
-  const formSignup = document.getElementById('form-signup')
-  if (formSignup) formSignup.innerHTML = '<div style="text-align:center;padding:2rem;color:#10b981;font-weight:700;font-size:1rem">✅ Conta criada! Redirecionando para o login...</div>'
+function showSignupSuccess(name) {
   const firstName = name.split(' ')[0]
   const formSignup = document.getElementById('form-signup')
   if (!formSignup) return
@@ -1691,13 +1677,7 @@ async function doLogin(){
     showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
   }
 }
-async function doLogout(){
-  toggleUserMenu();
-  try{if(window._firebase)await window._firebase.signOut();}catch(e){console.warn(e);}
-  document.getElementById('app').style.display='none';
-  document.getElementById('app-loading').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-}
+async function doLogout(){toggleUserMenu();const fb=window._firebase;if(fb)await fb.signOut();else location.reload()}
 function showResetPassword(){
   document.getElementById('reset-input-panel').style.display='block'
   document.getElementById('reset-success-panel').style.display='none'
@@ -3047,7 +3027,17 @@ window.addEventListener('load',()=>{
   window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
 
-// onFirebaseReady e onFirebaseSignOut definidos na linha ~1452 (único ponto correto)
+window.onFirebaseReady=function(user){
+  var el=document.getElementById('app-loading');
+  if(el)el.style.display='none';
+  window._currentUser=user||null;
+  if(typeof updateHeaderUser==='function')updateHeaderUser();
+};
+window.onFirebaseSignOut=function(){
+  var el=document.getElementById('app-loading');
+  if(el)el.style.display='none';
+  window._currentUser=null;
+};
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
 <nav id="mobile-nav">
