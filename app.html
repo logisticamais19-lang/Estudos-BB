@@ -1566,7 +1566,7 @@ async function doSignup(){
   // Disable button while processing
   const signupBtn = document.querySelector('#form-signup .btn-bb')
   if (signupBtn) { signupBtn.disabled = true; signupBtn.textContent = 'Criando conta...' }
-  const email=document.getElementById('signup-email')?.value?.trim()||'';const pass=document.getElementById('signup-pass')?.value||'';const name=document.getElementById('signup-name')?.value?.trim()||'';try{
+  try{
     const cred=await fb.createUserWithEmailAndPassword(email,pass)
     profile={name,email,dailyGoalH:parseInt(document.getElementById('signup-daily').value)||2,monthlyGoalH:parseInt(document.getElementById('signup-monthly').value)||60}
     _uid=cred.user.uid
