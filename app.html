@@ -1571,7 +1571,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
-    showSignupSuccess(name); setTimeout(()=>{ navigateTo('dashboard'); showToast('✅ Cadastro concluído! Seja bem-vindo(a), '+name+'!', 'success'); }, 1500)
+    showSignupSuccess(name); setTimeout(()=>{ // nao navegar - Firebase auth handler cuida disso showToast('✅ Cadastro concluído! Seja bem-vindo(a), '+name+'!', 'success'); }, 1500)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
