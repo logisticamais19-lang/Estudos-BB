@@ -1589,6 +1589,20 @@ async function doSignup(){
 
 function showSignupSuccess(name, email) {
   const firstName = name.split(' ')[0]
+  const toast = document.createElement('div')
+  toast.style.cssText = 'position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:1rem 2rem;border-radius:1rem;font-weight:700;font-size:.95rem;z-index:99999;box-shadow:0 8px 30px rgba(16,185,129,.4);text-align:center'
+  toast.innerHTML = '✅ Conta criada! Bem-vindo(a), ' + firstName + '!'
+  document.body.appendChild(toast)
+  setTimeout(() => {
+    toast.remove()
+    switchAuthTab('login')
+    const loginEmail = document.getElementById('login-email')
+    if (loginEmail) loginEmail.value = email
+  }, 2500)
+  // REMOVE old body
+  const formSignup = document.getElementById('form-signup')
+  if (formSignup) formSignup.innerHTML = '<div style="text-align:center;padding:2rem;color:#10b981;font-weight:700;font-size:1rem">✅ Conta criada! Redirecionando para o login...</div>'
+  const firstName = name.split(' ')[0]
   const formSignup = document.getElementById('form-signup')
   if (!formSignup) return
   // Replace form content with success message
