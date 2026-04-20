@@ -1670,7 +1670,7 @@ async function doLogin(){
     showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
   }
 }
-async function doLogout(){try{const fb=window._firebase;if(fb&&fb.signOut)await fb.signOut();}catch(e){console.warn(e);}window.location.href='/app';}
+async function doLogout(){try{const fb=window._firebase;if(fb&&fb.signOut)await fb.signOut();}catch(e){console.warn(e);}window.location.href='/';}
 function showResetPassword(){
   document.getElementById('reset-input-panel').style.display='block'
   document.getElementById('reset-success-panel').style.display='none'
