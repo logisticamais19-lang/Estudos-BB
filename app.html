@@ -3781,7 +3781,7 @@ async function adminChangePlan(uid, plan) {
 
 function checkAdminAccess() {
   if (!isAdmin()) return
-  const navAdmin = document.getElementById('nav-admin')
+  const navAdmin = null; // document.getElementById('nav-admin') foi removido do HTML
   if (navAdmin) navAdmin.style.display = 'flex'
 }
 
