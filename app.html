@@ -1591,31 +1591,21 @@ async function doSignup(){
 
 function showSignupSuccess(name, email) {
   const firstName = name.split(' ')[0]
-  const formSignup = document.getElementById('form-signup')
-  if (!formSignup) return
-  // Replace form content with success message
-  formSignup.innerHTML = `
-    <div style="text-align:center;padding:1rem 0">
+  const authScreen = document.getElementById('auth-screen')
+  if (authScreen) authScreen.innerHTML = `
+    <div class="auth-card" style="text-align:center">
       <div style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(16,185,129,.3)">
         <i class="fas fa-check" style="color:white;font-size:1.6rem"></i>
       </div>
       <h3 style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:.4rem">Conta criada com sucesso! 🎉</h3>
-      <p style="font-size:.85rem;color:#6b7280;line-height:1.6;margin-bottom:.3rem">Bem-vindo(a), <strong style="color:#0038A8">${_esc(firstName)}</strong>!</p>
-      <p style="font-size:.82rem;color:#9ca3af;margin-bottom:1.5rem">Sua conta foi criada. Faça login para começar seus estudos.</p>
-      <button onclick="switchAuthTab('login');document.getElementById('login-email').value='${_esc(email)}'" class="btn-bb" style="width:100%;padding:.9rem;border-radius:.85rem;font-weight:700;font-size:.95rem;border:none;cursor:pointer">
-        <i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>Ir para o Login
-      </button>
+      <p style="font-size:.85rem;color:#6b7280;margin-bottom:.5rem">Bem-vindo(a), <strong style="color:#0038A8">${firstName}</strong>!</p>
+      <p style="font-size:.8rem;color:#9ca3af;margin-bottom:1.5rem">Redirecionando para o login em 3 segundos...</p>
+      <div style="width:100%;height:4px;background:#e5e7eb;border-radius:9999px;overflow:hidden">
+        <div id="redirect-bar" style="height:100%;width:0%;background:#10b981;transition:width 3s linear"></div>
+      </div>
     </div>`
-  // Restore form on next signup tab click
-  const tabSignup = document.getElementById('tab-signup')
-  if (tabSignup) {
-    const origSwitch = tabSignup.onclick
-    tabSignup.onclick = () => {
-      formSignup.innerHTML = ''
-      switchAuthTab('signup')
-      tabSignup.onclick = origSwitch
-    }
-  }
+  setTimeout(() => { const b=document.getElementById('redirect-bar');if(b)b.style.width='100%' }, 50)
+  setTimeout(() => { window.location.reload() }, 3000)
 }
 function showDeleteAccountModal(){
   document.getElementById('delete-confirm-input').value=''
