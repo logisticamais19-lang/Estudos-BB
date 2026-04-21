@@ -3579,6 +3579,11 @@ function goToStripeCheckout() {
 // ═══════════════════════════════════════════════════
 const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 function isAdmin() { return ADMIN_UIDS.includes(_uid) }
+function checkAdminAccess() {
+  if (!isAdmin()) return
+  const navAdmin = document.getElementById('nav-admin')
+  if (navAdmin) navAdmin.style.display = 'flex'
+}
 let _adminUsers = []
 
 function renderAdmin() {
