@@ -1500,6 +1500,11 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 // BUG #1 FIX + BUG #12 FIX: única definição de onFirebaseReady + flag signup
 let _firebaseReady = false
 let _signupInProgress = false
+function checkAdminAccess() {
+  if (!isAdmin()) return
+  const navAdmin = document.getElementById('nav-admin')
+  if (navAdmin) navAdmin.style.display = 'flex'
+}
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
   _firebaseReady=true
@@ -3779,11 +3784,7 @@ async function adminChangePlan(uid, plan) {
   }
 }
 
-function checkAdminAccess() {
-  if (!isAdmin()) return
-  const navAdmin = document.getElementById('nav-admin')
-  if (navAdmin) navAdmin.style.display = 'flex'
-}
+
 
 // BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
 
