@@ -1675,8 +1675,9 @@ async function doLogin(){
   try{await fb.signInWithEmailAndPassword(email,pass)}
   catch(e){
     shakeEl('login-email')
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.'}
-    showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
+    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.','auth/network-request-failed':'Erro de conexão. Desative ad-blockers ou Brave Shields e tente novamente.'}
+    const msg = msgs[e.code]||'E-mail ou senha incorretos. Se usar Brave ou ad-blocker, desative-o para este site.'
+    showAuthError('login-error', msg)
   }
 }
 async function doLogout(){
