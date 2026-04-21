@@ -1543,11 +1543,13 @@ function toggleEye(inputId,iconId){
   icon.className=input.type==='text'?'fas fa-eye-slash':'fas fa-eye'
 }
 function switchAuthTab(tab){
-  const fl=document.getElementById('form-login');if(fl)fl.style.display=tab==='login'?'block':'none'
-  const fs=document.getElementById('form-signup');if(fs)fs.style.display=tab==='signup'?'block':'none'
-  const tl=document.getElementById('tab-login');if(tl)tl.className='auth-tab'+(tab==='login'?' active':'')
-  const ts=document.getElementById('tab-signup');if(ts)ts.className='auth-tab'+(tab==='signup'?' active':'')
-  ;['login-error','signup-error'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'})
+  try{
+    const fl=document.getElementById('form-login');if(fl)fl.style.display=tab==='login'?'block':'none'
+    const fs=document.getElementById('form-signup');if(fs)fs.style.display=tab==='signup'?'block':'none'
+    const tl=document.getElementById('tab-login');if(tl)tl.className='auth-tab'+(tab==='login'?' active':'')
+    const ts=document.getElementById('tab-signup');if(ts)ts.className='auth-tab'+(tab==='signup'?' active':'')
+    ;['login-error','signup-error'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'})
+  }catch(e){console.warn('switchAuthTab:',e)}
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
 async function doSignup(){
