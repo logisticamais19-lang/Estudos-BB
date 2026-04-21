@@ -1553,8 +1553,6 @@ function switchAuthTab(tab){
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
 async function doSignup(){
-  // BUG #12 FIX: sinaliza signup em progresso para onFirebaseReady ignorar primeira chamada
-  _signupInProgress = true
   const name=document.getElementById('signup-name').value.trim()
   const email=document.getElementById('signup-email').value.trim()
   const pass=document.getElementById('signup-pass').value
@@ -1569,6 +1567,8 @@ async function doSignup(){
     showAuthError('signup-error','Você precisa aceitar os Termos de Uso e a Política de Privacidade.')
     shakeEl('terms-label');return
   }
+  // Sinaliza signup em progresso APÓS validações passarem
+  _signupInProgress = true
   const fb=window._firebase;if(!fb){showAuthError('signup-error','Firebase não configurado.');return}
   // Disable button while processing
   const signupBtn = document.querySelector('#form-signup .btn-bb')
