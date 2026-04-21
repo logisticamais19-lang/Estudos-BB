@@ -46,6 +46,7 @@
 
   // Camada de serviço — front não acessa db diretamente
   window._fbService = {
+    _db: db,
     async loadAll(uid){
       const snaps=await Promise.all(VALID_KEYS.map(k=>getDoc(_ref(uid,k))));
       const r={};snaps.forEach((s,i)=>{r[VALID_KEYS[i]]=s.exists()?s.data():null;});return r;
@@ -988,6 +989,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
     <h2 style="font-size:1.4rem;font-weight:800">🛡️ Painel Admin</h2>
     <button onclick="adminLoadUsers()" style="padding:.6rem 1.1rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="margin-right:.3rem"></i>Atualizar</button>
+      <button id="btn-maintenance" onclick="toggleMaintenance()" style="padding:.6rem 1rem;background:#dc2626;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer">🔧 Ativar Manutenção</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem">
     <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-total" style="font-size:2rem;font-weight:900;color:#0038A8">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Total</div></div>
@@ -1453,6 +1455,23 @@ window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
   _firebaseReady=true
   _uid=user.uid
+  // Verificar modo manutenção
+  try{
+    const {getDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const snap=await getDoc(doc(window._firebase.auth.app?window._fbService._db:window._fbService._db,'config','maintenance'))
+    if(snap.exists()&&snap.data().active&&_uid!=='1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'){
+      document.getElementById('app-loading').style.display='none'
+      document.getElementById('auth-screen').style.display='none'
+      document.getElementById('app').style.display='none'
+      document.body.innerHTML=`<div style="min-height:100vh;background:linear-gradient(145deg,#0038A8,#002B85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;color:white;text-align:center;padding:2rem">
+        <div style="font-size:4rem">🔧</div>
+        <h1 style="font-size:2rem;font-weight:900">Site em Manutenção</h1>
+        <p style="font-size:1rem;opacity:.8;max-width:400px">${snap.data().message||'Estamos realizando melhorias. Voltaremos em breve!'}</p>
+        <p style="font-size:.8rem;opacity:.6">© EstudoBB</p>
+      </div>`
+      return
+    }
+  }catch(e){console.warn('maintenance check:',e)}
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
   _userPlan=await window._fbService.getUserPlan(_uid).catch(()=>'free')
@@ -3525,6 +3544,20 @@ async function adminSavePlan(uid) {
 }
 
 // BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
+async function toggleMaintenance(){
+  try{
+    const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const ref=doc(window._fbService._db,'config','maintenance')
+    const current=await getDoc(ref)
+    const isActive=current.exists()&&current.data().active
+    const message=isActive?'':prompt('Mensagem de manutencao (vazio = padrao):')||''
+    await setDoc(ref,{active:!isActive,message,updatedAt:new Date().toISOString()})
+    const btn=document.getElementById('btn-maintenance')
+    if(btn){btn.textContent=isActive?'Ativar Manutencao':'Desativar Manutencao';btn.style.background=isActive?'#dc2626':'#10b981'}
+    showXPToast(0,isActive?'Manutencao desativada!':'Modo manutencao ativado!')
+  }catch(e){alert('Erro: '+e.message)}
+}
+
 async function adminLoadUsers() {
   if (!isAdmin()) return
   const loading = document.getElementById('admin-loading')
