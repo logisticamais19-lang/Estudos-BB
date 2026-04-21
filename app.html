@@ -1923,6 +1923,7 @@ function renderSubjects(){
     </div></td>`
     tbody.appendChild(tr)
   })
+  adminWatchPresence(users)
 }
 function addSubject(){
   const limits=PLAN_FEATURES[_userPlan]||PLAN_FEATURES.free
@@ -3579,11 +3580,6 @@ function goToStripeCheckout() {
 // ═══════════════════════════════════════════════════
 const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 function isAdmin() { return ADMIN_UIDS.includes(_uid) }
-function checkAdminAccess() {
-  if (!isAdmin()) return
-  const navAdmin = document.getElementById('nav-admin')
-  if (navAdmin) navAdmin.style.display = 'flex'
-}
 let _adminUsers = []
 
 function renderAdmin() {
@@ -3597,6 +3593,7 @@ async function adminSavePlan(safeUid, rawUid) {
   const realUid = rawUid || sel.dataset.rawuid || safeUid
   await adminChangePlan(realUid, sel.value, safeUid)
 }
+
 // BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
 async function toggleMaintenance(){
   try{
@@ -3667,7 +3664,8 @@ function adminRenderTable(users) {
       <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
       <td style="text-align:center;padding:.75rem">
         <div style="display:flex;gap:.35rem;align-items:center;justify-content:center">
-          <select id="sel-${safeUid}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
+          <span id="dot-${safeUid}" title="offline" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db;transition:background .4s"></span>
+          <select id="sel-${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
             <option value="${plan}">${planLbl[plan]||plan} (atual)</option>
             ${plan!=='free'?'<option value="free">→ Free</option>':''}
             ${plan!=='basico'?'<option value="basico">→ Básico Mensal</option>':''}
@@ -3675,13 +3673,304 @@ function adminRenderTable(users) {
             ${plan!=='pro'?'<option value="pro">→ Pro Mensal</option>':''}
             ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
           </select>
-          <button class="admin-save-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
-          <button class="admin-del-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
+          <button class="admin-save-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
+          <button class="admin-del-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
         </div>
       </td>`
     tbody.appendChild(tr)
   })
 }
+
+function adminWatchPresence(users) {
+  if (!window._fbService?._onSnapshot || !window._fbService?._db) return
+  const db = window._fbService._db
+  const {doc, onSnapshot} = { doc: (d,c,id)=>({path:`${c}/${id}`}), onSnapshot: window._fbService._onSnapshot }
+  users.forEach(u => {
+    const ref = window._fbService._db && typeof window._fbService._onSnapshot === 'function'
+      ? (() => { try { const {doc:d} = window._fbService; return null } catch(e){ return null } })()
+      : null
+  })
+  // Usa import dinâmico para onSnapshot
+  import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js').then(({doc, onSnapshot}) => {
+    let onlineCount = 0
+    const total = users.length
+    users.forEach(u => {
+      const ref = doc(window._fbService._db, 'presence', u.uid)
+      onSnapshot(ref, snap => {
+        const dot = document.getElementById('online-dot-' + u.uid.replace(/[^a-zA-Z0-9]/g,''))
+        if (!dot) return
+        const isOnline = snap.exists() && snap.data().online === true
+        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
+        dot.title = isOnline ? 'online agora' : 'offline'
+        // Atualiza contador
+        const onlineDots = document.querySelectorAll('[id^="online-dot-"]')
+        let count = 0
+        onlineDots.forEach(d => { if(d.style.background === 'rgb(16, 185, 129)') count++ })
+        const counter = document.getElementById('admin-online-count')
+        if (counter) counter.innerHTML = '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span> ' + count + ' online'
+      })
+    })
+  }).catch(()=>{})
+}
+
+function adminUpdateStats(users) {
+  const total = users.length
+  const byPlan = { free:0, basico:0, basicoAnual:0, pro:0, proAnual:0 }
+  users.forEach(u => { const p = u.plan||'free'; byPlan[p] = (byPlan[p]||0)+1 })
+  const mrr = byPlan.basico*12.9 + byPlan.basicoAnual*10.75 + byPlan.pro*19.9 + byPlan.proAnual*16.58
+  const totalPaid = byPlan.basico + byPlan.basicoAnual + byPlan.pro + byPlan.proAnual
+  document.getElementById('stat-total').textContent = total
+  document.getElementById('stat-free').textContent = byPlan.free
+  document.getElementById('stat-basico').textContent = byPlan.basico + byPlan.basicoAnual
+  document.getElementById('stat-pro').textContent = byPlan.pro + byPlan.proAnual
+  document.getElementById('stat-mrr').textContent = 'R$' + mrr.toFixed(2)
+}
+
+function adminFilterUsers() {
+  const q = document.getElementById('admin-search')?.value?.toLowerCase()||''
+  const planF = document.getElementById('admin-filter-plan')?.value||''
+  const filtered = _adminUsers.filter(u => {
+    const matchQ = !q || (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)
+    const matchP = !planF || (u.plan||'free') === planF
+    return matchQ && matchP
+  })
+  adminRenderTable(filtered)
+}
+
+async function adminChangePlan(uid, plan) {
+  if (!plan || !isAdmin()) return
+  // Encontra nome do usuário para confirmar
+  const userObj = _adminUsers.find(u => u.uid === uid)
+  const userName = userObj?.name || uid
+  const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
+  const confirmed = await adminConfirmModal(`Alterar plano de <strong>${_esc(userName)}</strong>?`,`Novo plano: <span style="font-weight:800;color:#0038A8">${planLblMap[plan]||plan}</span>`,'Confirmar','Cancelar')
+  if (!confirmed) return
+  // Feedback visual imediato
+  const _safe = uid.replace(/[^a-zA-Z0-9_-]/g,'_')
+  const btn = document.querySelector(`.admin-save-btn[data-uid="${_safe}"]`)
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
+  try {
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid + '/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
+    // Atualiza local sem recarregar tudo
+    if (userObj) userObj.plan = plan
+    if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
+    if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
+    // Atualiza só a linha da tabela visualmente
+    const sel = document.getElementById('sel-' + _safe)
+    if (sel) {
+      const planLbl = {free:'FREE',basico:'BÁSICO',basicoAnual:'BÁSICO ANUAL',pro:'PRO',proAnual:'PRO ANUAL'}
+      sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
+      sel.options[0].value = plan
+    }
+    showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
+    adminUpdateStats(_adminUsers)
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
+  } catch (e) {
+    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
+    console.error('adminChangePlan error:', e)
+    alert('❌ Erro ao salvar: ' + e.message)
+  }
+}
+
+function checkAdminAccess() {
+  if (!isAdmin()) return
+  const navAdmin = document.getElementById('nav-admin')
+  if (navAdmin) navAdmin.style.display = 'flex'
+}
+
+// BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
+
+// NOVO: Templates de Plano Inteligente
+const PLAN_TEMPLATES = {
+  1: {
+    name: 'Iniciante BB – 6 meses',
+    dailyGoalH: 2,
+    subjects: [
+      {name:'Língua Portuguesa',target:80,hours:0,progress:0},
+      {name:'Matemática Financeira',target:60,hours:0,progress:0},
+      {name:'Conhecimentos Bancários',target:70,hours:0,progress:0},
+      {name:'Redação',target:40,hours:0,progress:0},
+      {name:'Atualidades',target:30,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Português – Interpretação de Texto',type:'study'},
+      {text:'Matemática Financeira – Juros Compostos',type:'study'},
+      {text:'Conhecimentos Bancários – Sistema Financeiro Nacional',type:'study'},
+      {text:'Redação – Estrutura Dissertativa',type:'study'},
+      {text:'Atualidades – Leitura de Notícias Financeiras',type:'study'}
+    ],
+    books: ['Redação – Tipologia Textual','Matemática Financeira – Juros','Conhecimentos Bancários – SFN'],
+    reviews: ['Interpretação de Texto','Juros Compostos','Sistema Financeiro Nacional','Estrutura Dissertativa']
+  },
+  2: {
+    name: 'Intermediário BB – 4 meses',
+    dailyGoalH: 3,
+    subjects: [
+      {name:'Matemática Financeira',target:60,hours:0,progress:0},
+      {name:'Conhecimentos Bancários',target:70,hours:0,progress:0},
+      {name:'Língua Portuguesa',target:50,hours:0,progress:0},
+      {name:'Redação',target:40,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Matemática Financeira + Conhecimentos Bancários (alternados)',type:'study'},
+      {text:'Português – Gramática Avançada',type:'study'},
+      {text:'Redação – Temas Bancários',type:'study'}
+    ],
+    books: ['Atualidades – Open Banking','Redação – Temas Bancários'],
+    reviews: ['Matemática Financeira','Conhecimentos Bancários','Gramática','Redação Bancária']
+  },
+  3: {
+    name: 'Foco Redação + Atualidades',
+    dailyGoalH: 2,
+    subjects: [
+      {name:'Redação',target:30,hours:0,progress:0},
+      {name:'Atualidades',target:30,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'Redação – 1h de produção textual',type:'study'},
+      {text:'Atualidades – 1h de estudo do mercado financeiro',type:'study'}
+    ],
+    books: ['Redação – Estrutura Dissertativa','Atualidades – Mercado Financeiro'],
+    reviews: ['Estrutura Dissertativa','Open Banking','Mercado de Capitais','Redação Argumentativa']
+  },
+  4: {
+    name: 'Revisão Final – 30 dias antes da prova',
+    dailyGoalH: 4,
+    subjects: [
+      {name:'Questões (50%)',target:20,hours:0,progress:0},
+      {name:'Revisão Espaçada (30%)',target:12,hours:0,progress:0},
+      {name:'Redação (20%)',target:8,hours:0,progress:0}
+    ],
+    tasks: [
+      {text:'50% – Resolução de questões (banco de questões)',type:'study'},
+      {text:'30% – Revisão espaçada dos tópicos anteriores',type:'study'},
+      {text:'20% – Redação: escreva 1 texto por dia',type:'study'}
+    ],
+    books: [],
+    reviews: ['Revisão Final – Português','Revisão Final – Matemática','Revisão Final – Bancários','Revisão Final – Atualidades','Revisão Final – Redação']
+  }
+}
+
+async function loadPlanTemplate(templateId) {
+  const tpl = PLAN_TEMPLATES[templateId]
+  if (!tpl) return
+  if (!confirm(`Carregar o plano "${tpl.name}"?\n\nSerão criados automaticamente:\n• Matérias\n• Cadernos\n• Tarefas\n• Revisões espaçadas`)) return
+
+  // 1. Matérias
+  tpl.subjects.forEach(sub => {
+    const exists = subjects.find(s => s.name === sub.name)
+    if (!exists) subjects.push({ id: Date.now() + Math.random(), ...sub })
+  })
+
+  // 2. Meta diária
+  if (profile) profile.dailyGoalH = tpl.dailyGoalH
+
+  // 3. Tarefas para hoje e próximos dias
+  const today = todayStr()
+  tpl.tasks.forEach((task, i) => {
+    const taskDate = addDays(today, i)
+    const exists = dailyTasks.find(t => t.text === task.text && t.date === taskDate)
+    if (!exists) {
+      dailyTasks.push({
+        id: uid(), text: task.text, done: false, date: taskDate,
+        type: task.type || 'study', priority: 'normal', start: '', end: ''
+      })
+    }
+  })
+
+  // 4. Revisões espaçadas
+  tpl.reviews.forEach((topic, i) => {
+    const exists = reviewItems.find(r => r.topic === topic)
+    if (!exists) {
+      reviewItems.push({
+        id: uid(), topic,
+        subjectName: tpl.subjects[0]?.name || '—',
+        notes: `Template: ${tpl.name}`,
+        lastReview: today,
+        nextReview: addDays(today, i + 1),
+        stage: 1
+      })
+    }
+  })
+
+  // 5. Criar cadernos automaticamente
+  const bookColors = ['#0038A8','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2']
+  const bookEmojis = ['📚','📖','✏️','🎓','📐','🔬']
+  let booksCreated = 0
+  tpl.books.forEach((bookName, i) => {
+    const exists = books.find(b => b.name === bookName)
+    if (!exists) {
+      books.push({
+        id: uid(),
+        name: bookName,
+        emoji: bookEmojis[i % bookEmojis.length],
+        color: bookColors[i % bookColors.length],
+        coverImg: '',
+        pages: [{ id: uid(), title: 'Página 1', blocks: [] }],
+        createdAt: new Date().toISOString()
+      })
+      booksCreated++
+    }
+  })
+  if (booksCreated > 0) {
+    gamification.stats.totalBooks = (gamification.stats.totalBooks || 0) + booksCreated
+  }
+
+  // 6. Salvar tudo
+  await saveData()
+
+  // 7. Feedback com toasts
+  showXPToast(0, `✅ Plano "${tpl.name}" carregado!`)
+  if (booksCreated > 0) {
+    setTimeout(() => showXPToast(0, `📚 ${booksCreated} caderno(s) criado(s) automaticamente!`), 1600)
+  }
+
+  // 8. Re-renderizar
+  renderSubjects()
+  updateHeaderUser()
+  renderDashboard()
+  checkBadges()
+}
+// /NOVO: Templates de Plano Inteligente
+
+async function adminDeleteUser(uid) {
+  if (!confirm('Excluir permanentemente este usuário?')) return
+  const btn = document.querySelector(`.admin-del-btn[data-uid="${uid}"]`)
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
+  try {
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
+    _adminUsers = _adminUsers.filter(u => u.uid !== uid)
+    adminRenderTable(_adminUsers)
+    adminUpdateStats(_adminUsers)
+    showXPToast(0, '✅ Usuário excluído.')
+  } catch(e) {
+    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
+    setTimeout(() => { if (btn) { btn.textContent = 'Excluir'; btn.disabled = false } }, 2500)
+    alert('❌ Erro: ' + e.message)
+  }
+}
+
+// Delegador global da tabela admin (save + delete)
+document.getElementById('admin-users-table')?.addEventListener('click', e => {
+  const save = e.target.closest('.admin-save-btn')
+  const del  = e.target.closest('.admin-del-btn')
+  if (save) adminSavePlan(save.dataset.uid, save.dataset.rawuid)
+  if (del)  adminDeleteUser(del.dataset.rawuid || del.dataset.uid)
+})
+
+// Registrar Service Worker para PWA
 
 function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
   return new Promise(resolve => {
@@ -3698,6 +3987,7 @@ function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
   })
 }
 
+let _adminPresenceUnsubs = []
 async function adminWatchPresence(users) {
   _adminPresenceUnsubs.forEach(u => { try { u() } catch(e){} })
   _adminPresenceUnsubs = []
