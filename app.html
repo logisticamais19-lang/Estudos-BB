@@ -1044,6 +1044,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   <div style="background:white;border-radius:14px;border:1px solid #f3f4f6;overflow:hidden">
     <div style="display:flex;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;align-items:center">
       <input id="admin-search" type="text" placeholder="Buscar por nome ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:180px;padding:.45rem .85rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;outline:none">
+      <div id="admin-online-count" style="display:flex;align-items:center;padding:.5rem .85rem;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:.85rem;font-size:.78rem;font-weight:700;color:#16a34a;white-space:nowrap"><span style="width:8px;height:8px;background:#d1d5db;border-radius:50%;display:inline-block;margin-right:.4rem"></span>0 online</div>
       <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.45rem .75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;cursor:pointer">
         <option value="">Todos os planos</option>
         <option value="free">Free</option>
@@ -3584,11 +3585,11 @@ function renderAdmin() {
   adminLoadUsers()
 }
 
-async function adminSavePlan(uid) {
-  const sel = document.getElementById('sel-' + uid)
+async function adminSavePlan(safeUid, rawUid) {
+  const sel = document.getElementById('sel-' + safeUid)
   if (!sel) return
-  await adminChangePlan(uid, sel.value)
-}
+  const realUid = rawUid || sel.dataset.rawuid || safeUid
+  await adminChangePlan(realUid, sel.value, safeUid)
 
 // BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
 async function toggleMaintenance(){
@@ -3641,10 +3642,13 @@ function adminRenderTable(users) {
     tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
     const plan = u.plan || 'free'
     const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
-    const safeUid = _esc(u.uid)
+    const rawUid = u.uid
+    const safeUid = rawUid.replace(/[^a-zA-Z0-9_-]/g,'_')
+    const isAdminUser = ADMIN_UIDS.includes(rawUid)
+    const crownBadge = isAdminUser ? ' <span title="Admin" style="font-size:.75rem">👑</span>' : ''
     tr.innerHTML = `
       <td style="padding:.85rem 1rem">
-        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}</div>
+        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}${crownBadge}</div>
         <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
         <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
       </td>
@@ -3735,8 +3739,8 @@ async function adminChangePlan(uid, plan) {
   const userObj = _adminUsers.find(u => u.uid === uid)
   const userName = userObj?.name || uid
   const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
-  if (!confirm(`Alterar plano de:\n${userName}\npara: ${planLblMap[plan]||plan}?`)) return
-  // Feedback visual imediato
+  const confirmed = await adminConfirmModal(`Alterar plano de <strong>${_esc(userName)}</strong>?`,`Novo plano: <span style="font-weight:800;color:#0038A8">${planLblMap[plan]||plan}</span>`,'Confirmar','Cancelar')
+  if (!confirmed) return
   const btn = document.querySelector(`.admin-save-btn[data-uid="${_esc(uid)}"]`)
   if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
@@ -3963,11 +3967,53 @@ async function adminDeleteUser(uid) {
 document.getElementById('admin-users-table')?.addEventListener('click', e => {
   const save = e.target.closest('.admin-save-btn')
   const del  = e.target.closest('.admin-del-btn')
-  if (save) adminSavePlan(save.dataset.uid)
-  if (del)  adminDeleteUser(del.dataset.uid)
+  if (save) adminSavePlan(save.dataset.uid, save.dataset.rawuid)
+  if (del)  adminDeleteUser(del.dataset.rawuid || del.dataset.uid)
 })
 
 // Registrar Service Worker para PWA
+
+function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
+  return new Promise(resolve => {
+    document.getElementById('admin-confirm-modal')?.remove()
+    const overlay = document.createElement('div')
+    overlay.id = 'admin-confirm-modal'
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(3px)'
+    overlay.innerHTML = `<div style="background:white;border-radius:1.5rem;padding:2rem 1.75rem;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center"><div style="font-size:2rem;margin-bottom:.75rem">✏️</div><div style="font-size:1rem;font-weight:800;color:#111827;margin-bottom:.4rem">${title}</div><div style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem">${subtitle}</div><div style="display:flex;gap:.75rem;justify-content:center"><button id="acm-cancel" style="flex:1;padding:.75rem;border:2px solid #e5e7eb;border-radius:1rem;background:white;font-weight:700;font-size:.85rem;cursor:pointer;color:#374151">${cancelLabel}</button><button id="acm-ok" style="flex:1;padding:.75rem;border:none;border-radius:1rem;background:#0038A8;color:white;font-weight:800;font-size:.85rem;cursor:pointer">${okLabel}</button></div></div>`
+    document.body.appendChild(overlay)
+    const close = (val) => { overlay.remove(); resolve(val) }
+    overlay.querySelector('#acm-ok').onclick = () => close(true)
+    overlay.querySelector('#acm-cancel').onclick = () => close(false)
+    overlay.onclick = (e) => { if(e.target===overlay) close(false) }
+  })
+}
+
+let _adminPresenceUnsubs = []
+async function adminWatchPresence(users) {
+  _adminPresenceUnsubs.forEach(u => { try { u() } catch(e){} })
+  _adminPresenceUnsubs = []
+  if (!window._fbService || !window._fbService._db) return
+  try {
+    const { onSnapshot, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    users.forEach(u => {
+      const safeId = u.uid.replace(/[^a-zA-Z0-9_-]/g,'_')
+      const ref = doc(window._fbService._db, 'presence', u.uid)
+      const unsub = onSnapshot(ref, snap => {
+        const dot = document.getElementById('dot-' + safeId)
+        if (!dot) return
+        const isOnline = snap.exists() && snap.data().online === true
+        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
+        dot.title = isOnline ? 'online agora' : 'offline'
+        const allDots = document.querySelectorAll('[id^="dot-"]')
+        const count = [...allDots].filter(d => d.style.background === 'rgb(16, 185, 129)').length
+        const counter = document.getElementById('admin-online-count')
+        if (counter) counter.innerHTML = `<span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block"></span>${count} online</span>`
+      }, () => {})
+      _adminPresenceUnsubs.push(unsub)
+    })
+  } catch(e) { console.warn('adminWatchPresence:', e.message) }
+}
+
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js?v=5').catch(()=>{})
 }
