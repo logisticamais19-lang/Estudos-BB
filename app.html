@@ -25,7 +25,7 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, onAuthStateChanged, sendPasswordResetEmail }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc }
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -46,6 +46,7 @@
 
   // Camada de serviço — front não acessa db diretamente
   window._fbService = {
+    _onSnapshot: onSnapshot,
     _db: db,
     async loadAll(uid){
       const snaps=await Promise.all(VALID_KEYS.map(k=>getDoc(_ref(uid,k))));
@@ -76,15 +77,28 @@
   };
 
   onAuthStateChanged(auth, user => {
-    if(user){ window._currentUser=user; window.onFirebaseReady&&window.onFirebaseReady(user); }
-    else    { window._currentUser=null; window.onFirebaseSignOut&&window.onFirebaseSignOut(); }
+    if(user){
+      window._currentUser=user;
+      // Presença online
+      const presRef=doc(db,'presence',user.uid);
+      setDoc(presRef,{online:true,lastSeen:serverTimestamp(),name:user.displayName||'',email:user.email||''},{ merge:true });
+      window.addEventListener('beforeunload',()=>setDoc(presRef,{online:false,lastSeen:serverTimestamp()},{merge:true}));
+      window.onFirebaseReady&&window.onFirebaseReady(user);
+    } else {
+      if(window._currentUser){
+        const presRef=doc(db,'presence',window._currentUser.uid);
+        setDoc(presRef,{online:false,lastSeen:serverTimestamp()},{merge:true});
+      }
+      window._currentUser=null;
+      window.onFirebaseSignOut&&window.onFirebaseSignOut();
+    }
   });
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-*{font-family:'Inter',system-ui,sans-serif}
+*{font-family:'Nunito',system-ui,sans-serif}
 body{background:#EEF2FF;min-height:100vh;padding-bottom:50px}
 
 /* ── MOBILE NAV BAR ── */
@@ -986,22 +1000,51 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ SCREEN: ADMIN ══ -->
 <div id="screen-admin" class="screen" style="display:none">
+  <!-- Header -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-    <h2 style="font-size:1.4rem;font-weight:800">🛡️ Painel Admin</h2>
-    <button onclick="adminLoadUsers()" style="padding:.6rem 1.1rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="margin-right:.3rem"></i>Atualizar</button>
-      <button id="btn-maintenance" onclick="toggleMaintenance()" style="padding:.6rem 1rem;background:#dc2626;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer">🔧 Ativar Manutenção</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <i class="fas fa-shield-alt" style="font-size:1.1rem;color:#0038A8"></i>
+      <h2 style="font-size:1.2rem;font-weight:700;color:#111827;margin:0">Painel admin</h2>
+      <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;background:#EEF3FF;color:#0038A8;border:1px solid #c7d7f9">v5.0</span>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <button onclick="adminLoadUsers()" style="display:flex;align-items:center;gap:6px;padding:.45rem 1rem;background:#0038A8;color:white;border:none;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="font-size:.7rem"></i>Atualizar</button>
+      <button id="btn-maintenance" onclick="toggleMaintenance()" style="display:flex;align-items:center;gap:6px;padding:.45rem 1rem;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer"><i class="fas fa-wrench" style="font-size:.7rem"></i>Ativar Manutenção</button>
+    </div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem">
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-total" style="font-size:2rem;font-weight:900;color:#0038A8">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Total</div></div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-free" style="font-size:2rem;font-weight:900;color:#6b7280">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Free</div></div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-basico" style="font-size:2rem;font-weight:900;color:#0038A8">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Básico</div></div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-pro" style="font-size:2rem;font-weight:900;color:#F9DD16;background:#001A55;border-radius:.85rem">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-top:.25rem">Pro</div></div>
-    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-mrr" style="font-size:1.4rem;font-weight:900;color:#10b981">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">MRR</div></div>
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem">
+    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #0038A8">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Total</div>
+      <div id="stat-total" style="font-size:1.9rem;font-weight:300;color:#111827;letter-spacing:-.02em;line-height:1">—</div>
+      <div style="font-size:10px;color:#d1d5db;margin-top:4px">usuários</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #d1d5db">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Free</div>
+      <div id="stat-free" style="font-size:1.9rem;font-weight:300;color:#6b7280;letter-spacing:-.02em;line-height:1">—</div>
+      <div style="font-size:10px;color:#d1d5db;margin-top:4px">sem plano pago</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #3b82f6">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Básico</div>
+      <div id="stat-basico" style="font-size:1.9rem;font-weight:300;color:#0038A8;letter-spacing:-.02em;line-height:1">—</div>
+      <div style="font-size:10px;color:#d1d5db;margin-top:4px">mensal / anual</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #F9DD16">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Pro</div>
+      <div id="stat-pro" style="font-size:1.9rem;font-weight:300;color:#111827;letter-spacing:-.02em;line-height:1">—</div>
+      <div style="font-size:10px;color:#d1d5db;margin-top:4px">mensal / anual</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #10b981">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">MRR</div>
+      <div id="stat-mrr" style="font-size:1.25rem;font-weight:400;color:#10b981;letter-spacing:-.01em;line-height:1;margin-top:4px">—</div>
+      <div style="font-size:10px;color:#d1d5db;margin-top:4px">receita mensal</div>
+    </div>
   </div>
-  <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-    <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
-      <input id="admin-search" type="text" placeholder="Buscar por nome ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:200px;padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem">
-      <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white">
+  <!-- Tabela -->
+  <div style="background:white;border-radius:14px;border:1px solid #f3f4f6;overflow:hidden">
+    <div style="display:flex;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;align-items:center">
+      <input id="admin-search" type="text" placeholder="Buscar por nome ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:180px;padding:.45rem .85rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;outline:none">
+      <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.45rem .75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;cursor:pointer">
         <option value="">Todos os planos</option>
         <option value="free">Free</option>
         <option value="basico">Básico Mensal</option>
@@ -1009,19 +1052,23 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
         <option value="pro">Pro Mensal</option>
         <option value="proAnual">Pro Anual</option>
       </select>
+      <span id="admin-online-count" style="font-size:.75rem;color:#10b981;font-weight:600;display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span>0 online</span>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:.82rem">
-        <thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af">
-          <th style="text-align:left;padding:.75rem 1rem">Usuário</th>
-          <th style="text-align:center;padding:.75rem">Plano</th>
-          <th style="text-align:center;padding:.75rem">Desde</th>
-          <th style="text-align:center;padding:.75rem">Ações</th>
-        </tr></thead>
+        <thead>
+          <tr style="background:#fafafa;border-bottom:1px solid #f3f4f6">
+            <th style="text-align:left;padding:.65rem 1rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Usuário</th>
+            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Status</th>
+            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Plano</th>
+            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Desde</th>
+            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Ações</th>
+          </tr>
+        </thead>
         <tbody id="admin-users-table"></tbody>
       </table>
     </div>
-    <div id="admin-loading" style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem">Clique em "Atualizar" para carregar usuários.</div>
+    <div id="admin-loading" style="text-align:center;padding:2rem;color:#9ca3af;font-size:.82rem">Clique em "Atualizar" para carregar usuários.</div>
   </div>
 </div>
 
@@ -3571,6 +3618,7 @@ async function adminLoadUsers() {
     _adminUsers = await res.json()
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
+    adminWatchPresence(_adminUsers)
     if (loading) loading.style.display = 'none'
   } catch (e) {
     if (loading) { loading.style.display = 'block'; loading.textContent = 'Erro: ' + e.message }
@@ -3601,6 +3649,9 @@ function adminRenderTable(users) {
         <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
       </td>
       <td style="text-align:center;padding:.75rem">
+        <span id="online-dot-${safeUid}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db" title="offline"></span>
+      </td>
+      <td style="text-align:center;padding:.75rem">
         <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
       </td>
       <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
@@ -3620,6 +3671,38 @@ function adminRenderTable(users) {
       </td>`
     tbody.appendChild(tr)
   })
+}
+
+function adminWatchPresence(users) {
+  if (!window._fbService?._onSnapshot || !window._fbService?._db) return
+  const db = window._fbService._db
+  const {doc, onSnapshot} = { doc: (d,c,id)=>({path:`${c}/${id}`}), onSnapshot: window._fbService._onSnapshot }
+  users.forEach(u => {
+    const ref = window._fbService._db && typeof window._fbService._onSnapshot === 'function'
+      ? (() => { try { const {doc:d} = window._fbService; return null } catch(e){ return null } })()
+      : null
+  })
+  // Usa import dinâmico para onSnapshot
+  import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js').then(({doc, onSnapshot}) => {
+    let onlineCount = 0
+    const total = users.length
+    users.forEach(u => {
+      const ref = doc(window._fbService._db, 'presence', u.uid)
+      onSnapshot(ref, snap => {
+        const dot = document.getElementById('online-dot-' + u.uid.replace(/[^a-zA-Z0-9]/g,''))
+        if (!dot) return
+        const isOnline = snap.exists() && snap.data().online === true
+        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
+        dot.title = isOnline ? 'online agora' : 'offline'
+        // Atualiza contador
+        const onlineDots = document.querySelectorAll('[id^="online-dot-"]')
+        let count = 0
+        onlineDots.forEach(d => { if(d.style.background === 'rgb(16, 185, 129)') count++ })
+        const counter = document.getElementById('admin-online-count')
+        if (counter) counter.innerHTML = '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span> ' + count + ' online'
+      })
+    })
+  }).catch(()=>{})
 }
 
 function adminUpdateStats(users) {
