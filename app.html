@@ -1528,7 +1528,7 @@ window.onFirebaseReady=async function(user){
   document.getElementById('auth-screen').style.display='none'
   document.getElementById('app').style.display='block'
   updateHeaderUser();navigateTo(0)
-  checkAdminAccess();updateHeaderUser()
+  updateHeaderUser();checkAdminAccess()
 }
 window.onFirebaseSignOut=function(){
   document.getElementById('app-loading').style.display='none'
