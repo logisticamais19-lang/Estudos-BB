@@ -3678,6 +3678,21 @@ function adminRenderTable(users) {
   })
 }
 
+function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
+  return new Promise(resolve => {
+    document.getElementById('admin-confirm-modal')?.remove()
+    const overlay = document.createElement('div')
+    overlay.id = 'admin-confirm-modal'
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(3px)'
+    overlay.innerHTML = `<div style="background:white;border-radius:1.5rem;padding:2rem 1.75rem;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center"><div style="font-size:2rem;margin-bottom:.75rem">✏️</div><div style="font-size:1rem;font-weight:800;color:#111827;margin-bottom:.4rem">${title}</div><div style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem">${subtitle}</div><div style="display:flex;gap:.75rem;justify-content:center"><button id="acm-cancel" style="flex:1;padding:.75rem;border:2px solid #e5e7eb;border-radius:1rem;background:white;font-weight:700;font-size:.85rem;cursor:pointer;color:#374151">${cancelLabel}</button><button id="acm-ok" style="flex:1;padding:.75rem;border:none;border-radius:1rem;background:#0038A8;color:white;font-weight:800;font-size:.85rem;cursor:pointer">${okLabel}</button></div></div>`
+    document.body.appendChild(overlay)
+    const close = (val) => { overlay.remove(); resolve(val) }
+    overlay.querySelector('#acm-ok').onclick = () => close(true)
+    overlay.querySelector('#acm-cancel').onclick = () => close(false)
+    overlay.onclick = (e) => { if(e.target===overlay) close(false) }
+  })
+}
+
 async function adminWatchPresence(users) {
   _adminPresenceUnsubs.forEach(u => { try { u() } catch(e){} })
   _adminPresenceUnsubs = []
