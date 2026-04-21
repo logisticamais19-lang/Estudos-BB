@@ -3591,7 +3591,7 @@ async function adminSavePlan(safeUid, rawUid) {
   if (!sel) return
   const realUid = rawUid || sel.dataset.rawuid || safeUid
   await adminChangePlan(realUid, sel.value, safeUid)
-
+}
 // BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
 async function toggleMaintenance(){
   try{
