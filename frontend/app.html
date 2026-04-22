@@ -1501,13 +1501,26 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 let _firebaseReady = false
 let _signupInProgress = false
 const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
+
+// Fallback: reaplica a verificação admin sempre que auth mudar
+// (cobre casos onde onFirebaseReady roda antes do DOM estar 100% pronto)
+if (typeof firebase !== 'undefined' && firebase.auth) {
+  firebase.auth().onAuthStateChanged(function(u) {
+    if (u) { _uid = u.uid; checkAdminAccess() }
+  })
+}
 function checkAdminAccess() {
   const navAdmin = document.getElementById('nav-admin')
-  if (!navAdmin) return
-  if (ADMIN_UIDS.includes(_uid)) navAdmin.style.display = 'flex'
+  console.log('[AdminCheck] _uid:', _uid, '| navAdmin:', navAdmin, '| match:', ADMIN_UIDS.includes(_uid))
+  if (!navAdmin) { console.warn('[AdminCheck] nav-admin element NOT found in DOM'); return }
+  if (ADMIN_UIDS.includes(_uid)) {
+    navAdmin.style.display = 'flex'
+    navAdmin.style.setProperty('display', 'flex', 'important')
+    navAdmin.removeAttribute('hidden')
+  }
 }
 window.onFirebaseReady=async function(user){
-  if(_signupInProgress){_signupInProgress=false;return}
+  if(_signupInProgress){_signupInProgress=false;}
   _firebaseReady=true
   _uid=user.uid
   // MOSTRAR UID NA TELA
