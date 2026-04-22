@@ -25,7 +25,7 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, onAuthStateChanged, sendPasswordResetEmail }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp }
+  import { getFirestore, doc, setDoc, getDoc }
          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -46,8 +46,6 @@
 
   // Camada de serviço — front não acessa db diretamente
   window._fbService = {
-    _onSnapshot: onSnapshot,
-    _db: db,
     async loadAll(uid){
       const snaps=await Promise.all(VALID_KEYS.map(k=>getDoc(_ref(uid,k))));
       const r={};snaps.forEach((s,i)=>{r[VALID_KEYS[i]]=s.exists()?s.data():null;});return r;
@@ -77,28 +75,15 @@
   };
 
   onAuthStateChanged(auth, user => {
-    if(user){
-      window._currentUser=user;
-      // Presença online
-      const presRef=doc(db,'presence',user.uid);
-      setDoc(presRef,{online:true,lastSeen:serverTimestamp(),name:user.displayName||'',email:user.email||''},{ merge:true });
-      window.addEventListener('beforeunload',()=>setDoc(presRef,{online:false,lastSeen:serverTimestamp()},{merge:true}));
-      window.onFirebaseReady&&window.onFirebaseReady(user);
-    } else {
-      if(window._currentUser){
-        const presRef=doc(db,'presence',window._currentUser.uid);
-        setDoc(presRef,{online:false,lastSeen:serverTimestamp()},{merge:true});
-      }
-      window._currentUser=null;
-      window.onFirebaseSignOut&&window.onFirebaseSignOut();
-    }
+    if(user){ window._currentUser=user; window.onFirebaseReady&&window.onFirebaseReady(user); }
+    else    { window._currentUser=null; window.onFirebaseSignOut&&window.onFirebaseSignOut(); }
   });
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-*{font-family:'Nunito',system-ui,sans-serif}
+*{font-family:'Inter',system-ui,sans-serif}
 body{background:#EEF2FF;min-height:100vh;padding-bottom:50px}
 
 /* ── MOBILE NAV BAR ── */
@@ -423,7 +408,6 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
       <a onclick="navigateTo('heatmap')"   class="nav-item" id="nav-heatmap"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-fire"></i><span>Heatmap</span></a>
       <a onclick="navigateTo('rewards')"  class="nav-item" id="nav-rewards"  style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:rgba(255,255,255,.8)"><i class="fas fa-trophy"></i><span>Recompensas</span></a>
       <a onclick="navigateTo('settings')" class="nav-item" id="nav-settings" style="display:none"></a>
-      <a onclick="navigateTo('admin')" class="nav-item" id="nav-admin" style="display:none;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:#ef4444"><i class="fas fa-shield-alt"></i><span>Admin</span></a>
       <a onclick="navigateTo('pricing')" class="nav-item" id="nav-pricing" style="display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:#F9DD16"><i class="fas fa-crown"></i><span>Planos</span></a>
     </div>
   </div>
@@ -1001,52 +985,21 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ SCREEN: ADMIN ══ -->
 <div id="screen-admin" class="screen" style="display:none">
-  <!-- Header -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
-    <div style="display:flex;align-items:center;gap:10px">
-      <i class="fas fa-shield-alt" style="font-size:1.1rem;color:#0038A8"></i>
-      <h2 style="font-size:1.2rem;font-weight:700;color:#111827;margin:0">Painel admin</h2>
-      <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;background:#EEF3FF;color:#0038A8;border:1px solid #c7d7f9">v5.0</span>
-    </div>
-    <div style="display:flex;gap:.5rem;align-items:center">
-      <button onclick="adminLoadUsers()" style="display:flex;align-items:center;gap:6px;padding:.45rem 1rem;background:#0038A8;color:white;border:none;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="font-size:.7rem"></i>Atualizar</button>
-      <button id="btn-maintenance" onclick="toggleMaintenance()" style="display:flex;align-items:center;gap:6px;padding:.45rem 1rem;background:white;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer"><i class="fas fa-wrench" style="font-size:.7rem"></i>Ativar Manutenção</button>
-    </div>
+    <h2 style="font-size:1.4rem;font-weight:800">🛡️ Painel Admin</h2>
+    <button onclick="adminLoadUsers()" style="padding:.6rem 1.1rem;background:#0038A8;color:white;border:none;border-radius:.85rem;font-weight:700;font-size:.8rem;cursor:pointer"><i class="fas fa-sync-alt" style="margin-right:.3rem"></i>Atualizar</button>
   </div>
-  <!-- Stats -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem">
-    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #0038A8">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Total</div>
-      <div id="stat-total" style="font-size:1.9rem;font-weight:300;color:#111827;letter-spacing:-.02em;line-height:1">—</div>
-      <div style="font-size:10px;color:#d1d5db;margin-top:4px">usuários</div>
-    </div>
-    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #d1d5db">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Free</div>
-      <div id="stat-free" style="font-size:1.9rem;font-weight:300;color:#6b7280;letter-spacing:-.02em;line-height:1">—</div>
-      <div style="font-size:10px;color:#d1d5db;margin-top:4px">sem plano pago</div>
-    </div>
-    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #3b82f6">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Básico</div>
-      <div id="stat-basico" style="font-size:1.9rem;font-weight:300;color:#0038A8;letter-spacing:-.02em;line-height:1">—</div>
-      <div style="font-size:10px;color:#d1d5db;margin-top:4px">mensal / anual</div>
-    </div>
-    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #F9DD16">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">Pro</div>
-      <div id="stat-pro" style="font-size:1.9rem;font-weight:300;color:#111827;letter-spacing:-.02em;line-height:1">—</div>
-      <div style="font-size:10px;color:#d1d5db;margin-top:4px">mensal / anual</div>
-    </div>
-    <div style="background:white;border-radius:12px;padding:1rem 1.25rem;border:1px solid #f3f4f6;border-top:2px solid #10b981">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:8px">MRR</div>
-      <div id="stat-mrr" style="font-size:1.25rem;font-weight:400;color:#10b981;letter-spacing:-.01em;line-height:1;margin-top:4px">—</div>
-      <div style="font-size:10px;color:#d1d5db;margin-top:4px">receita mensal</div>
-    </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem">
+    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-total" style="font-size:2rem;font-weight:900;color:#0038A8">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Total</div></div>
+    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-free" style="font-size:2rem;font-weight:900;color:#6b7280">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Free</div></div>
+    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-basico" style="font-size:2rem;font-weight:900;color:#0038A8">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">Básico</div></div>
+    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-pro" style="font-size:2rem;font-weight:900;color:#F9DD16;background:#001A55;border-radius:.85rem">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-top:.25rem">Pro</div></div>
+    <div style="background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);text-align:center"><div id="stat-mrr" style="font-size:1.4rem;font-weight:900;color:#10b981">—</div><div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase">MRR</div></div>
   </div>
-  <!-- Tabela -->
-  <div style="background:white;border-radius:14px;border:1px solid #f3f4f6;overflow:hidden">
-    <div style="display:flex;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;align-items:center">
-      <input id="admin-search" type="text" placeholder="Buscar por nome ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:180px;padding:.45rem .85rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;outline:none">
-      <div id="admin-online-count" style="display:flex;align-items:center;padding:.5rem .85rem;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:.85rem;font-size:.78rem;font-weight:700;color:#16a34a;white-space:nowrap"><span style="width:8px;height:8px;background:#d1d5db;border-radius:50%;display:inline-block;margin-right:.4rem"></span>0 online</div>
-      <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.45rem .75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.82rem;background:#fafafa;cursor:pointer">
+  <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
+    <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
+      <input id="admin-search" type="text" placeholder="Buscar por nome ou UID..." oninput="adminFilterUsers()" style="flex:1;min-width:200px;padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem">
+      <select id="admin-filter-plan" onchange="adminFilterUsers()" style="padding:.65rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white">
         <option value="">Todos os planos</option>
         <option value="free">Free</option>
         <option value="basico">Básico Mensal</option>
@@ -1054,23 +1007,19 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
         <option value="pro">Pro Mensal</option>
         <option value="proAnual">Pro Anual</option>
       </select>
-      <span id="admin-online-count" style="font-size:.75rem;color:#10b981;font-weight:600;display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span>0 online</span>
     </div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:.82rem">
-        <thead>
-          <tr style="background:#fafafa;border-bottom:1px solid #f3f4f6">
-            <th style="text-align:left;padding:.65rem 1rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Usuário</th>
-            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Status</th>
-            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Plano</th>
-            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Desde</th>
-            <th style="text-align:center;padding:.65rem;font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em">Ações</th>
-          </tr>
-        </thead>
+        <thead><tr style="border-bottom:2px solid #f3f4f6;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af">
+          <th style="text-align:left;padding:.75rem 1rem">Usuário</th>
+          <th style="text-align:center;padding:.75rem">Plano</th>
+          <th style="text-align:center;padding:.75rem">Desde</th>
+          <th style="text-align:center;padding:.75rem">Ações</th>
+        </tr></thead>
         <tbody id="admin-users-table"></tbody>
       </table>
     </div>
-    <div id="admin-loading" style="text-align:center;padding:2rem;color:#9ca3af;font-size:.82rem">Clique em "Atualizar" para carregar usuários.</div>
+    <div id="admin-loading" style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem">Clique em "Atualizar" para carregar usuários.</div>
   </div>
 </div>
 
@@ -1381,7 +1330,7 @@ const BOOK_COLORS=['#0038A8','#dc2626','#16a34a','#7c3aed','#d97706','#0891b2','
 const BOOK_EMOJIS=['📚','📖','✏️','🎓','📐','🔬','💰','⚖️','💻','🌎','🧮','📊','🗣️','🏦','🎯','🔢','📝','🧠','⭐','🔥']
 const RECURSOS=[
   // VÍDEO-AULAS — links de busca do YouTube (sempre funcionam)
-  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do Brasil com mais de 3 milhões de inscritos. Português, Matemática, Bancários, Informática e muito mais.',icon:'🎓',url:'https://www.youtube.com/channel/UChvwkhC3eHxJsVxW_ItDjdA',badge:'YouTube',yt:true},
+  {id:1,tipo:'video',titulo:'Estratégia Concursos — Aulas Grátis',desc:'Maior canal de concursos do Brasil com mais de 3 milhões de inscritos. Português, Matemática, Bancários, Informática e muito mais.',icon:'🎓',url:'https://www.youtube.com/@EstrategiaConcursos',badge:'YouTube',yt:true},
   {id:2,tipo:'video',titulo:'Aulas de Português para Concursos',desc:'Pesquisa no YouTube por aulas gratuitas de língua portuguesa focadas em concursos bancários e públicos.',icon:'📝',url:'https://www.youtube.com/results?search_query=aulas+portugues+concursos+bancarios+gratis',badge:'YouTube',yt:true},
   {id:3,tipo:'video',titulo:'Matemática Financeira para Bancários',desc:'Pesquisa no YouTube por aulas de matemática financeira, juros compostos e porcentagem para o BB.',icon:'🔢',url:'https://www.youtube.com/results?search_query=matematica+financeira+banco+do+brasil+gratis',badge:'YouTube',yt:true},
   {id:4,tipo:'video',titulo:'Conhecimentos Bancários — Aulas',desc:'Pesquisa no YouTube por aulas de sistema financeiro, produtos bancários e conhecimentos bancários para concursos.',icon:'🏦',url:'https://www.youtube.com/results?search_query=conhecimentos+bancarios+concurso+BB+aulas+gratis',badge:'YouTube',yt:true},
@@ -1500,33 +1449,10 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 // BUG #1 FIX + BUG #12 FIX: única definição de onFirebaseReady + flag signup
 let _firebaseReady = false
 let _signupInProgress = false
-function checkAdminAccess() {
-  if (!isAdmin()) return
-  const navAdmin = document.getElementById('nav-admin')
-  if (navAdmin) navAdmin.style.display = 'flex'
-}
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
   _firebaseReady=true
   _uid=user.uid
-  checkAdminAccess()
-  // Verificar modo manutenção
-  try{
-    const {getDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const snap=await getDoc(doc(window._firebase.auth.app?window._fbService._db:window._fbService._db,'config','maintenance'))
-    if(snap.exists()&&snap.data().active&&_uid!=='1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'){
-      document.getElementById('app-loading').style.display='none'
-      document.getElementById('auth-screen').style.display='none'
-      document.getElementById('app').style.display='none'
-      document.body.innerHTML=`<div style="min-height:100vh;background:linear-gradient(145deg,#0038A8,#002B85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;color:white;text-align:center;padding:2rem">
-        <div style="font-size:4rem">🔧</div>
-        <h1 style="font-size:2rem;font-weight:900">Site em Manutenção</h1>
-        <p style="font-size:1rem;opacity:.8;max-width:400px">${snap.data().message||'Estamos realizando melhorias. Voltaremos em breve!'}</p>
-        <p style="font-size:.8rem;opacity:.6">© EstudoBB</p>
-      </div>`
-      return
-    }
-  }catch(e){console.warn('maintenance check:',e)}
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
   _userPlan=await window._fbService.getUserPlan(_uid).catch(()=>'free')
@@ -1534,7 +1460,7 @@ window.onFirebaseReady=async function(user){
   document.getElementById('auth-screen').style.display='none'
   document.getElementById('app').style.display='block'
   updateHeaderUser();navigateTo(0)
-  updateHeaderUser()
+  checkAdminAccess();updateHeaderUser()
 }
 window.onFirebaseSignOut=function(){
   document.getElementById('app-loading').style.display='none'
@@ -1617,16 +1543,16 @@ function toggleEye(inputId,iconId){
   icon.className=input.type==='text'?'fas fa-eye-slash':'fas fa-eye'
 }
 function switchAuthTab(tab){
-  try{
-    const fl=document.getElementById('form-login');if(fl)fl.style.display=tab==='login'?'block':'none'
-    const fs=document.getElementById('form-signup');if(fs)fs.style.display=tab==='signup'?'block':'none'
-    const tl=document.getElementById('tab-login');if(tl)tl.className='auth-tab'+(tab==='login'?' active':'')
-    const ts=document.getElementById('tab-signup');if(ts)ts.className='auth-tab'+(tab==='signup'?' active':'')
-    ;['login-error','signup-error'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'})
-  }catch(e){console.warn('switchAuthTab:',e)}
+  document.getElementById('form-login').style.display=tab==='login'?'block':'none'
+  document.getElementById('form-signup').style.display=tab==='signup'?'block':'none'
+  document.getElementById('tab-login').className='auth-tab'+(tab==='login'?' active':'')
+  document.getElementById('tab-signup').className='auth-tab'+(tab==='signup'?' active':'')
+  ;['login-error','signup-error'].forEach(id=>document.getElementById(id).style.display='none')
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
 async function doSignup(){
+  // BUG #12 FIX: sinaliza signup em progresso para onFirebaseReady ignorar primeira chamada
+  _signupInProgress = true
   const name=document.getElementById('signup-name').value.trim()
   const email=document.getElementById('signup-email').value.trim()
   const pass=document.getElementById('signup-pass').value
@@ -1641,8 +1567,6 @@ async function doSignup(){
     showAuthError('signup-error','Você precisa aceitar os Termos de Uso e a Política de Privacidade.')
     shakeEl('terms-label');return
   }
-  // Sinaliza signup em progresso APÓS validações passarem
-  _signupInProgress = true
   const fb=window._firebase;if(!fb){showAuthError('signup-error','Firebase não configurado.');return}
   // Disable button while processing
   const signupBtn = document.querySelector('#form-signup .btn-bb')
@@ -1654,7 +1578,7 @@ async function doSignup(){
     await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
-    showSignupSuccess(name, email)
+    showSignupSuccess(name)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
     const msgs={'auth/email-already-in-use':'E-mail já cadastrado.','auth/invalid-email':'E-mail inválido.','auth/weak-password':'Senha muito fraca.'}
@@ -1663,23 +1587,33 @@ async function doSignup(){
   }
 }
 
-function showSignupSuccess(name, email) {
+function showSignupSuccess(name) {
   const firstName = name.split(' ')[0]
-  const authScreen = document.getElementById('auth-screen')
-  if (authScreen) authScreen.innerHTML = `
-    <div class="auth-card" style="text-align:center">
+  const formSignup = document.getElementById('form-signup')
+  if (!formSignup) return
+  // Replace form content with success message
+  formSignup.innerHTML = `
+    <div style="text-align:center;padding:1rem 0">
       <div style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(16,185,129,.3)">
         <i class="fas fa-check" style="color:white;font-size:1.6rem"></i>
       </div>
       <h3 style="font-size:1.1rem;font-weight:800;color:#111827;margin-bottom:.4rem">Conta criada com sucesso! 🎉</h3>
-      <p style="font-size:.85rem;color:#6b7280;margin-bottom:.5rem">Bem-vindo(a), <strong style="color:#0038A8">${firstName}</strong>!</p>
-      <p style="font-size:.8rem;color:#9ca3af;margin-bottom:1.5rem">Redirecionando para o login em 3 segundos...</p>
-      <div style="width:100%;height:4px;background:#e5e7eb;border-radius:9999px;overflow:hidden">
-        <div id="redirect-bar" style="height:100%;width:0%;background:#10b981;transition:width 3s linear"></div>
-      </div>
+      <p style="font-size:.85rem;color:#6b7280;line-height:1.6;margin-bottom:.3rem">Bem-vindo(a), <strong style="color:#0038A8">${_esc(firstName)}</strong>!</p>
+      <p style="font-size:.82rem;color:#9ca3af;margin-bottom:1.5rem">Sua conta foi criada. Faça login para começar seus estudos.</p>
+      <button onclick="switchAuthTab('login');document.getElementById('login-email').value='${_esc(email)}'" class="btn-bb" style="width:100%;padding:.9rem;border-radius:.85rem;font-weight:700;font-size:.95rem;border:none;cursor:pointer">
+        <i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>Ir para o Login
+      </button>
     </div>`
-  setTimeout(() => { const b=document.getElementById('redirect-bar');if(b)b.style.width='100%' }, 50)
-  setTimeout(() => { window.location.reload() }, 3000)
+  // Restore form on next signup tab click
+  const tabSignup = document.getElementById('tab-signup')
+  if (tabSignup) {
+    const origSwitch = tabSignup.onclick
+    tabSignup.onclick = () => {
+      formSignup.innerHTML = ''
+      switchAuthTab('signup')
+      tabSignup.onclick = origSwitch
+    }
+  }
 }
 function showDeleteAccountModal(){
   document.getElementById('delete-confirm-input').value=''
@@ -1739,21 +1673,11 @@ async function doLogin(){
   try{await fb.signInWithEmailAndPassword(email,pass)}
   catch(e){
     shakeEl('login-email')
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.','auth/network-request-failed':'Erro de conexão. Desative ad-blockers ou Brave Shields e tente novamente.'}
-    const msg = msgs[e.code]||'E-mail ou senha incorretos. Se usar Brave ou ad-blocker, desative-o para este site.'
-    showAuthError('login-error', msg)
+    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.'}
+    showAuthError('login-error',msgs[e.code]||'E-mail ou senha incorretos.')
   }
 }
-async function doLogout(){
-  toggleUserMenu();
-  try{if(window._firebase)await window._firebase.signOut();}catch(e){console.warn(e);}
-  window._currentUser=null;
-  _uid=null;
-  document.getElementById('app').style.display='none';
-  document.getElementById('app-loading').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-  switchAuthTab('login');
-}
+async function doLogout(){toggleUserMenu();const fb=window._firebase;if(fb)await fb.signOut();else location.reload()}
 function showResetPassword(){
   document.getElementById('reset-input-panel').style.display='block'
   document.getElementById('reset-success-panel').style.display='none'
@@ -1929,7 +1853,6 @@ function renderSubjects(){
     </div></td>`
     tbody.appendChild(tr)
   })
-  adminWatchPresence(users)
 }
 function addSubject(){
   const limits=PLAN_FEATURES[_userPlan]||PLAN_FEATURES.free
@@ -3103,8 +3026,6 @@ window.addEventListener('load',()=>{
   const _origSignOut=window.onFirebaseSignOut
   window.onFirebaseSignOut=()=>{clearTimeout(_loadTimeout);_origSignOut&&_origSignOut()}
 })
-
-// onFirebaseReady e onFirebaseSignOut definidos na linha ~1452 (único ponto correto)
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
 <nav id="mobile-nav">
@@ -3584,38 +3505,22 @@ function goToStripeCheckout() {
 // ═══════════════════════════════════════════════════
 // ADMIN
 // ═══════════════════════════════════════════════════
-const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
+const ADMIN_UIDS = ['2WKwdCPEJoMocxRv8cOdZn31kjn2']
 function isAdmin() { return ADMIN_UIDS.includes(_uid) }
 let _adminUsers = []
 
 function renderAdmin() {
-  checkAdminAccess()
   if (!isAdmin()) { navigateTo(0); return }
-  try { adminLoadUsers() } catch(e) { console.warn('renderAdmin:', e.message) }
+  adminLoadUsers()
 }
 
-async function adminSavePlan(safeUid, rawUid) {
-  const sel = document.getElementById('sel-' + safeUid)
+async function adminSavePlan(uid) {
+  const sel = document.getElementById('sel-' + uid)
   if (!sel) return
-  const realUid = rawUid || sel.dataset.rawuid || safeUid
-  const selectedPlan = sel.options[sel.selectedIndex].value
-  await adminChangePlan(realUid, selectedPlan)
+  await adminChangePlan(uid, sel.value)
 }
 
-async function toggleMaintenance(){
-  try{
-    const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const ref=doc(window._fbService._db,'config','maintenance')
-    const current=await getDoc(ref)
-    const isActive=current.exists()&&current.data().active
-    const message=isActive?'':prompt('Mensagem de manutencao (vazio = padrao):')||''
-    await setDoc(ref,{active:!isActive,message,updatedAt:new Date().toISOString()})
-    const btn=document.getElementById('btn-maintenance')
-    if(btn){btn.innerHTML=isActive?'<i class="fas fa-wrench" style="font-size:.7rem"></i> Ativar Manutenção':'<i class="fas fa-wrench" style="font-size:.7rem"></i> Desativar Manutenção';btn.style.background=isActive?'white':'#dc2626';btn.style.color=isActive?'#dc2626':'white';btn.style.border=isActive?'1.5px solid #fca5a5':'none'}
-    showXPToast(0,isActive?'Manutencao desativada!':'Modo manutencao ativado!')
-  }catch(e){alert('Erro: '+e.message)}
-}
-
+// BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
 async function adminLoadUsers() {
   if (!isAdmin()) return
   const loading = document.getElementById('admin-loading')
@@ -3629,7 +3534,6 @@ async function adminLoadUsers() {
     _adminUsers = await res.json()
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
-    adminWatchPresence(_adminUsers)
     if (loading) loading.style.display = 'none'
   } catch (e) {
     if (loading) { loading.style.display = 'block'; loading.textContent = 'Erro: ' + e.message }
@@ -3652,18 +3556,12 @@ function adminRenderTable(users) {
     tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
     const plan = u.plan || 'free'
     const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
-    const rawUid = u.uid
-    const safeUid = rawUid.replace(/[^a-zA-Z0-9_-]/g,'_')
-    const isAdminUser = ADMIN_UIDS.includes(rawUid)
-    const crownBadge = isAdminUser ? ' <span title="Admin" style="font-size:.75rem">👑</span>' : ''
+    const safeUid = _esc(u.uid)
     tr.innerHTML = `
       <td style="padding:.85rem 1rem">
-        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}${crownBadge}</div>
+        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}</div>
         <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
         <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
-      </td>
-      <td style="text-align:center;padding:.75rem">
-        <span id="online-dot-${safeUid}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db" title="offline"></span>
       </td>
       <td style="text-align:center;padding:.75rem">
         <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
@@ -3671,8 +3569,7 @@ function adminRenderTable(users) {
       <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
       <td style="text-align:center;padding:.75rem">
         <div style="display:flex;gap:.35rem;align-items:center;justify-content:center">
-          <span id="dot-${safeUid}" title="offline" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db;transition:background .4s"></span>
-          <select id="sel-${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
+          <select id="sel-${safeUid}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
             <option value="${plan}">${planLbl[plan]||plan} (atual)</option>
             ${plan!=='free'?'<option value="free">→ Free</option>':''}
             ${plan!=='basico'?'<option value="basico">→ Básico Mensal</option>':''}
@@ -3680,44 +3577,12 @@ function adminRenderTable(users) {
             ${plan!=='pro'?'<option value="pro">→ Pro Mensal</option>':''}
             ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
           </select>
-          <button class="admin-save-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
-          <button class="admin-del-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
+          <button class="admin-save-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
+          <button class="admin-del-btn" data-uid="${safeUid}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
         </div>
       </td>`
     tbody.appendChild(tr)
   })
-}
-
-function adminWatchPresence(users) {
-  if (!window._fbService?._onSnapshot || !window._fbService?._db) return
-  const db = window._fbService._db
-  const {doc, onSnapshot} = { doc: (d,c,id)=>({path:`${c}/${id}`}), onSnapshot: window._fbService._onSnapshot }
-  users.forEach(u => {
-    const ref = window._fbService._db && typeof window._fbService._onSnapshot === 'function'
-      ? (() => { try { const {doc:d} = window._fbService; return null } catch(e){ return null } })()
-      : null
-  })
-  // Usa import dinâmico para onSnapshot
-  import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js').then(({doc, onSnapshot}) => {
-    let onlineCount = 0
-    const total = users.length
-    users.forEach(u => {
-      const ref = doc(window._fbService._db, 'presence', u.uid)
-      onSnapshot(ref, snap => {
-        const dot = document.getElementById('online-dot-' + u.uid.replace(/[^a-zA-Z0-9]/g,''))
-        if (!dot) return
-        const isOnline = snap.exists() && snap.data().online === true
-        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
-        dot.title = isOnline ? 'online agora' : 'offline'
-        // Atualiza contador
-        const onlineDots = document.querySelectorAll('[id^="online-dot-"]')
-        let count = 0
-        onlineDots.forEach(d => { if(d.style.background === 'rgb(16, 185, 129)') count++ })
-        const counter = document.getElementById('admin-online-count')
-        if (counter) counter.innerHTML = '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span> ' + count + ' online'
-      })
-    })
-  }).catch(()=>{})
 }
 
 function adminUpdateStats(users) {
@@ -3750,11 +3615,9 @@ async function adminChangePlan(uid, plan) {
   const userObj = _adminUsers.find(u => u.uid === uid)
   const userName = userObj?.name || uid
   const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
-  const confirmed = await adminConfirmModal(`Alterar plano de <strong>${_esc(userName)}</strong>?`,`Novo plano: <span style="font-weight:800;color:#0038A8">${planLblMap[plan]||plan}</span>`,'Confirmar','Cancelar')
-  if (!confirmed) return
+  if (!confirm(`Alterar plano de:\n${userName}\npara: ${planLblMap[plan]||plan}?`)) return
   // Feedback visual imediato
-  const _safe = uid.replace(/[^a-zA-Z0-9_-]/g,'_')
-  const btn = document.querySelector(`.admin-save-btn[data-uid="${_safe}"]`)
+  const btn = document.querySelector(`.admin-save-btn[data-uid="${_esc(uid)}"]`)
   if (btn) { btn.textContent = '⏳'; btn.disabled = true }
   try {
     const token = await window._currentUser.getIdToken()
@@ -3769,7 +3632,7 @@ async function adminChangePlan(uid, plan) {
     if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
     if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
     // Atualiza só a linha da tabela visualmente
-    const sel = document.getElementById('sel-' + _safe)
+    const sel = document.getElementById('sel-' + _esc(uid))
     if (sel) {
       const planLbl = {free:'FREE',basico:'BÁSICO',basicoAnual:'BÁSICO ANUAL',pro:'PRO',proAnual:'PRO ANUAL'}
       sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
@@ -3786,7 +3649,18 @@ async function adminChangePlan(uid, plan) {
   }
 }
 
-
+function checkAdminAccess() {
+  if (!isAdmin()) return
+  const navSettings = document.getElementById('nav-settings')
+  if (navSettings && !document.getElementById('nav-admin')) {
+    const a = document.createElement('a')
+    a.id = 'nav-admin'; a.className = 'nav-item'
+    a.onclick = () => navigateTo('admin')
+    a.style.cssText = 'display:flex;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:#ef4444'
+    a.innerHTML = '<i class="fas fa-shield-alt"></i><span>Admin</span>'
+    navSettings.parentNode.insertBefore(a, navSettings.nextSibling)
+  }
+}
 
 // BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
 
@@ -3969,29 +3843,11 @@ async function adminDeleteUser(uid) {
 document.getElementById('admin-users-table')?.addEventListener('click', e => {
   const save = e.target.closest('.admin-save-btn')
   const del  = e.target.closest('.admin-del-btn')
-  if (save) adminSavePlan(save.dataset.uid, save.dataset.rawuid)
-  if (del)  adminDeleteUser(del.dataset.rawuid || del.dataset.uid)
+  if (save) adminSavePlan(save.dataset.uid)
+  if (del)  adminDeleteUser(del.dataset.uid)
 })
 
 // Registrar Service Worker para PWA
-
-function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
-  return new Promise(resolve => {
-    document.getElementById('admin-confirm-modal')?.remove()
-    const overlay = document.createElement('div')
-    overlay.id = 'admin-confirm-modal'
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(3px)'
-    overlay.innerHTML = `<div style="background:white;border-radius:1.5rem;padding:2rem 1.75rem;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center"><div style="font-size:2rem;margin-bottom:.75rem">✏️</div><div style="font-size:1rem;font-weight:800;color:#111827;margin-bottom:.4rem">${title}</div><div style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem">${subtitle}</div><div style="display:flex;gap:.75rem;justify-content:center"><button id="acm-cancel" style="flex:1;padding:.75rem;border:2px solid #e5e7eb;border-radius:1rem;background:white;font-weight:700;font-size:.85rem;cursor:pointer;color:#374151">${cancelLabel}</button><button id="acm-ok" style="flex:1;padding:.75rem;border:none;border-radius:1rem;background:#0038A8;color:white;font-weight:800;font-size:.85rem;cursor:pointer">${okLabel}</button></div></div>`
-    document.body.appendChild(overlay)
-    const close = (val) => { overlay.remove(); resolve(val) }
-    overlay.querySelector('#acm-ok').onclick = () => close(true)
-    overlay.querySelector('#acm-cancel').onclick = () => close(false)
-    overlay.onclick = (e) => { if(e.target===overlay) close(false) }
-  })
-}
-
-let _adminPresenceUnsubs = []
-
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js?v=5').catch(()=>{})
 }
