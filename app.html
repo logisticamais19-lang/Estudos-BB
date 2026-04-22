@@ -1505,6 +1505,221 @@ function checkAdminAccess() {
   const navAdmin = document.getElementById('nav-admin')
   if (navAdmin) navAdmin.style.display = 'flex'
 }
+
+// ═════════════════════════════════════════════════════
+// SEÇÃO ADMIN MOVIDA PARA CIMA
+// ═════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════
+const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
+function isAdmin() { return ADMIN_UIDS.includes(_uid) }
+let _adminUsers = []
+
+function renderAdmin() {
+  checkAdminAccess()
+  if (!isAdmin()) { navigateTo(0); return }
+  adminLoadUsers()
+}
+
+async function adminSavePlan(safeUid, rawUid) {
+  const sel = document.getElementById('sel-' + safeUid)
+  if (!sel) return
+  const realUid = rawUid || sel.dataset.rawuid || safeUid
+  await adminChangePlan(realUid, sel.value, safeUid)
+  await adminChangePlan(realUid, selectedPlan, safeUid)
+  const selectedPlan = sel.options[sel.selectedIndex].value
+// BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
+async function toggleMaintenance(){
+  try{
+    const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const ref=doc(window._fbService._db,'config','maintenance')
+    const current=await getDoc(ref)
+    const isActive=current.exists()&&current.data().active
+    const message=isActive?'':prompt('Mensagem de manutencao (vazio = padrao):')||''
+    await setDoc(ref,{active:!isActive,message,updatedAt:new Date().toISOString()})
+    const btn=document.getElementById('btn-maintenance')
+    if(btn){btn.innerHTML=isActive?'<i class="fas fa-wrench" style="font-size:.7rem"></i> Ativar Manutenção':'<i class="fas fa-wrench" style="font-size:.7rem"></i> Desativar Manutenção';btn.style.background=isActive?'white':'#dc2626';btn.style.color=isActive?'#dc2626':'white';btn.style.border=isActive?'1.5px solid #fca5a5':'none'}
+    showXPToast(0,isActive?'Manutencao desativada!':'Modo manutencao ativado!')
+  }catch(e){alert('Erro: '+e.message)}
+}
+
+async function adminLoadUsers() {
+  if (!isAdmin()) return
+  const loading = document.getElementById('admin-loading')
+  const tbody = document.getElementById('admin-users-table')
+  if (loading) { loading.style.display = 'block'; loading.textContent = 'Carregando...' }
+  if (tbody) tbody.innerHTML = ''
+  try {
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/users', { headers: { Authorization: 'Bearer ' + token } })
+    if (!res.ok) throw new Error(await res.text())
+    _adminUsers = await res.json()
+    adminRenderTable(_adminUsers)
+    adminUpdateStats(_adminUsers)
+    adminWatchPresence(_adminUsers)
+    if (loading) loading.style.display = 'none'
+  } catch (e) {
+    if (loading) { loading.style.display = 'block'; loading.textContent = 'Erro: ' + e.message }
+  }
+}
+
+function adminRenderTable(users) {
+  const tbody = document.getElementById('admin-users-table')
+  if (!tbody) return
+  tbody.innerHTML = ''
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#9ca3af">Nenhum usuário.</td></tr>'
+    return
+  }
+  const planBg  = { free:'#f3f4f6', basico:'#EEF3FF', basicoAnual:'#dbeafe', pro:'#001A55', proAnual:'#001A55' }
+  const planFg  = { free:'#6b7280', basico:'#0038A8', basicoAnual:'#1d4ed8', pro:'#F9DD16', proAnual:'#F9DD16' }
+  const planLbl = { free:'FREE', basico:'BÁSICO', basicoAnual:'BÁSICO ANUAL', pro:'PRO', proAnual:'PRO ANUAL' }
+  users.forEach(u => {
+    const tr = document.createElement('tr')
+    tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
+    const plan = u.plan || 'free'
+    const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
+    const rawUid = u.uid
+    const safeUid = rawUid.replace(/[^a-zA-Z0-9_-]/g,'_')
+    const isAdminUser = ADMIN_UIDS.includes(rawUid)
+    const crownBadge = isAdminUser ? ' <span title="Admin" style="font-size:.75rem">👑</span>' : ''
+    tr.innerHTML = `
+      <td style="padding:.85rem 1rem">
+        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}${crownBadge}</div>
+        <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
+        <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
+      </td>
+      <td style="text-align:center;padding:.75rem">
+        <span id="online-dot-${safeUid}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db" title="offline"></span>
+      </td>
+      <td style="text-align:center;padding:.75rem">
+        <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
+      </td>
+      <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
+      <td style="text-align:center;padding:.75rem">
+        <div style="display:flex;gap:.35rem;align-items:center;justify-content:center">
+          <span id="dot-${safeUid}" title="offline" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db;transition:background .4s"></span>
+          <select id="sel-${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
+            <option value="${plan}">${planLbl[plan]||plan} (atual)</option>
+            ${plan!=='free'?'<option value="free">→ Free</option>':''}
+            ${plan!=='basico'?'<option value="basico">→ Básico Mensal</option>':''}
+            ${plan!=='basicoAnual'?'<option value="basicoAnual">→ Básico Anual</option>':''}
+            ${plan!=='pro'?'<option value="pro">→ Pro Mensal</option>':''}
+            ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
+          </select>
+          <button class="admin-save-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
+          <button class="admin-del-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
+        </div>
+      </td>`
+    tbody.appendChild(tr)
+  })
+}
+
+function adminWatchPresence(users) {
+  if (!window._fbService?._onSnapshot || !window._fbService?._db) return
+  const db = window._fbService._db
+  const {doc, onSnapshot} = { doc: (d,c,id)=>({path:`${c}/${id}`}), onSnapshot: window._fbService._onSnapshot }
+  users.forEach(u => {
+    const ref = window._fbService._db && typeof window._fbService._onSnapshot === 'function'
+      ? (() => { try { const {doc:d} = window._fbService; return null } catch(e){ return null } })()
+      : null
+  })
+  // Usa import dinâmico para onSnapshot
+  import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js').then(({doc, onSnapshot}) => {
+    let onlineCount = 0
+    const total = users.length
+    users.forEach(u => {
+      const ref = doc(window._fbService._db, 'presence', u.uid)
+      onSnapshot(ref, snap => {
+        const dot = document.getElementById('online-dot-' + u.uid.replace(/[^a-zA-Z0-9]/g,''))
+        if (!dot) return
+        const isOnline = snap.exists() && snap.data().online === true
+        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
+        dot.title = isOnline ? 'online agora' : 'offline'
+        // Atualiza contador
+        const onlineDots = document.querySelectorAll('[id^="online-dot-"]')
+        let count = 0
+        onlineDots.forEach(d => { if(d.style.background === 'rgb(16, 185, 129)') count++ })
+        const counter = document.getElementById('admin-online-count')
+        if (counter) counter.innerHTML = '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span> ' + count + ' online'
+      })
+    })
+  }).catch(()=>{})
+}
+
+function adminUpdateStats(users) {
+  const total = users.length
+  const byPlan = { free:0, basico:0, basicoAnual:0, pro:0, proAnual:0 }
+  users.forEach(u => { const p = u.plan||'free'; byPlan[p] = (byPlan[p]||0)+1 })
+  const mrr = byPlan.basico*12.9 + byPlan.basicoAnual*10.75 + byPlan.pro*19.9 + byPlan.proAnual*16.58
+  const totalPaid = byPlan.basico + byPlan.basicoAnual + byPlan.pro + byPlan.proAnual
+  document.getElementById('stat-total').textContent = total
+  document.getElementById('stat-free').textContent = byPlan.free
+  document.getElementById('stat-basico').textContent = byPlan.basico + byPlan.basicoAnual
+  document.getElementById('stat-pro').textContent = byPlan.pro + byPlan.proAnual
+  document.getElementById('stat-mrr').textContent = 'R$' + mrr.toFixed(2)
+}
+
+function adminFilterUsers() {
+  const q = document.getElementById('admin-search')?.value?.toLowerCase()||''
+  const planF = document.getElementById('admin-filter-plan')?.value||''
+  const filtered = _adminUsers.filter(u => {
+    const matchQ = !q || (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)
+    const matchP = !planF || (u.plan||'free') === planF
+    return matchQ && matchP
+  })
+  adminRenderTable(filtered)
+}
+
+async function adminChangePlan(uid, plan) {
+  if (!plan || !isAdmin()) return
+  // Encontra nome do usuário para confirmar
+  const userObj = _adminUsers.find(u => u.uid === uid)
+  const userName = userObj?.name || uid
+  const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
+  const confirmed = await adminConfirmModal(`Alterar plano de <strong>${_esc(userName)}</strong>?`,`Novo plano: <span style="font-weight:800;color:#0038A8">${planLblMap[plan]||plan}</span>`,'Confirmar','Cancelar')
+  if (!confirmed) return
+  // Feedback visual imediato
+  const _safe = uid.replace(/[^a-zA-Z0-9_-]/g,'_')
+  const btn = document.querySelector(`.admin-save-btn[data-uid="${_safe}"]`)
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
+  try {
+    const token = await window._currentUser.getIdToken()
+    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid + '/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan })
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
+    // Atualiza local sem recarregar tudo
+    if (userObj) userObj.plan = plan
+    if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
+    if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
+    // Atualiza só a linha da tabela visualmente
+    const sel = document.getElementById('sel-' + _safe)
+    if (sel) {
+      const planLbl = {free:'FREE',basico:'BÁSICO',basicoAnual:'BÁSICO ANUAL',pro:'PRO',proAnual:'PRO ANUAL'}
+      sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
+      sel.options[0].value = plan
+    }
+    showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
+    adminUpdateStats(_adminUsers)
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
+  } catch (e) {
+    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
+    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
+    console.error('adminChangePlan error:', e)
+    alert('❌ Erro ao salvar: ' + e.message)
+  }
+}
+
+
+
+// BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
+
+// NOVO: Templates de Plano Inteligente
+const PLAN_TEMPLATES = {
+
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
   _firebaseReady=true
@@ -3581,216 +3796,6 @@ function goToStripeCheckout() {
 }
 
 // ═══════════════════════════════════════════════════
-// ADMIN
-// ═══════════════════════════════════════════════════
-const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
-function isAdmin() { return ADMIN_UIDS.includes(_uid) }
-let _adminUsers = []
-
-function renderAdmin() {
-  checkAdminAccess()
-  if (!isAdmin()) { navigateTo(0); return }
-  adminLoadUsers()
-}
-
-async function adminSavePlan(safeUid, rawUid) {
-  const sel = document.getElementById('sel-' + safeUid)
-  if (!sel) return
-  const realUid = rawUid || sel.dataset.rawuid || safeUid
-  await adminChangePlan(realUid, sel.value, safeUid)
-  await adminChangePlan(realUid, selectedPlan, safeUid)
-  const selectedPlan = sel.options[sel.selectedIndex].value
-// BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
-async function toggleMaintenance(){
-  try{
-    const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    const ref=doc(window._fbService._db,'config','maintenance')
-    const current=await getDoc(ref)
-    const isActive=current.exists()&&current.data().active
-    const message=isActive?'':prompt('Mensagem de manutencao (vazio = padrao):')||''
-    await setDoc(ref,{active:!isActive,message,updatedAt:new Date().toISOString()})
-    const btn=document.getElementById('btn-maintenance')
-    if(btn){btn.innerHTML=isActive?'<i class="fas fa-wrench" style="font-size:.7rem"></i> Ativar Manutenção':'<i class="fas fa-wrench" style="font-size:.7rem"></i> Desativar Manutenção';btn.style.background=isActive?'white':'#dc2626';btn.style.color=isActive?'#dc2626':'white';btn.style.border=isActive?'1.5px solid #fca5a5':'none'}
-    showXPToast(0,isActive?'Manutencao desativada!':'Modo manutencao ativado!')
-  }catch(e){alert('Erro: '+e.message)}
-}
-
-async function adminLoadUsers() {
-  if (!isAdmin()) return
-  const loading = document.getElementById('admin-loading')
-  const tbody = document.getElementById('admin-users-table')
-  if (loading) { loading.style.display = 'block'; loading.textContent = 'Carregando...' }
-  if (tbody) tbody.innerHTML = ''
-  try {
-    const token = await window._currentUser.getIdToken()
-    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/users', { headers: { Authorization: 'Bearer ' + token } })
-    if (!res.ok) throw new Error(await res.text())
-    _adminUsers = await res.json()
-    adminRenderTable(_adminUsers)
-    adminUpdateStats(_adminUsers)
-    adminWatchPresence(_adminUsers)
-    if (loading) loading.style.display = 'none'
-  } catch (e) {
-    if (loading) { loading.style.display = 'block'; loading.textContent = 'Erro: ' + e.message }
-  }
-}
-
-function adminRenderTable(users) {
-  const tbody = document.getElementById('admin-users-table')
-  if (!tbody) return
-  tbody.innerHTML = ''
-  if (!users.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#9ca3af">Nenhum usuário.</td></tr>'
-    return
-  }
-  const planBg  = { free:'#f3f4f6', basico:'#EEF3FF', basicoAnual:'#dbeafe', pro:'#001A55', proAnual:'#001A55' }
-  const planFg  = { free:'#6b7280', basico:'#0038A8', basicoAnual:'#1d4ed8', pro:'#F9DD16', proAnual:'#F9DD16' }
-  const planLbl = { free:'FREE', basico:'BÁSICO', basicoAnual:'BÁSICO ANUAL', pro:'PRO', proAnual:'PRO ANUAL' }
-  users.forEach(u => {
-    const tr = document.createElement('tr')
-    tr.style.cssText = 'border-bottom:1px solid #f3f4f6'
-    const plan = u.plan || 'free'
-    const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—'
-    const rawUid = u.uid
-    const safeUid = rawUid.replace(/[^a-zA-Z0-9_-]/g,'_')
-    const isAdminUser = ADMIN_UIDS.includes(rawUid)
-    const crownBadge = isAdminUser ? ' <span title="Admin" style="font-size:.75rem">👑</span>' : ''
-    tr.innerHTML = `
-      <td style="padding:.85rem 1rem">
-        <div style="font-weight:700;font-size:.85rem;color:#111827">${_esc(u.name||'—')}${crownBadge}</div>
-        <div style="font-size:.7rem;color:#0038A8;font-weight:600">${_esc(u.email||'')}</div>
-        <div style="font-size:.62rem;color:#d1d5db;margin-top:.1rem">${safeUid}</div>
-      </td>
-      <td style="text-align:center;padding:.75rem">
-        <span id="online-dot-${safeUid}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db" title="offline"></span>
-      </td>
-      <td style="text-align:center;padding:.75rem">
-        <span style="padding:.25rem .65rem;border-radius:2rem;font-size:.7rem;font-weight:700;background:${planBg[plan]||'#f3f4f6'};color:${planFg[plan]||'#6b7280'}">${planLbl[plan]||plan.toUpperCase()}</span>
-      </td>
-      <td style="text-align:center;padding:.75rem;font-size:.78rem;color:#6b7280">${date}</td>
-      <td style="text-align:center;padding:.75rem">
-        <div style="display:flex;gap:.35rem;align-items:center;justify-content:center">
-          <span id="dot-${safeUid}" title="offline" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d1d5db;transition:background .4s"></span>
-          <select id="sel-${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .5rem;border:1.5px solid #e5e7eb;border-radius:.55rem;font-size:.72rem;background:white;cursor:pointer">
-            <option value="${plan}">${planLbl[plan]||plan} (atual)</option>
-            ${plan!=='free'?'<option value="free">→ Free</option>':''}
-            ${plan!=='basico'?'<option value="basico">→ Básico Mensal</option>':''}
-            ${plan!=='basicoAnual'?'<option value="basicoAnual">→ Básico Anual</option>':''}
-            ${plan!=='pro'?'<option value="pro">→ Pro Mensal</option>':''}
-            ${plan!=='proAnual'?'<option value="proAnual">→ Pro Anual</option>':''}
-          </select>
-          <button class="admin-save-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#0038A8;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Salvar</button>
-          <button class="admin-del-btn" data-uid="${safeUid}" data-rawuid="${_esc(rawUid)}" style="padding:.3rem .65rem;background:#dc2626;color:white;border:none;border-radius:.55rem;font-size:.7rem;font-weight:700;cursor:pointer">Excluir</button>
-        </div>
-      </td>`
-    tbody.appendChild(tr)
-  })
-}
-
-function adminWatchPresence(users) {
-  if (!window._fbService?._onSnapshot || !window._fbService?._db) return
-  const db = window._fbService._db
-  const {doc, onSnapshot} = { doc: (d,c,id)=>({path:`${c}/${id}`}), onSnapshot: window._fbService._onSnapshot }
-  users.forEach(u => {
-    const ref = window._fbService._db && typeof window._fbService._onSnapshot === 'function'
-      ? (() => { try { const {doc:d} = window._fbService; return null } catch(e){ return null } })()
-      : null
-  })
-  // Usa import dinâmico para onSnapshot
-  import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js').then(({doc, onSnapshot}) => {
-    let onlineCount = 0
-    const total = users.length
-    users.forEach(u => {
-      const ref = doc(window._fbService._db, 'presence', u.uid)
-      onSnapshot(ref, snap => {
-        const dot = document.getElementById('online-dot-' + u.uid.replace(/[^a-zA-Z0-9]/g,''))
-        if (!dot) return
-        const isOnline = snap.exists() && snap.data().online === true
-        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
-        dot.title = isOnline ? 'online agora' : 'offline'
-        // Atualiza contador
-        const onlineDots = document.querySelectorAll('[id^="online-dot-"]')
-        let count = 0
-        onlineDots.forEach(d => { if(d.style.background === 'rgb(16, 185, 129)') count++ })
-        const counter = document.getElementById('admin-online-count')
-        if (counter) counter.innerHTML = '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block"></span> ' + count + ' online'
-      })
-    })
-  }).catch(()=>{})
-}
-
-function adminUpdateStats(users) {
-  const total = users.length
-  const byPlan = { free:0, basico:0, basicoAnual:0, pro:0, proAnual:0 }
-  users.forEach(u => { const p = u.plan||'free'; byPlan[p] = (byPlan[p]||0)+1 })
-  const mrr = byPlan.basico*12.9 + byPlan.basicoAnual*10.75 + byPlan.pro*19.9 + byPlan.proAnual*16.58
-  const totalPaid = byPlan.basico + byPlan.basicoAnual + byPlan.pro + byPlan.proAnual
-  document.getElementById('stat-total').textContent = total
-  document.getElementById('stat-free').textContent = byPlan.free
-  document.getElementById('stat-basico').textContent = byPlan.basico + byPlan.basicoAnual
-  document.getElementById('stat-pro').textContent = byPlan.pro + byPlan.proAnual
-  document.getElementById('stat-mrr').textContent = 'R$' + mrr.toFixed(2)
-}
-
-function adminFilterUsers() {
-  const q = document.getElementById('admin-search')?.value?.toLowerCase()||''
-  const planF = document.getElementById('admin-filter-plan')?.value||''
-  const filtered = _adminUsers.filter(u => {
-    const matchQ = !q || (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)
-    const matchP = !planF || (u.plan||'free') === planF
-    return matchQ && matchP
-  })
-  adminRenderTable(filtered)
-}
-
-async function adminChangePlan(uid, plan) {
-  if (!plan || !isAdmin()) return
-  // Encontra nome do usuário para confirmar
-  const userObj = _adminUsers.find(u => u.uid === uid)
-  const userName = userObj?.name || uid
-  const planLblMap = {free:'Free',basico:'Básico Mensal',basicoAnual:'Básico Anual',pro:'Pro Mensal',proAnual:'Pro Anual'}
-  const confirmed = await adminConfirmModal(`Alterar plano de <strong>${_esc(userName)}</strong>?`,`Novo plano: <span style="font-weight:800;color:#0038A8">${planLblMap[plan]||plan}</span>`,'Confirmar','Cancelar')
-  if (!confirmed) return
-  // Feedback visual imediato
-  const _safe = uid.replace(/[^a-zA-Z0-9_-]/g,'_')
-  const btn = document.querySelector(`.admin-save-btn[data-uid="${_safe}"]`)
-  if (btn) { btn.textContent = '⏳'; btn.disabled = true }
-  try {
-    const token = await window._currentUser.getIdToken()
-    const res = await fetch('https://southamerica-east1-estudobb-5c661.cloudfunctions.net/api/admin/' + uid + '/plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ plan })
-    })
-    if (!res.ok) throw new Error((await res.json()).error)
-    // Atualiza local sem recarregar tudo
-    if (userObj) userObj.plan = plan
-    if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
-    if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
-    // Atualiza só a linha da tabela visualmente
-    const sel = document.getElementById('sel-' + _safe)
-    if (sel) {
-      const planLbl = {free:'FREE',basico:'BÁSICO',basicoAnual:'BÁSICO ANUAL',pro:'PRO',proAnual:'PRO ANUAL'}
-      sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
-      sel.options[0].value = plan
-    }
-    showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
-    adminUpdateStats(_adminUsers)
-    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
-  } catch (e) {
-    if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
-    setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
-    console.error('adminChangePlan error:', e)
-    alert('❌ Erro ao salvar: ' + e.message)
-  }
-}
-
-
-
-// BUG #1 FIX: wrapper removido — checkAdminAccess e updateHeaderUser já estão no onFirebaseReady principal
-
-// NOVO: Templates de Plano Inteligente
-const PLAN_TEMPLATES = {
   1: {
     name: 'Iniciante BB – 6 meses',
     dailyGoalH: 2,
