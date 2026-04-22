@@ -1503,9 +1503,7 @@ let _signupInProgress = false
 function checkAdminAccess() {
   const navAdmin = document.getElementById('nav-admin')
   if (!navAdmin) return
-  if (ADMIN_UIDS.includes(window._uid) || ADMIN_UIDS.includes(_uid)) {
-    navAdmin.style.display = 'flex'
-  }
+  if (ADMIN_UIDS.includes(_uid)) navAdmin.style.display = 'flex'
 }
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
@@ -1531,17 +1529,13 @@ window.onFirebaseReady=async function(user){
   }catch(e){console.warn('maintenance check:',e)}
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
-  // Garantir que nav-admin aparece para admin
-  if (ADMIN_UIDS.includes(_uid)) {
-    const el = document.getElementById('nav-admin')
-    if (el) el.style.display = 'flex'
-  }
   _userPlan=await window._fbService.getUserPlan(_uid).catch(()=>'free')
   document.getElementById('app-loading').style.display='none'
   document.getElementById('auth-screen').style.display='none'
   document.getElementById('app').style.display='block'
   updateHeaderUser();navigateTo(0)
   updateHeaderUser()
+  checkAdminAccess()
 }
 window.onFirebaseSignOut=function(){
   document.getElementById('app-loading').style.display='none'
