@@ -3994,7 +3994,7 @@ function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
 let _adminPresenceUnsubs = []
 
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js?v=7').catch(()=>{})
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()))
 }
 </script>
 </body>
