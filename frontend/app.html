@@ -1510,6 +1510,11 @@ window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
   _firebaseReady=true
   _uid=user.uid
+  // DEBUG TEMPORARIO
+  if(_uid==='1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'){
+    const el=document.getElementById('nav-admin')
+    if(el){el.style.display='flex';el.style.background='red'}
+  }
   checkAdminAccess()
   // Verificar modo manutenção
   try{
