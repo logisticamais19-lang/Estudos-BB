@@ -1501,9 +1501,11 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 let _firebaseReady = false
 let _signupInProgress = false
 function checkAdminAccess() {
-  if (!isAdmin()) return
   const navAdmin = document.getElementById('nav-admin')
-  if (navAdmin) navAdmin.style.display = 'flex'
+  if (!navAdmin) return
+  if (ADMIN_UIDS.includes(window._uid) || ADMIN_UIDS.includes(_uid)) {
+    navAdmin.style.display = 'flex'
+  }
 }
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;return}
