@@ -1500,6 +1500,7 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 // BUG #1 FIX + BUG #12 FIX: única definição de onFirebaseReady + flag signup
 let _firebaseReady = false
 let _signupInProgress = false
+const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 function checkAdminAccess() {
   const navAdmin = document.getElementById('nav-admin')
   if (!navAdmin) return
@@ -3585,7 +3586,6 @@ function goToStripeCheckout() {
 // ═══════════════════════════════════════════════════
 // ADMIN
 // ═══════════════════════════════════════════════════
-const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 function isAdmin() { return ADMIN_UIDS.includes(_uid) }
 let _adminUsers = []
 
