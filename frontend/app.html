@@ -1535,7 +1535,13 @@ window.onFirebaseReady=async function(user){
     const el=document.getElementById('nav-admin')
     if(el){el.style.display='flex';el.style.background='red'}
   }
-  checkAdminAccess()
+  // Retry checkAdminAccess até nav-admin aparecer no DOM
+  ;(function retryAdmin(n){
+    const el=document.getElementById('nav-admin')
+    if(el&&_uid){
+      if(['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'].includes(_uid)){el.style.cssText+='display:flex!important'}
+    } else if(n>0) { setTimeout(()=>retryAdmin(n-1),300) }
+  })(20)
   // Verificar modo manutenção
   try{
     const {getDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
