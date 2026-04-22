@@ -1531,6 +1531,11 @@ window.onFirebaseReady=async function(user){
   }catch(e){console.warn('maintenance check:',e)}
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
+  // Garantir que nav-admin aparece para admin
+  if (ADMIN_UIDS.includes(_uid)) {
+    const el = document.getElementById('nav-admin')
+    if (el) el.style.display = 'flex'
+  }
   _userPlan=await window._fbService.getUserPlan(_uid).catch(()=>'free')
   document.getElementById('app-loading').style.display='none'
   document.getElementById('auth-screen').style.display='none'
