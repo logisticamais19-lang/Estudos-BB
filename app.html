@@ -3590,17 +3590,17 @@ let _adminUsers = []
 function renderAdmin() {
   checkAdminAccess()
   if (!isAdmin()) { navigateTo(0); return }
-  adminLoadUsers()
+  try { adminLoadUsers() } catch(e) { console.warn('renderAdmin:', e.message) }
 }
 
 async function adminSavePlan(safeUid, rawUid) {
   const sel = document.getElementById('sel-' + safeUid)
   if (!sel) return
   const realUid = rawUid || sel.dataset.rawuid || safeUid
-  await adminChangePlan(realUid, sel.value, safeUid)
-  await adminChangePlan(realUid, selectedPlan, safeUid)
   const selectedPlan = sel.options[sel.selectedIndex].value
-// BUG #7 FIX: usa _fbService existente em vez de import() dinâmico
+  await adminChangePlan(realUid, selectedPlan)
+}
+
 async function toggleMaintenance(){
   try{
     const {getDoc,setDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
@@ -3990,30 +3990,6 @@ function adminConfirmModal(title, subtitle, okLabel, cancelLabel) {
 }
 
 let _adminPresenceUnsubs = []
-async function adminWatchPresence(users) {
-  _adminPresenceUnsubs.forEach(u => { try { u() } catch(e){} })
-  _adminPresenceUnsubs = []
-  if (!window._fbService || !window._fbService._db) return
-  try {
-    const { onSnapshot, doc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
-    users.forEach(u => {
-      const safeId = u.uid.replace(/[^a-zA-Z0-9_-]/g,'_')
-      const ref = doc(window._fbService._db, 'presence', u.uid)
-      const unsub = onSnapshot(ref, snap => {
-        const dot = document.getElementById('dot-' + safeId)
-        if (!dot) return
-        const isOnline = snap.exists() && snap.data().online === true
-        dot.style.background = isOnline ? '#10b981' : '#d1d5db'
-        dot.title = isOnline ? 'online agora' : 'offline'
-        const allDots = document.querySelectorAll('[id^="dot-"]')
-        const count = [...allDots].filter(d => d.style.background === 'rgb(16, 185, 129)').length
-        const counter = document.getElementById('admin-online-count')
-        if (counter) counter.innerHTML = `<span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block"></span>${count} online</span>`
-      }, () => {})
-      _adminPresenceUnsubs.push(unsub)
-    })
-  } catch(e) { console.warn('adminWatchPresence:', e.message) }
-}
 }
 
 if('serviceWorker' in navigator){
