@@ -1502,46 +1502,20 @@ let _firebaseReady = false
 let _signupInProgress = false
 const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
 
-// Fallback: reaplica a verificação admin sempre que auth mudar
-// (cobre casos onde onFirebaseReady roda antes do DOM estar 100% pronto)
-if (typeof firebase !== 'undefined' && firebase.auth) {
-  firebase.auth().onAuthStateChanged(function(u) {
-    if (u) { _uid = u.uid; checkAdminAccess() }
-  })
-}
+// checkAdminAccess é chamada dentro de onFirebaseReady
 function checkAdminAccess() {
   const navAdmin = document.getElementById('nav-admin')
-  console.log('[AdminCheck] _uid:', _uid, '| navAdmin:', navAdmin, '| match:', ADMIN_UIDS.includes(_uid))
-  if (!navAdmin) { console.warn('[AdminCheck] nav-admin element NOT found in DOM'); return }
+  if (!navAdmin) return
   if (ADMIN_UIDS.includes(_uid)) {
-    navAdmin.style.display = 'flex'
-    navAdmin.style.setProperty('display', 'flex', 'important')
-    navAdmin.removeAttribute('hidden')
+    navAdmin.setAttribute('style', 'display:flex!important;align-items:center;gap:.4rem;padding:.7rem .6rem;border-bottom:3px solid transparent;cursor:pointer;font-size:.75rem;font-weight:600;white-space:nowrap;color:#ef4444')
   }
 }
 window.onFirebaseReady=async function(user){
   if(_signupInProgress){_signupInProgress=false;}
   _firebaseReady=true
   _uid=user.uid
-  // MOSTRAR UID NA TELA
-  setTimeout(()=>{
-    const d=document.createElement('div')
-    d.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:20px;z-index:99999;padding:10px;text-align:center'
-    d.textContent='UID: '+_uid
-    document.body.appendChild(d)
-  },2000)
-  // DEBUG TEMPORARIO
-  if(_uid==='1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'){
-    const el=document.getElementById('nav-admin')
-    if(el){el.style.display='flex';el.style.background='red'}
-  }
-  // Retry checkAdminAccess até nav-admin aparecer no DOM
-  ;(function retryAdmin(n){
-    const el=document.getElementById('nav-admin')
-    if(el&&_uid){
-      if(['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1'].includes(_uid)){el.style.cssText+='display:flex!important'}
-    } else if(n>0) { setTimeout(()=>retryAdmin(n-1),300) }
-  })(20)
+
+
   // Verificar modo manutenção
   try{
     const {getDoc,doc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
