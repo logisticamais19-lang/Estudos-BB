@@ -1532,7 +1532,7 @@ window.onFirebaseReady=async function(user){
   document.getElementById('app-loading').style.display='none'
   document.getElementById('auth-screen').style.display='none'
   document.getElementById('app').style.display='block'
-  updateHeaderUser();navigateTo(0);setTimeout(checkAdminAccess, 100)
+  updateHeaderUser();navigateTo(0)
   updateHeaderUser()
 }
 window.onFirebaseSignOut=function(){
@@ -3074,7 +3074,7 @@ window.addEventListener('load',()=>{
         document.getElementById('app-loading').style.display='none'
         document.getElementById('auth-screen').style.display='none'
         document.getElementById('app').style.display='block'
-        updateHeaderUser();navigateTo(0);setTimeout(checkAdminAccess, 100)
+        updateHeaderUser();navigateTo(0)
       }
     },800)
   }
@@ -3085,7 +3085,7 @@ window.addEventListener('load',()=>{
       if(profile){
         document.getElementById('auth-screen').style.display='none'
         document.getElementById('app').style.display='block'
-        updateHeaderUser();navigateTo(0);setTimeout(checkAdminAccess, 100)
+        updateHeaderUser();navigateTo(0)
       } else {
         document.getElementById('auth-screen').style.display='flex'
         // Show connection warning if firebase didn't load
