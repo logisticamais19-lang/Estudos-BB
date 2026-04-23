@@ -3599,6 +3599,23 @@ function renderAdmin() {
   checkAdminAccess()
   if (!isAdmin()) { navigateTo(0); return }
   try { adminLoadUsers() } catch(e) { console.warn('renderAdmin:', e.message) }
+  adminLoadMaintenanceState()
+}
+
+async function adminLoadMaintenanceState() {
+  try {
+    const {getDoc,doc} = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js')
+    const ref = doc(window._fbService._db,'config','maintenance')
+    const snap = await getDoc(ref)
+    const isActive = snap.exists() && snap.data().active
+    const btn = document.getElementById('btn-maintenance')
+    if(btn){
+      btn.innerHTML = isActive ? '<i class="fas fa-wrench" style="font-size:.7rem"></i> Desativar Manutenção' : '<i class="fas fa-wrench" style="font-size:.7rem"></i> Ativar Manutenção'
+      btn.style.background = isActive ? '#dc2626' : 'white'
+      btn.style.color = isActive ? 'white' : '#dc2626'
+      btn.style.border = isActive ? 'none' : '1.5px solid #fca5a5'
+    }
+  } catch(e) { console.warn('adminLoadMaintenanceState:', e.message) }
 }
 
 async function adminSavePlan(safeUid, rawUid) {
