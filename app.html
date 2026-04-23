@@ -63,7 +63,7 @@
       try{const s=await getDoc(doc(db,'users',uid));return s.exists()?(s.data().plan||'free'):'free';}catch{return 'free';}
     },
     async initUser(uid,data){
-      return setDoc(doc(db,'users',uid),{plan:'free',...data},{merge:true});
+      return setDoc(doc(db,'users',uid),{...data},{merge:true});
     }
   };
 
