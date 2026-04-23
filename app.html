@@ -1682,10 +1682,11 @@ function showSignupSuccess(name, email) {
       <h3 style="font-size:1.2rem;font-weight:800;color:#059669;margin-bottom:.4rem">✅ Conta criada com sucesso!</h3>
       <p style="font-size:.9rem;color:#6b7280;margin-bottom:0.2rem">Bem-vindo(a), <strong style="color:#0038A8">${firstName}</strong>!</p>
       <p style="font-size:.8rem;color:#9ca3af;margin-bottom:1.5rem">Sua conta foi registrada com sucesso.</p>
-      <button onclick="window.location.hash='#login'; document.getElementById('auth-screen').innerHTML=''" style="width:100%;padding:0.75rem 1rem;background:#0066cc;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;hover:background:#0052a3">
+      <button onclick="window.location.hash='#login'" style="width:100%;padding:0.75rem 1rem;background:#0066cc;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s">
         Continuar para Login
       </button>
     </div>`
+  setTimeout(() => { window.location.hash='#login' }, 100)
 }
 function showDeleteAccountModal(){
   document.getElementById('delete-confirm-input').value=''
