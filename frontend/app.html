@@ -1733,18 +1733,66 @@ async function confirmDeleteAccount(){
   }
 }
 
+
+// ── Rate Limiting para Login ──
+function checkLoginRateLimit(){
+  const key='bb_login_attempts'
+  const blockKey='bb_login_blocked_until'
+  const now=Date.now()
+  const blockedUntil=parseInt(localStorage.getItem(blockKey)||'0')
+  
+  if(now < blockedUntil){
+    const minutesLeft=Math.ceil((blockedUntil-now)/60000)
+    return {allowed:false,reason:`Muitas tentativas. Tente novamente em ${minutesLeft}min.`}
+  }
+  
+  const attemptsStr=localStorage.getItem(key)
+  if(!attemptsStr){
+    localStorage.setItem(key,JSON.stringify({count:0,firstAttempt:now}))
+    return {allowed:true}
+  }
+  
+  const attempts=JSON.parse(attemptsStr)
+  const timeSinceFirst=now-attempts.firstAttempt
+  
+  // Reset se passaram 15min desde a primeira tentativa
+  if(timeSinceFirst > 15*60*1000){
+    localStorage.setItem(key,JSON.stringify({count:0,firstAttempt:now}))
+    return {allowed:true}
+  }
+  
+  // Bloqueia se 5+ tentativas nos últimos 15min
+  if(attempts.count >= 5){
+    localStorage.setItem(blockKey,String(now + 15*60*1000))
+    return {allowed:false,reason:'Conta temporariamente bloqueada. Tente em 15 minutos.'}
+  }
+  
+  return {allowed:true,attempts:attempts.count}
+}
+
+function recordLoginAttempt(){
+  const key='bb_login_attempts'
+  const attemptsStr=localStorage.getItem(key)
+  const attempts=attemptsStr?JSON.parse(attemptsStr):{count:0,firstAttempt:Date.now()}
+  attempts.count++
+  localStorage.setItem(key,JSON.stringify(attempts))
+}
+
 async function doLogin(){
+  const rateCheck=checkLoginRateLimit()
+  if(!rateCheck.allowed){showAuthError('login-error',rateCheck.reason);return}
+  
   const email=document.getElementById('login-email').value.trim()
   const pass=document.getElementById('login-pass').value
   if(!email||!pass){showAuthError('login-error','Preencha e-mail e senha.');return}
   const fb=window._firebase
   if(!fb){
-    // Firebase module blocked or failed to load (ex: ad-blocker, firewall)
     showAuthError('login-error','Erro de conexão. Desative extensões como ad-blocker ou tente outro navegador.')
     return
   }
-  try{await fb.signInWithEmailAndPassword(email,pass)}
+  try{await fb.signInWithEmailAndPassword(email,pass);localStorage.removeItem('bb_login_attempts');localStorage.removeItem('bb_login_blocked_until')}
   catch(e){
+    recordLoginAttempt()
     shakeEl('login-email')
     const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.','auth/network-request-failed':'Erro de conexão. Desative ad-blockers ou Brave Shields e tente novamente.'}
     const msg = msgs[e.code]||'E-mail ou senha incorretos. Se usar Brave ou ad-blocker, desative-o para este site.'
