@@ -2203,10 +2203,10 @@ function renderBooks(){
   books.forEach(book=>{
     const div=document.createElement('div');div.className='subject-book';div.style.background=book.color||'#0038A8'
     div.onclick=()=>openBook(book.id)
-    div.innerHTML=`<div class="book-spine"><div class="book-spine-text">${book.name}</div></div>
+    div.innerHTML=`<div class="book-spine"><div class="book-spine-text">${sanitizeHTML(book.name)}</div></div>
     <div class="book-cover">${book.coverImg?`<img class="book-cover-img" src="${book.coverImg}" alt="">`:''}
-      <div class="book-emoji-big">${book.emoji||'📚'}</div>
-      <div class="book-title">${book.name}</div>
+      <div class="book-emoji-big">${sanitizeHTML(book.emoji||'📚')}</div>
+      <div class="book-title">${sanitizeHTML(book.name)}</div>
       <div class="book-meta">${book.pages?book.pages.length:1} página(s)</div>
     </div>
     <button class="book-del" onclick="event.stopPropagation();deleteBook('${book.id}')" style="position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.4);border:none;color:white;border-radius:.4rem;width:24px;height:24px;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s"><i class="fas fa-trash"></i></button>`
@@ -2273,7 +2273,7 @@ function renderBookTabs(){
   const bar=document.getElementById('book-tabs-bar');bar.innerHTML=''
   book.pages.forEach((page,idx)=>{
     const tab=document.createElement('div');tab.className='book-tab'+(page.id===currentPageId?' active':'')
-    tab.innerHTML=`<span onclick="switchBookPage('${page.id}')" style="flex:1">${page.title}</span>
+    tab.innerHTML=`<span onclick="switchBookPage('${page.id}')" style="flex:1">${sanitizeHTML(page.title)}</span>
     ${book.pages.length>1?`<button onclick="event.stopPropagation();renameBookPage('${page.id}')" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:.65rem;padding:.1rem" title="Renomear"><i class="fas fa-pen"></i></button>
     <button onclick="event.stopPropagation();deleteBookPage('${page.id}')" style="background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.65rem;padding:.1rem" title="Excluir"><i class="fas fa-times"></i></button>`:''}`
     bar.appendChild(tab)
@@ -2440,7 +2440,7 @@ function renderMM(block,canvasId){
     const h=node.emoji&&node.text?54:node.emoji||node.text?38:32
     div.style.left=(node.x-w/2)+'px';div.style.top=(node.y-h/2)+'px';div.style.width=w+'px'
     if(isSelected)div.style.outline='3px solid #F9DD16'
-    div.innerHTML=`${node.emoji?`<span style="font-size:${node.type==='central'?'1.4':'1.1'}rem">${node.emoji}</span>`:''}${node.text?`<span style="font-size:${node.type==='central'?'.85':'.72'}rem;font-weight:${node.type==='central'?'800':'600'}">${node.text}</span>`:''}`
+    div.innerHTML=`${node.emoji?`<span style="font-size:${node.type==='central'?'1.4':'1.1'}rem">${sanitizeHTML(node.emoji)}</span>`:''}${node.text?`<span style="font-size:${node.type==='central'?'.85':'.72'}rem;font-weight:${node.type==='central'?'800':'600'}">${sanitizeHTML(node.text)}</span>`:''}`
     div.addEventListener('click',e=>{e.stopPropagation();block.mmSelected=block.mmSelected===node.id?null:node.id;renderMM(block,canvasId)})
     div.addEventListener('dblclick',e=>{e.stopPropagation();const t=prompt('Editar texto:',node.text||'');if(t!==null){node.text=t.trim();renderMM(block,canvasId)}})
     let isDrag=false,ox=0,oy=0
@@ -2516,16 +2516,28 @@ function sanitizeHTML(str){
 }
 function sanitizeContent(html){
   if(!html) return ''
-  // Remove script tags, event handlers, javascript: links
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi,'')
-    .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi,'')
-    .replace(/javascript\s*:/gi,'')
-    .replace(/<iframe[\s\S]*?>/gi,'')
-    .replace(/<object[\s\S]*?>/gi,'')
-    .replace(/<embed[\s\S]*?>/gi,'')
+  if(typeof DOMPurify === 'undefined'){
+    const tmp=document.createElement('div');tmp.textContent=html;return tmp.innerHTML
+  }
+  return DOMPurify.sanitize(html,{
+    ALLOWED_TAGS:[
+      'p','br','b','i','u','strong','em','s','mark',
+      'h1','h2','h3','h4','ul','ol','li',
+      'table','thead','tbody','tr','th','td',
+      'span','div','blockquote','pre','code',
+      'img'
+    ],
+    ALLOWED_ATTR:[
+      'style','class','src','alt','width','height',
+      'colspan','rowspan','align'
+    ],
+    ALLOWED_URI_REGEXP:/^(?:https?:|data:image\/(?:png|jpg|jpeg|gif|webp|svg\+xml);base64,)/i,
+    FORBID_ATTR:['onerror','onload','onclick','onmouseover','onfocus','onblur','onkeydown','onkeyup','onchange','oninput','onsubmit'],
+    FORBID_TAGS:['script','style','iframe','object','embed','form','input','button','link','meta','base','svg','math'],
+    FORCE_BODY:false,
+    SANITIZE_DOM:true
+  })
 }
-
 // ── Converte mapa mental para SVG estático (para PDF perfeito) ──
 function mmToStaticSVG(block){
   const nodes = block.mmNodes || []
@@ -2724,13 +2736,13 @@ function openEditNoteModal(noteId){
   const note=notes.find(n=>n.id===noteId);if(!note)return
   editingNoteId=noteId;document.getElementById('note-title-input').value=note.title||''
   setNoteType(note.type||'text')
-  if(!note.type||note.type==='text')document.getElementById('note-editor-content').innerHTML=note.content||''
+  if(!note.type||note.type==='text')document.getElementById('note-editor-content').innerHTML=sanitizeContent(note.content||'')
   else if(note.type==='draw'){setTimeout(()=>{initDrawCanvas();loadDrawData(note.drawData)},100)}
   else if(note.type==='table'){tableData=note.tableData||{cols:['Col 1','Col 2'],rows:[['','']]};renderTableEditor()}
   showModal('modal-note-editor')
 }
 async function saveNote(){
-  const title=(document.getElementById('note-title-input').value.trim()||'Sem título').substring(0,100)
+  const title=(_esc(document.getElementById('note-title-input').value.trim()||'Sem título')).substring(0,100)
   let noteData={id:editingNoteId||uid(),title,type:currentNoteType,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}
   if(currentNoteType==='text'){
     const raw=document.getElementById('note-editor-content').innerHTML
