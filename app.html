@@ -1659,7 +1659,7 @@ async function doSignup(){
     const cred=await fb.createUserWithEmailAndPassword(email,pass)
     profile={name,email,dailyGoalH:parseInt(document.getElementById('signup-daily').value)||2,monthlyGoalH:parseInt(document.getElementById('signup-monthly').value)||60}
     _uid=cred.user.uid
-    await window._fbService.initUser(_uid,{plan:'free', name:profile.name, email:profile.email})
+    await window._fbService.initUser(_uid,{name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
     // ✅ Mostrar tela de sucesso e voltar para login
     showSignupSuccess(name, email)
