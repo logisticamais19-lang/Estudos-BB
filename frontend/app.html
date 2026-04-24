@@ -16,8 +16,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="icon-192.svg">
-<script src="https://cdn.tailwindcss.com">(function(){var t;function r(){clearTimeout(t);t=setTimeout(function(){if(window._currentUser)doLogout();},1800000);}["click","keydown","mousemove","touchstart"].forEach(function(e){document.addEventListener(e,r,{passive:true});});r();})();
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -3189,6 +3188,7 @@ window.addEventListener('load',()=>{
 })
 
 // onFirebaseReady e onFirebaseSignOut definidos na linha ~1452 (único ponto correto)
+(function(){var t;function r(){clearTimeout(t);t=setTimeout(function(){if(window._currentUser)doLogout();},1800000);}["click","keydown","mousemove","touchstart"].forEach(function(e){document.addEventListener(e,r,{passive:true});});r();})();
 </script>
 <!-- ══ MOBILE NAV BAR ══ -->
 <nav id="mobile-nav">
