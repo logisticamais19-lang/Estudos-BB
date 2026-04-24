@@ -303,6 +303,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 .stat-card{background:white;border-radius:1.25rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);}
 .streak-flame{font-size:1.8rem;line-height:1;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -1341,6 +1342,8 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <script>
 'use strict';
+const IS_DEV=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+
 // ── Segurança: escape HTML para dados dinâmicos ──
 function _esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');}
 
@@ -1500,7 +1503,7 @@ window.addEventListener('offline',()=>setOnlineStatus(false))
 // BUG #1 FIX + BUG #12 FIX: única definição de onFirebaseReady + flag signup
 let _firebaseReady = false
 let _signupInProgress = false
-const ADMIN_UIDS = ['1LOQzxkQGaeQ6ptW3DSGRjkrHRj1']
+const ADMIN_UIDS = [atob('MUxPUXp4a1FHYWVRNB0VzNEU0dSamtySDRSajE=')]
 
 // checkAdminAccess é chamada dentro de onFirebaseReady
 function checkAdminAccess() {
@@ -1533,7 +1536,7 @@ window.onFirebaseReady=async function(user){
       </div>`
       return
     }
-  }catch(e){console.warn('maintenance check:',e)}
+  }catch(e){IS_DEV&&console.warn('maintenance check:',e)}
   await window._fbService.initUser(_uid,{}).catch(()=>{})
   await loadFromFirebase()
   _userPlan=await window._fbService.getUserPlan(_uid).catch(()=>'free')
@@ -1573,7 +1576,7 @@ async function loadFromFirebase(){
     _cronograma=get('cronograma',{data:{}}).data||{}
     _distribuicao=get('distribuicao',{data:{}}).data||{}
     saveToLocalStorage()
-  }catch(e){console.warn('Firebase load failed:',e);loadFromLocalStorage()}
+  }catch(e){IS_DEV&&console.warn('Firebase load failed:',e);loadFromLocalStorage()}
 }
 async function saveToFirebase(){
   if(!_uid||!_isOnline){saveToLocalStorage();_pendingSync=true;return}
@@ -1594,7 +1597,7 @@ async function saveToFirebase(){
       distribuicao:{data:_distribuicao}
     })
     _pendingSync=false
-  }catch(e){console.warn('Firebase save failed:',e);saveToLocalStorage();_pendingSync=true}
+  }catch(e){IS_DEV&&console.warn('Firebase save failed:',e);saveToLocalStorage();_pendingSync=true}
 }
 function saveToLocalStorage(){
   const k=(n,v)=>localStorage.setItem('bb_'+n,JSON.stringify(v))
@@ -1618,6 +1621,13 @@ async function saveData(){await saveToFirebase()}
 // ═══════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════
+
+function validateImageFile(f){
+  if(!f)return false
+  if(f.size>5*1024*1024){alert('Imagem muito grande. Limite: 5MB.');return false}
+  if(!['image/jpeg','image/png','image/webp','image/gif'].includes(f.type)){alert('Formato inválido. Use JPEG, PNG, WebP ou GIF.');return false}
+  return true
+}
 function toggleEye(inputId,iconId){
   const input=document.getElementById(inputId),icon=document.getElementById(iconId)
   if(!input||!icon)return
@@ -1631,9 +1641,13 @@ function switchAuthTab(tab){
     const tl=document.getElementById('tab-login');if(tl)tl.className='auth-tab'+(tab==='login'?' active':'')
     const ts=document.getElementById('tab-signup');if(ts)ts.className='auth-tab'+(tab==='signup'?' active':'')
     ;['login-error','signup-error'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'})
-  }catch(e){console.warn('switchAuthTab:',e)}
+  }catch(e){IS_DEV&&console.warn('switchAuthTab:',e)}
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
+if(e.code==='auth/too-many-requests'){
+  const b=document.querySelector('#form-login .btn-bb')
+  if(b){b.disabled=true;b.textContent='Aguarde 60s...';setTimeout(()=>{b.disabled=false;b.innerHTML='<i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>ENTRAR'},60000)}
+}
 async function doSignup(){
   const name=document.getElementById('signup-name').value.trim()
   const email=document.getElementById('signup-email').value.trim()
@@ -1794,14 +1808,14 @@ async function doLogin(){
   catch(e){
     recordLoginAttempt()
     shakeEl('login-email')
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/wrong-password':'Senha incorreta.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.','auth/network-request-failed':'Erro de conexão. Desative ad-blockers ou Brave Shields e tente novamente.'}
+    const msgs={'auth/user-not-found':'E-mail ou senha incorretos.','auth/wrong-password':'E-mail ou senha incorretos.','auth/invalid-email':'E-mail inválido.','auth/too-many-requests':'Muitas tentativas. Tente mais tarde.','auth/network-request-failed':'Erro de conexão. Desative ad-blockers ou Brave Shields e tente novamente.'}
     const msg = msgs[e.code]||'E-mail ou senha incorretos. Se usar Brave ou ad-blocker, desative-o para este site.'
     showAuthError('login-error', msg)
   }
 }
 async function doLogout(){
   toggleUserMenu();
-  try{if(window._firebase)await window._firebase.signOut();}catch(e){console.warn(e);}
+  try{if(window._firebase)await window._firebase.signOut();}catch(e){IS_DEV&&console.warn(e);}
   window._currentUser=null;
   _uid=null;
   document.getElementById('app').style.display='none';
@@ -1826,7 +1840,7 @@ async function sendResetEmail(){
     document.getElementById('reset-input-panel').style.display='none'
     document.getElementById('reset-success-panel').style.display='block'
   }catch(e){
-    const msgs={'auth/user-not-found':'E-mail não encontrado.','auth/invalid-email':'E-mail inválido.'}
+    const msgs={'auth/user-not-found':'E-mail ou senha incorretos.','auth/invalid-email':'E-mail inválido.'}
     errEl.textContent=msgs[e.code]||'Erro ao enviar e-mail.';errEl.style.display='block'
   }
 }
@@ -1872,9 +1886,9 @@ function navigateTo(n){
   if(fn&&window[fn]){
     try{
       const r=window[fn]()
-      if(r&&r.then)r.catch(e=>console.warn('navigateTo render error:',e))
+      if(r&&r.then)r.catch(e=>IS_DEV&&console.warn('navigateTo render error:',e))
     }catch(e){
-      console.error('Render error in',fn,':',e)
+      IS_DEV&&console.error('Render error in',fn,':',e)
     }
   }
 }
@@ -2047,7 +2061,7 @@ function playTimerSound(){
     })
     // Fecha o contexto depois do último bipe
     setTimeout(()=>ctx.close(),1200)
-  }catch(e){console.warn('Som não disponível:',e)}
+  }catch(e){IS_DEV&&console.warn('Som não disponível:',e)}
 }
 
 async function onTimerFinished(){
@@ -2284,7 +2298,7 @@ function selectBookColor(c){
   document.querySelectorAll('#book-color-grid button').forEach(btn=>{btn.style.border=btn.style.background===c?'3px solid #F9DD16':'3px solid transparent'})
 }
 function loadBookCoverImg(event){
-  const file=event.target.files[0];if(!file)return
+  const file=event.target.files[0];if(!file||!validateImageFile(file))return
   const reader=new FileReader();reader.onload=e=>{
     bookCoverImgData=e.target.result
     document.getElementById('book-cover-img-preview').src=bookCoverImgData
@@ -2389,7 +2403,8 @@ function renderBlock(block){
   actions.innerHTML=`<button class="block-btn" style="background:#EEF3FF;color:#0038A8" onclick="moveBlock('${block.id}',-1)" title="↑"><i class="fas fa-arrow-up"></i></button><button class="block-btn" style="background:#EEF3FF;color:#0038A8" onclick="moveBlock('${block.id}',1)" title="↓"><i class="fas fa-arrow-down"></i></button><button class="block-btn" style="background:#fee2e2;color:#dc2626" onclick="deleteBlock('${block.id}')" title="Excluir"><i class="fas fa-trash"></i></button>`
   div.appendChild(actions)
   let content=''
-  if(block.type==='text'){
+  if(block.type==='text'){block.content = sanitizeContent(block.content || '');
+
     content=`<div class="text-toolbar"><button onclick="execFmt('bold')"><b>B</b></button><button onclick="execFmt('italic')"><i>I</i></button><button onclick="execFmt('underline')"><u>U</u></button><button onclick="execFmt('formatBlock','H1')"><b>H1</b></button><button onclick="execFmt('formatBlock','H2')"><b>H2</b></button><button onclick="execFmt('insertUnorderedList')"><i class="fas fa-list-ul"></i></button><button onclick="execFmt('insertOrderedList')"><i class="fas fa-list-ol"></i></button><button onclick="execFmt('hiliteColor','#FFF9C4')" style="background:#FFF9C4"><i class="fas fa-highlighter"></i></button></div>
     <div class="page-editable" contenteditable="true" data-placeholder="Digite seu texto aqui..." oninput="updateBlockContent('${block.id}',this.innerHTML)">${block.content||''}</div>`
   } else if(block.type==='image'){
@@ -2432,7 +2447,7 @@ function updateBlockContent(blockId,content){
   const block=page?.blocks.find(bl=>bl.id===blockId);if(block)block.content=sanitizeContent(content)
 }
 function loadBlockImage(blockId,event){
-  const file=event.target.files[0];if(!file)return
+  const file=event.target.files[0];if(!file||!validateImageFile(file))return
   const reader=new FileReader();reader.onload=e=>{
     const book=books.find(b=>b.id===currentBookId);if(!book)return
     const block=(() => { const page = book.pages.find(p=>p.id===currentPageId)||book.pages[0]; return page?.blocks.find(bl=>bl.id===blockId); })();if(!block)return
@@ -2761,7 +2776,7 @@ async function exportBookPDF(){
     await html2pdf().from(targetEl).set(opt).save()
     showXPToast(0,`PDF "${book.name}" pronto! 📄 Verifique Downloads`)
   } catch(e){
-    console.error('PDF error:',e)
+    IS_DEV&&console.error('PDF error:',e)
     showXPToast(0,'Erro ao gerar PDF. Tente novamente.')
   } finally {
     document.body.removeChild(wrap)
@@ -3657,7 +3672,7 @@ let _adminUsers = []
 function renderAdmin() {
   checkAdminAccess()
   if (!isAdmin()) { navigateTo(0); return }
-  try { adminLoadUsers() } catch(e) { console.warn('renderAdmin:', e.message) }
+  try { adminLoadUsers() } catch(e) { IS_DEV&&console.warn('renderAdmin:', e.message) }
   adminLoadMaintenanceState()
 }
 
@@ -3674,7 +3689,7 @@ async function adminLoadMaintenanceState() {
       btn.style.color = isActive ? 'white' : '#dc2626'
       btn.style.border = isActive ? 'none' : '1.5px solid #fca5a5'
     }
-  } catch(e) { console.warn('adminLoadMaintenanceState:', e.message) }
+  } catch(e) { IS_DEV&&console.warn('adminLoadMaintenanceState:', e.message) }
 }
 
 async function adminSavePlan(safeUid, rawUid) {
@@ -3864,7 +3879,7 @@ async function adminChangePlan(uid, plan) {
   } catch (e) {
     if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
     setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
-    console.error('adminChangePlan error:', e)
+    IS_DEV&&console.error('adminChangePlan error:', e)
     alert('❌ Erro ao salvar: ' + e.message)
   }
 }
