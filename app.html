@@ -1646,10 +1646,7 @@ function switchAuthTab(tab){
   }catch(e){IS_DEV&&console.warn('switchAuthTab:',e)}
 }
 function showAuthError(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
-if(e.code==='auth/too-many-requests'){
-  const b=document.querySelector('#form-login .btn-bb')
-  if(b){b.disabled=true;b.textContent='Aguarde 60s...';setTimeout(()=>{b.disabled=false;b.innerHTML='<i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>ENTRAR'},60000)}
-}
+
 async function doSignup(){
   const name=document.getElementById('signup-name').value.trim()
   const email=document.getElementById('signup-email').value.trim()
@@ -1796,7 +1793,8 @@ function recordLoginAttempt(){
 
 async function doLogin(){
   const rateCheck=checkLoginRateLimit()
-  if(!rateCheck.allowed){showAuthError('login-error',rateCheck.reason);return}
+  if(!rateCheck.allowed){showAuthError('login-error',rateCheck.reason);
+if(e.code==='auth/too-many-requests'){const b=document.querySelector('#form-login .btn-bb');if(b){b.disabled=true;b.textContent='Aguarde 60s...';setTimeout(()=>{b.disabled=false;b.innerHTML='<i class="fas fa-sign-in-alt" style="margin-right:.5rem"></i>ENTRAR'},60000);}}return}
   
   const email=document.getElementById('login-email').value.trim()
   const pass=document.getElementById('login-pass').value
