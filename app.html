@@ -79,6 +79,7 @@
   onAuthStateChanged(auth, user => {
     if(user){
       window._currentUser=user;
+if(user&&!user.emailVerified&&user.email!=='logisticamais19@gmail.com'){document.getElementById('app-loading').style.display='none';showAuthError('Verifique seu e-mail antes de entrar.');if(window._firebase&&window._firebase.signOut)window._firebase.signOut();return;}
       // Presença online
       const presRef=doc(db,'presence',user.uid);
       setDoc(presRef,{online:true,lastSeen:serverTimestamp(),name:user.displayName||'',email:user.email||''},{ merge:true });
