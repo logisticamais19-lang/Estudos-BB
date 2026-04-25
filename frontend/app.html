@@ -2825,6 +2825,45 @@ function filterNotes(type){
   const active=document.getElementById('nb-filter-'+type);if(active){active.style.background='#0038A8';active.style.color='white'}
   renderNotesGrid()
 }
+
+// ── NOTAS: saveData e loadNotes ──────────────────────────────────────────
+async function saveData(){
+  if(!window._currentUser)return;
+  try{
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js');
+    const db=window._fbService._db;
+    const ref=doc(db,'users',window._currentUser.uid,'data','notes');
+    await setDoc(ref,{notes:notes,updatedAt:new Date().toISOString()},{merge:true});
+  }catch(err){
+    IS_DEV&&console.error('saveData error:',err);
+    // Fallback localStorage
+    try{localStorage.setItem('notes_'+window._currentUser.uid,JSON.stringify(notes));}catch(e){}
+  }
+}
+
+async function loadNotes(){
+  if(!window._currentUser)return;
+  try{
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js');
+    const db=window._fbService._db;
+    const ref=doc(db,'users',window._currentUser.uid,'data','notes');
+    const snap=await getDoc(ref);
+    if(snap.exists()&&snap.data().notes){
+      notes=snap.data().notes;
+    } else {
+      // Tentar localStorage como fallback
+      const local=localStorage.getItem('notes_'+window._currentUser.uid);
+      if(local)notes=JSON.parse(local);
+    }
+  }catch(err){
+    IS_DEV&&console.error('loadNotes error:',err);
+    try{const local=localStorage.getItem('notes_'+window._currentUser.uid);if(local)notes=JSON.parse(local);}catch(e){}
+  }
+  renderNotesGrid();
+}
+// ─────────────────────────────────────────────────────────────────────────
+
+let notes=[];
 function searchNotes(q){renderNotesGrid(q)}
 function renderNotesGrid(searchQuery=''){
   const grid=document.getElementById('notes-grid');grid.innerHTML=''
