@@ -4149,6 +4149,11 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()))
 }
 </script>
+<script>
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && !sessionStorage.getItem('forcarDesktop')) {
+    window.location.replace('https://estudobb-5c661.web.app/mobile/');
+  }
+</script>
 </body>
 </html>
 

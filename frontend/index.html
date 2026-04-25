@@ -535,6 +535,11 @@ document.querySelectorAll('.feat-card, .dor-card, .sol-card, .price-card').forEa
   observer.observe(el);
 });
 </script>
+<script>
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && !sessionStorage.getItem('forcarDesktop')) {
+    window.location.replace('https://estudobb-5c661.web.app/mobile/');
+  }
+</script>
 </body>
 </html>
  
