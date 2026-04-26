@@ -1,0 +1,45 @@
+{
+  "name": "EstudoBB - Planner para o Concurso BB",
+  "short_name": "EstudoBB",
+  "description": "Planner inteligente para o Concurso do Banco do Brasil 2025/2026",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#001B5E",
+  "theme_color": "#001B5E",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Abrir App",
+      "short_name": "App",
+      "description": "Abrir o planner",
+      "url": "/app",
+      "icons": [
+        {
+          "src": "/favicon.svg",
+          "sizes": "any"
+        }
+      ]
+    }
+  ]
+}

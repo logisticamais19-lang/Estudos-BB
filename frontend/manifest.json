@@ -1,0 +1,21 @@
+{
+  "name": "EstudoBB — Planner Inteligente",
+  "short_name": "EstudoBB",
+  "description": "Plataforma de estudos para o concurso do Banco do Brasil",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#001B5E",
+  "theme_color": "#001B5E",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"]
+}
