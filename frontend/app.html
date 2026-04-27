@@ -317,11 +317,11 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   <div style="font-size:.8rem;opacity:.7">v5.0 — Carregando...</div>
 </div>
 
-<div id="xp-toast"><span class="xp-badge" id="xp-amount">+30 XP</span><span id="xp-message">Sessão concluída! 🎯</span></div>
+<div id="xp-toast"><span class="xp-badge" id="xp-amount">+30 XP</span><span id="xp-message">Sessão concluída! [>]</span></div>
 
 <div id="levelup-overlay" onclick="this.classList.remove('show')">
   <div class="levelup-card">
-    <div style="font-size:3.5rem;margin-bottom:.5rem">🏆</div>
+    <div style="font-size:3.5rem;margin-bottom:.5rem">[T]</div>
     <div style="color:#F9DD16;font-size:.85rem;font-weight:700;letter-spacing:.15em;margin-bottom:.5rem">NOVO NÍVEL!</div>
     <div id="levelup-name" style="font-size:1.6rem;font-weight:900;margin-bottom:.5rem"></div>
     <button onclick="document.getElementById('levelup-overlay').classList.remove('show')" style="background:#F9DD16;color:#0038A8;border:none;border-radius:1rem;padding:.75rem 2rem;font-weight:800;cursor:pointer;margin-top:1rem">CONTINUAR! 💪</button>
@@ -450,7 +450,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;text-align:center">
             <div style="background:#f9fafb;border-radius:.75rem;padding:.6rem .3rem"><div style="font-size:.65rem;color:#9ca3af">Ontem</div><div style="font-size:.8rem;font-weight:700;color:#374151" id="yesterday-mins">—</div></div>
             <div style="background:#f9fafb;border-radius:.75rem;padding:.6rem .3rem"><div style="font-size:.65rem;color:#9ca3af">Média 7d</div><div style="font-size:.8rem;font-weight:700;color:#0038A8" id="weekly-avg">—</div></div>
-            <div style="background:#f9fafb;border-radius:.75rem;padding:.6rem .3rem"><div style="font-size:.65rem;color:#9ca3af">Streak</div><div style="font-size:.8rem;font-weight:700;color:#f59e0b" id="dash-streak">0🔥</div></div>
+            <div style="background:#f9fafb;border-radius:.75rem;padding:.6rem .3rem"><div style="font-size:.65rem;color:#9ca3af">Streak</div><div style="font-size:.8rem;font-weight:700;color:#f59e0b" id="dash-streak">0[F]</div></div>
           </div>
         </div>
       </div>
@@ -575,7 +575,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 <!-- ══ TIMER ══ -->
 <div id="screen-2" class="screen" style="display:none">
   <div style="max-width:440px;margin:0 auto;background:white;border-radius:1.75rem;padding:2rem 1.75rem;box-shadow:0 8px 40px rgba(0,56,168,.15);text-align:center">
-    <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:1.25rem">⏱ Temporizador</h2>
+    <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:1.25rem">[T] Temporizador</h2>
     <select id="timer-subject" style="width:100%;background:#f9fafb;border:2px solid #e5e7eb;border-radius:1rem;padding:.85rem 1rem;font-size:.9rem;font-weight:600;margin-bottom:1rem;cursor:pointer"></select>
     <div id="timer-display" style="font-size:5.5rem;font-weight:900;color:#0038A8;letter-spacing:-4px;line-height:1;margin-bottom:.5rem;font-variant-numeric:tabular-nums">25:00</div>
     <div style="height:8px;background:#f3f4f6;border-radius:9999px;overflow:hidden;margin-bottom:1rem"><div id="timer-progress-bar" class="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#0038A8,#F9DD16)"></div></div>
@@ -643,7 +643,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
       <div style="background:white;border-radius:1.5rem;padding:1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
         <div style="display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap">
           <button onclick="filterTasks('all')"      id="filter-all"      style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#0038A8;color:white">Todas</button>
-          <button onclick="filterTasks('study')"    id="filter-study"    style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">📚 Estudo</button>
+          <button onclick="filterTasks('study')"    id="filter-study"    style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">[L] Estudo</button>
           <button onclick="filterTasks('personal')" id="filter-personal" style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">🏃 Pessoal</button>
           <button onclick="filterTasks('work')"     id="filter-work"     style="padding:.35rem .85rem;border-radius:.65rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">💼 CLT</button>
         </div>
@@ -672,7 +672,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <div style="background:white;border-radius:1.25rem;padding:1rem 1.25rem;box-shadow:0 4px 20px rgba(0,56,168,.08);margin-top:1rem">
       <p style="font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:.65rem">Categorias</p>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#dbeafe;border-radius:.3rem;border:2px solid #0038A8;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">📚 Estudo</span></div>
+        <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#dbeafe;border-radius:.3rem;border:2px solid #0038A8;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">[L] Estudo</span></div>
         <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#dcfce7;border-radius:.3rem;border:2px solid #16a34a;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">🏃 Pessoal</span></div>
         <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#ede9fe;border-radius:.3rem;border:2px solid #7c3aed;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">💼 CLT</span></div>
         <div style="display:flex;align-items:center;gap:.35rem"><span style="width:14px;height:14px;background:#fef3c7;border-radius:.3rem;border:2px solid #d97706;display:inline-block"></span><span style="font-size:.75rem;font-weight:600">🍽️ Refeição</span></div>
@@ -686,7 +686,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
   <div id="agenda-panel-distribuicao" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
       <div>
-        <h3 style="font-size:1.1rem;font-weight:800">📊 Distribuição Semanal por Matéria</h3>
+        <h3 style="font-size:1.1rem;font-weight:800">[G] Distribuição Semanal por Matéria</h3>
         <p style="font-size:.78rem;color:#9ca3af;margin-top:.2rem">Defina quantas horas por semana dedicar a cada matéria</p>
       </div>
       <button onclick="saveDistribuicao()" class="btn-bb" style="padding:.6rem 1.1rem;border-radius:.85rem;font-weight:700;font-size:.8rem;border:none;cursor:pointer"><i class="fas fa-save" style="margin-right:.3rem"></i>Salvar</button>
@@ -694,7 +694,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem">
       <!-- Metas por matéria -->
       <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)">
-        <h4 style="font-size:.85rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">⏱ Horas por semana</h4>
+        <h4 style="font-size:.85rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">[T] Horas por semana</h4>
         <div id="distribuicao-subjects" style="display:flex;flex-direction:column;gap:.75rem"></div>
         <div style="margin-top:1rem;padding-top:1rem;border-top:1.5px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
           <span style="font-size:.8rem;color:#6b7280;font-weight:600">Total semanal</span>
@@ -706,7 +706,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
         <h4 style="font-size:.85rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">📈 Distribuição visual</h4>
         <div id="distribuicao-chart" style="display:flex;flex-direction:column;gap:.6rem"></div>
         <div style="margin-top:1.25rem;background:#EEF3FF;border-radius:1rem;padding:.85rem 1rem">
-          <p style="font-size:.75rem;color:#0038A8;font-weight:600;line-height:1.5">💡 <strong>Sugestão:</strong> Dedique mais tempo às matérias com menor progresso para equilibrar sua preparação.</p>
+          <p style="font-size:.75rem;color:#0038A8;font-weight:600;line-height:1.5">[L] <strong>Sugestão:</strong> Dedique mais tempo às matérias com menor progresso para equilibrar sua preparação.</p>
         </div>
       </div>
     </div>
@@ -766,9 +766,9 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     <span style="font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase">Filtrar:</span>
     <button onclick="filterNotes('all')"     id="nb-filter-all"     class="note-tag" style="background:#0038A8;color:white">Todas</button>
     <button onclick="filterNotes('text')"    id="nb-filter-text"    class="note-tag" style="background:#dbeafe;color:#1d4ed8">📝 Texto</button>
-    <button onclick="filterNotes('mindmap')" id="nb-filter-mindmap" class="note-tag" style="background:#dcfce7;color:#15803d">🧠 Mapa</button>
+    <button onclick="filterNotes('mindmap')" id="nb-filter-mindmap" class="note-tag" style="background:#dcfce7;color:#15803d">[C] Mapa</button>
     <button onclick="filterNotes('draw')"    id="nb-filter-draw"    class="note-tag" style="background:#fef3c7;color:#92400e">🎨 Desenho</button>
-    <button onclick="filterNotes('table')"   id="nb-filter-table"   class="note-tag" style="background:#ede9fe;color:#6d28d9">📊 Tabela</button>
+    <button onclick="filterNotes('table')"   id="nb-filter-table"   class="note-tag" style="background:#ede9fe;color:#6d28d9">[G] Tabela</button>
     <div style="margin-left:auto"><input id="nb-search" type="text" placeholder="🔍 Pesquisar..." oninput="searchNotes(this.value)" style="padding:.5rem 1rem;border:2px solid #e5e7eb;border-radius:.75rem;font-size:.82rem;width:200px"></div>
   </div>
   <div id="notes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem"><div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af"><i class="fas fa-sticky-note" style="font-size:2.5rem;margin-bottom:1rem;opacity:.3"></i><p style="font-weight:600">Nenhuma anotação ainda</p><p style="font-size:.82rem;margin-top:.25rem">Clique em "Nova anotação" para começar!</p></div></div>
@@ -855,7 +855,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
 <!-- ══ RECOMPENSAS ══ -->
 <div id="screen-rewards" class="screen" style="display:none">
-  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.25rem">🏆 Suas Recompensas</h2>
+  <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:1.25rem">[T] Suas Recompensas</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem">
     <div style="background:linear-gradient(135deg,#0038A8,#001A55);border-radius:1.5rem;padding:1.75rem;color:white;box-shadow:0 8px 30px rgba(0,56,168,.3)"><div style="font-size:.7rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Nível atual</div><div id="rewards-level-name" style="font-size:1.8rem;font-weight:900;color:#F9DD16;line-height:1">Iniciante</div><div id="rewards-xp-text" style="font-size:.85rem;opacity:.8;margin:.4rem 0 1rem">0 XP total</div><div class="level-bar" style="height:12px;margin-bottom:.5rem"><div id="rewards-level-bar" class="level-bar-fill" style="width:0%;height:100%"></div></div><div id="rewards-next-level" style="font-size:.72rem;opacity:.65">Próximo: 200 XP</div></div>
     <div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,56,168,.08)"><h3 style="font-weight:700;margin-bottom:1rem;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">Estatísticas</h3><div id="rewards-stats" style="display:flex;flex-direction:column;gap:.65rem"></div></div>
@@ -934,7 +934,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 
     <!-- BÁSICO -->
     <div style="background:white;border-radius:1.75rem;padding:2rem;box-shadow:0 8px 32px rgba(0,56,168,.16);border:2px solid #0038A8;position:relative;transition:box-shadow .2s" onmouseenter="this.style.boxShadow='0 16px 48px rgba(0,56,168,.22)'" onmouseleave="this.style.boxShadow='0 8px 32px rgba(0,56,168,.16)'">
-      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap">⭐ MAIS POPULAR</div>
+      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#0038A8;color:white;font-size:.65rem;font-weight:800;padding:.35rem 1.1rem;border-radius:2rem;white-space:nowrap">[*] MAIS POPULAR</div>
       <div style="font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#0038A8;margin-bottom:1rem">Básico</div>
       <div style="display:flex;align-items:baseline;gap:.3rem;margin-bottom:.2rem">
         <span id="price-basico" style="font-size:2.2rem;font-weight:900;color:#1e293b">R$12,90</span>
@@ -1187,7 +1187,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
       <div>
         <label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Emoji do caderno</label>
         <div id="book-emoji-grid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:.3rem;margin-top:.4rem;padding:.6rem;background:#f9fafb;border-radius:.85rem"></div>
-        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.4rem"><span style="font-size:.75rem;color:#6b7280">Selecionado:</span><span id="book-emoji-preview" style="font-size:1.6rem">📚</span></div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.4rem"><span style="font-size:.75rem;color:#6b7280">Selecionado:</span><span id="book-emoji-preview" style="font-size:1.6rem">[L]</span></div>
       </div>
       <div>
         <label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Cor da capa</label>
@@ -1253,7 +1253,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
 <!-- Sessão concluída -->
 <div id="modal-session-done" class="modal-overlay" style="display:none">
   <div class="modal-box" style="text-align:center">
-    <div style="font-size:3rem;margin-bottom:.5rem">🎯</div>
+    <div style="font-size:3rem;margin-bottom:.5rem">[>]</div>
     <h3 style="font-size:1.15rem;font-weight:800;margin-bottom:.4rem">Sessão concluída!</h3>
     <p id="session-done-text" style="font-size:.85rem;color:#6b7280;margin-bottom:1.25rem"></p>
     <div style="background:#f9fafb;border-radius:1rem;padding:1rem;margin-bottom:1rem;text-align:left"><label style="font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase">Adicionar à revisão (opcional)</label><input id="session-topic" type="text" placeholder="Nome do tópico..." style="margin-top:.4rem;width:100%;padding:.7rem 1rem;border:2px solid #e5e7eb;border-radius:.75rem;font-size:.85rem"></div>
@@ -1273,8 +1273,8 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
         <div><label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase">Fim</label><input id="task-end" type="time" style="margin-top:.3rem;width:100%;padding:.75rem 1rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.88rem"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
-        <div><label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase">Categoria</label><select id="task-type" style="margin-top:.3rem;width:100%;padding:.75rem .9rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white"><option value="study">📚 Estudo</option><option value="personal">🏃 Pessoal</option><option value="work">💼 CLT</option></select></div>
-        <div><label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase">Prioridade</label><select id="task-priority" style="margin-top:.3rem;width:100%;padding:.75rem .9rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white"><option value="high">🔴 Alta</option><option value="normal">⚪ Normal</option><option value="low">🔵 Baixa</option></select></div>
+        <div><label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase">Categoria</label><select id="task-type" style="margin-top:.3rem;width:100%;padding:.75rem .9rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white"><option value="study">[L] Estudo</option><option value="personal">🏃 Pessoal</option><option value="work">💼 CLT</option></select></div>
+        <div><label style="font-size:.7rem;font-weight:700;color:#6b7280;text-transform:uppercase">Prioridade</label><select id="task-priority" style="margin-top:.3rem;width:100%;padding:.75rem .9rem;border:2px solid #e5e7eb;border-radius:.85rem;font-size:.85rem;background:white"><option value="high">[!] Alta</option><option value="normal">⚪ Normal</option><option value="low">🔵 Baixa</option></select></div>
       </div>
     </div>
     <div style="display:flex;gap:.65rem;margin-top:1.1rem"><button onclick="saveTask()" class="btn-bb" style="flex:1;padding:.8rem;border-radius:.85rem;font-weight:700;border:none;cursor:pointer">Adicionar</button><button onclick="closeModal('modal-add-task')" class="btn-gray" style="padding:.8rem 1.1rem;border-radius:.85rem;font-weight:600;border:none;cursor:pointer">Cancelar</button></div>
@@ -1308,7 +1308,7 @@ input:focus,select:focus,textarea:focus{border-color:#0038A8!important;box-shado
     </div>
     <!-- Editor Mapa (simplificado no modal) -->
     <div id="editor-mindmap" style="display:none;text-align:center;padding:2rem;background:#f9fafb;border-radius:1rem;border:2px dashed #e5e7eb">
-      <div style="font-size:2.5rem;margin-bottom:.75rem">🧠</div>
+      <div style="font-size:2.5rem;margin-bottom:.75rem">[C]</div>
       <p style="font-weight:700;color:#374151;margin-bottom:.4rem">Mapas Mentais Completos</p>
       <p style="font-size:.8rem;color:#9ca3af;margin-bottom:1rem">Para mapas mentais interativos com emojis e arrastar, use a aba <strong>Cadernos</strong> e adicione um bloco de Mapa!</p>
       <button onclick="navigateTo('books');closeModal('modal-note-editor')" class="btn-bb" style="padding:.65rem 1.25rem;border-radius:.75rem;font-weight:700;font-size:.82rem;border:none;cursor:pointer">Ir para Cadernos →</button>
@@ -1363,51 +1363,51 @@ const DEFAULT_SUBJECTS=[
 ]
 const LEVELS=[
   {name:"Iniciante",minXP:0,maxXP:200,icon:"🌱"},
-  {name:"Estudante Dedicado",minXP:200,maxXP:600,icon:"📚"},
+  {name:"Estudante Dedicado",minXP:200,maxXP:600,icon:"[L]"},
   {name:"Guerreiro BB",minXP:600,maxXP:1200,icon:"⚔️"},
-  {name:"Analista BB",minXP:1200,maxXP:2500,icon:"🎯"},
-  {name:"Mestre BB",minXP:2500,maxXP:5000,icon:"🏆"},
+  {name:"Analista BB",minXP:1200,maxXP:2500,icon:"[>]"},
+  {name:"Mestre BB",minXP:2500,maxXP:5000,icon:"[T]"},
   {name:"Lenda BB",minXP:5000,maxXP:Infinity,icon:"👑"}
 ]
 const BADGE_DEFS=[
-  {id:"first_review",icon:"🧠",name:"1ª Revisão",check:s=>s.totalReviews>=1},
-  {id:"week_streak",icon:"🔥",name:"Semana Impecável",check:s=>s.maxStreak>=7},
-  {id:"recall_master",icon:"💡",name:"Mestre do Recall",check:s=>s.totalRecalls>=10},
+  {id:"first_review",icon:"[C]",name:"1ª Revisão",check:s=>s.totalReviews>=1},
+  {id:"week_streak",icon:"[F]",name:"Semana Impecável",check:s=>s.maxStreak>=7},
+  {id:"recall_master",icon:"[L]",name:"Mestre do Recall",check:s=>s.totalRecalls>=10},
   {id:"marathon",icon:"🏃",name:"Maratonista",check:s=>s.maxMonthHours>=10},
-  {id:"first_session",icon:"⏱",name:"1ª Sessão",check:s=>s.totalSessions>=1},
+  {id:"first_session",icon:"[T]",name:"1ª Sessão",check:s=>s.totalSessions>=1},
   {id:"ten_sessions",icon:"💪",name:"10 Sessões",check:s=>s.totalSessions>=10},
-  {id:"task_champion",icon:"✅",name:"Campeão de Tarefas",check:s=>s.totalTasksDone>=20},
-  {id:"monthly_goal",icon:"🎯",name:"Meta Mensal",check:s=>s.monthlyGoalHit},
+  {id:"task_champion",icon:"[V]",name:"Campeão de Tarefas",check:s=>s.totalTasksDone>=20},
+  {id:"monthly_goal",icon:"[>]",name:"Meta Mensal",check:s=>s.monthlyGoalHit},
   {id:"note_taker",icon:"📝",name:"Anotador",check:s=>(s.totalNotes||0)>=5},
   {id:"bookworm",icon:"📖",name:"Colecionador",check:s=>(s.totalBooks||0)>=3},
 ]
 const STAGES=[1,3,7,15,30,60]
 const BOOK_COLORS=['#0038A8','#dc2626','#16a34a','#7c3aed','#d97706','#0891b2','#db2777','#374151','#b45309','#065f46']
-const BOOK_EMOJIS=['📚','📖','✏️','🎓','📐','🔬','💰','⚖️','💻','🌎','🧮','📊','🗣️','🏦','🎯','🔢','📝','🧠','⭐','🔥']
+const BOOK_EMOJIS=['[L]','📖','✏️','[G]','📐','🔬','💰','⚖️','💻','🌎','🧮','[G]','🗣️','🏦','[>]','🔢','📝','[C]','[*]','[F]']
 const RECURSOS=[
   // ── 🎬 VÍDEO-AULAS ──
   {id:1,tipo:'video',titulo:'AlfaCon — Maior Canal de Concursos',desc:'O maior canal de concursos do Brasil com aulas completas e gratuitas de todas as matérias do edital BB: Português, Matemática Financeira, Bancários, Informática e mais.',icon:'🥇',url:'https://www.youtube.com/@AlfaConBr',badge:'YouTube',yt:true},
-  {id:2,tipo:'video',titulo:'Gran Concursos — Playlist BB 2026',desc:'Playlist especial do Gran com aulas focadas no edital BB 2025/2026. Professores especialistas por matéria, cobrindo tudo que a Cesgranrio costuma cobrar.',icon:'🎓',url:'https://www.youtube.com/playlist?list=PLZIcuMePV18wonMtcaeF0jaGd__a9Qqwh',badge:'YouTube',yt:true},
+  {id:2,tipo:'video',titulo:'Gran Concursos — Playlist BB 2026',desc:'Playlist especial do Gran com aulas focadas no edital BB 2025/2026. Professores especialistas por matéria, cobrindo tudo que a Cesgranrio costuma cobrar.',icon:'[G]',url:'https://www.youtube.com/playlist?list=PLZIcuMePV18wonMtcaeF0jaGd__a9Qqwh',badge:'YouTube',yt:true},
   {id:3,tipo:'video',titulo:'Prof. Renan Duarte — Especialista BB',desc:'Professor 100% focado no concurso do BB. Aulas de Conhecimentos Bancários, Vendas, Atualidades do Mercado Financeiro e estratégias específicas para a Cesgranrio.',icon:'🏦',url:'https://www.youtube.com/@profrenanduarte',badge:'YouTube',yt:true},
-  {id:4,tipo:'video',titulo:'QConcursos — Curso Gratuito BB',desc:'Curso completo e gratuito para Escriturário Agente Comercial. Videoaulas por matéria ideais para revisões rápidas e aprender o estilo da banca Cesgranrio.',icon:'🎯',url:'https://www.youtube.com/results?search_query=qconcursos+banco+do+brasil',badge:'YouTube',yt:true},
+  {id:4,tipo:'video',titulo:'QConcursos — Curso Gratuito BB',desc:'Curso completo e gratuito para Escriturário Agente Comercial. Videoaulas por matéria ideais para revisões rápidas e aprender o estilo da banca Cesgranrio.',icon:'[>]',url:'https://www.youtube.com/results?search_query=qconcursos+banco+do+brasil',badge:'YouTube',yt:true},
   {id:5,tipo:'video',titulo:'Kultivi — Cursos Completos Gratuitos',desc:'Cursos preparatórios 100% gratuitos com professores especialistas. Cobre Português, Matemática Financeira, Raciocínio Lógico e Informática para concursos bancários.',icon:'💻',url:'https://www.youtube.com/@KultiviConcursos',badge:'YouTube',yt:true},
-  {id:6,tipo:'video',titulo:'Direção Concursos — Aulas Gratuitas BB',desc:'Canal com aulas e materiais gratuitos preparados especialmente para o concurso do Banco do Brasil. Ótimo para quem está começando do zero.',icon:'📚',url:'https://www.youtube.com/@DirecaoConcursos',badge:'YouTube',yt:true},
+  {id:6,tipo:'video',titulo:'Direção Concursos — Aulas Gratuitas BB',desc:'Canal com aulas e materiais gratuitos preparados especialmente para o concurso do Banco do Brasil. Ótimo para quem está começando do zero.',icon:'[L]',url:'https://www.youtube.com/@DirecaoConcursos',badge:'YouTube',yt:true},
   {id:7,tipo:'video',titulo:'Vendas e Negociação — Alta Prioridade BB',desc:'Matéria com altíssimo peso no edital BB. Aulas gratuitas de técnicas de vendas, atendimento bancário, CRM, produtos financeiros e negociação.',icon:'🤝',url:'https://www.youtube.com/results?search_query=vendas+negociacao+concurso+banco+do+brasil+2026',badge:'YouTube',yt:true},
   // ── 📄 MATERIAIS ESTRATÉGICOS ──
   {id:8,tipo:'apostila',titulo:'BB Concursos — Portal Oficial 2026',desc:'Página oficial do Banco do Brasil com editais, provas anteriores (2021 e 2022), gabaritos e todas as informações sobre o próximo concurso.',icon:'🏦',url:'https://www.bb.com.br/site/concurso-bb/',badge:'Oficial BB',yt:false},
-  {id:9,tipo:'apostila',titulo:'QConcursos — Guia Gratuito Completo BB',desc:'Guia estruturado com matérias, pesos de cada uma na prova, organização da rotina e modelo prático de distribuição estratégica das disciplinas do edital.',icon:'📊',url:'https://estude.qconcursos.com/material-gratuito-banco-do-brasil',badge:'Gratuito',yt:false},
+  {id:9,tipo:'apostila',titulo:'QConcursos — Guia Gratuito Completo BB',desc:'Guia estruturado com matérias, pesos de cada uma na prova, organização da rotina e modelo prático de distribuição estratégica das disciplinas do edital.',icon:'[G]',url:'https://estude.qconcursos.com/material-gratuito-banco-do-brasil',badge:'Gratuito',yt:false},
   {id:10,tipo:'apostila',titulo:'Gran — Apostila Conhecimentos Bancários',desc:'Apostila gratuita de Conhecimentos Bancários preparada pelo professor Cid Roberto do Gran Cursos Online — matéria de alto peso no edital do BB.',icon:'📄',url:'https://concursos.grancursosonline.com.br/apostila-gratis-conhecimentos-bancarios-banco-do-brasil/',badge:'Gratuito',yt:false},
-  {id:11,tipo:'apostila',titulo:'Tribo Concursos — Curso Gratuito BB',desc:'Curso gratuito com aulas expositivas, material em PDF e questões. Ideal para definir um plano de estudos assertivo e direcionado ao edital do BB.',icon:'🎓',url:'https://triboconcursos.com.br/curso/escriturario-banco-do-brasil-bb-gratis',badge:'Gratuito',yt:false},
+  {id:11,tipo:'apostila',titulo:'Tribo Concursos — Curso Gratuito BB',desc:'Curso gratuito com aulas expositivas, material em PDF e questões. Ideal para definir um plano de estudos assertivo e direcionado ao edital do BB.',icon:'[G]',url:'https://triboconcursos.com.br/curso/escriturario-banco-do-brasil-bb-gratis',badge:'Gratuito',yt:false},
   {id:12,tipo:'apostila',titulo:'Estratégia — O Que Estudar no BB 2026',desc:'Artigo completo com análise do edital, pesos de cada matéria, dicas de estudo e cronograma sugerido. Leitura obrigatória antes de começar a estudar.',icon:'🗺️',url:'https://www.estrategiaconcursos.com.br/blog/concurso-banco-do-brasil/',badge:'Estratégico',yt:false},
   {id:13,tipo:'apostila',titulo:'BCB — Cidadania Financeira',desc:'Material oficial do Banco Central sobre sistema financeiro, produtos bancários e normas. Fonte primária das questões de Conhecimentos Bancários.',icon:'🏛️',url:'https://www.bcb.gov.br/cidadaniafinanceira',badge:'BCB Oficial',yt:false},
-  // ── 🎯 QUESTÕES E SIMULADOS ──
-  {id:14,tipo:'simulado',titulo:'QConcursos — Questões Banco do Brasil',desc:'Maior banco de questões do Brasil com filtro específico para BB e Cesgranrio. Resolva questões das provas 2021 e 2022 com gabarito e comentários de professores.',icon:'📋',url:'https://www.qconcursos.com/questoes-de-concursos/bancas/cesgranrio',badge:'Gratuito',yt:false},
-  {id:15,tipo:'simulado',titulo:'Tec Concursos — Caderno Filtrado BB',desc:'Monte seu caderno de questões filtrado por Banco do Brasil e matéria. Veja estatísticas de desempenho por assunto e identifique seus pontos fracos.',icon:'🎯',url:'https://www.tecconcursos.com.br/questoes',badge:'Gratuito',yt:false},
+  // ── [>] QUESTÕES E SIMULADOS ──
+  {id:14,tipo:'simulado',titulo:'QConcursos — Questões Banco do Brasil',desc:'Maior banco de questões do Brasil com filtro específico para BB e Cesgranrio. Resolva questões das provas 2021 e 2022 com gabarito e comentários de professores.',icon:'[E]',url:'https://www.qconcursos.com/questoes-de-concursos/bancas/cesgranrio',badge:'Gratuito',yt:false},
+  {id:15,tipo:'simulado',titulo:'Tec Concursos — Caderno Filtrado BB',desc:'Monte seu caderno de questões filtrado por Banco do Brasil e matéria. Veja estatísticas de desempenho por assunto e identifique seus pontos fracos.',icon:'[>]',url:'https://www.tecconcursos.com.br/questoes',badge:'Gratuito',yt:false},
   {id:16,tipo:'simulado',titulo:'CESGRANRIO — Provas Oficiais BB',desc:'Site oficial da banca CESGRANRIO — organizadora do BB. Baixe as provas completas de 2021 e 2022 diretamente na fonte para simular condições reais.',icon:'🗂️',url:'http://www.cesgranrio.org.br/eventos/concursos/lista_concursos.aspx',badge:'Banca Oficial',yt:false},
-  {id:17,tipo:'simulado',titulo:'Gabarite — Simulados Bancários Gratuitos',desc:'Simulados gratuitos no formato da prova do BB com cronômetro. Veja seu ranking e acompanhe sua evolução por matéria ao longo do tempo.',icon:'⏱️',url:'https://www.gabarite.com.br',badge:'Gratuito',yt:false},
+  {id:17,tipo:'simulado',titulo:'Gabarite — Simulados Bancários Gratuitos',desc:'Simulados gratuitos no formato da prova do BB com cronômetro. Veja seu ranking e acompanhe sua evolução por matéria ao longo do tempo.',icon:'[T]️',url:'https://www.gabarite.com.br',badge:'Gratuito',yt:false},
   // ── ⚖️ LEGISLAÇÃO OBRIGATÓRIA ──
   {id:18,tipo:'lei',titulo:'Lei 4.595/64 — Sistema Financeiro Nacional',desc:'Lei que estrutura o SFN — CMN, BACEN, bancos comerciais e suas atribuições. Cai em toda prova do BB. Leia integralmente antes da prova.',icon:'⚖️',url:'https://www.planalto.gov.br/ccivil_03/leis/l4595.htm',badge:'Legislação',yt:false},
-  {id:19,tipo:'lei',titulo:'BCB — Busca de Normas e Resoluções CMN',desc:'Resoluções CMN, circulares e normativos do Banco Central. Base para questões de legislação bancária — consulte as resoluções sobre produtos bancários.',icon:'📋',url:'https://www.bcb.gov.br/estabilidadefinanceira/buscanormas',badge:'BCB Oficial',yt:false},
+  {id:19,tipo:'lei',titulo:'BCB — Busca de Normas e Resoluções CMN',desc:'Resoluções CMN, circulares e normativos do Banco Central. Base para questões de legislação bancária — consulte as resoluções sobre produtos bancários.',icon:'[E]',url:'https://www.bcb.gov.br/estabilidadefinanceira/buscanormas',badge:'BCB Oficial',yt:false},
   {id:20,tipo:'lei',titulo:'Código de Defesa do Consumidor — CDC',desc:'Lei 8.078/90 completa. Frequente nas provas BB para questões de atendimento, SAC, ouvidoria, prazo de arrependimento e relação com clientes bancários.',icon:'🛡️',url:'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm',badge:'Legislação',yt:false},
   {id:21,tipo:'lei',titulo:'Lei 9.613/98 — Lavagem de Dinheiro',desc:'Lei de combate à lavagem de dinheiro e financiamento ao terrorismo. Tema recorrente em questões de compliance, COAF e prevenção a crimes financeiros no BB.',icon:'🚨',url:'https://www.planalto.gov.br/ccivil_03/leis/l9613.htm',badge:'Legislação',yt:false},
 ]
@@ -1431,7 +1431,7 @@ let calViewYear=new Date().getFullYear(),calViewMonth=new Date().getMonth()
 let activeReviewIndex=-1
 
 // Cadernos
-let currentBookId=null,currentPageId=null,bookSelectedColor='#0038A8',bookSelectedEmoji='📚',bookCoverImgData=''
+let currentBookId=null,currentPageId=null,bookSelectedColor='#0038A8',bookSelectedEmoji='[L]',bookCoverImgData=''
 
 // Notas rápidas
 let currentNoteType='text',editingNoteId=null,currentNoteFilter='all'
@@ -1677,7 +1677,7 @@ async function doSignup(){
     _uid=cred.user.uid
     await window._fbService.initUser(_uid,{name:profile.name, email:profile.email})
     await window._fbService.save(_uid,'profile',profile)
-    // ✅ Mostrar tela de sucesso e voltar para login
+    // [V] Mostrar tela de sucesso e voltar para login
     showSignupSuccess(name, email)
   }catch(e){
     _signupInProgress = false // BUG #12 FIX: reseta flag em caso de erro
@@ -1695,7 +1695,7 @@ function showSignupSuccess(name, email) {
       <div style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(16,185,129,.3)">
         <i class="fas fa-check" style="color:white;font-size:1.6rem"></i>
       </div>
-      <h3 style="font-size:1.2rem;font-weight:800;color:#059669;margin-bottom:.4rem">✅ Conta criada com sucesso!</h3>
+      <h3 style="font-size:1.2rem;font-weight:800;color:#059669;margin-bottom:.4rem">[V] Conta criada com sucesso!</h3>
       <p style="font-size:.9rem;color:#6b7280;margin-bottom:0.2rem">Bem-vindo(a), <strong style="color:#0038A8">${firstName}</strong>!</p>
       <p style="font-size:.8rem;color:#9ca3af;margin-bottom:1.5rem">Sua conta foi registrada com sucesso.</p>
       <button onclick="window.location.hash='#login'" style="width:100%;padding:0.75rem 1rem;background:#0066cc;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s">
@@ -1853,7 +1853,7 @@ function updateHeaderUser(){
   document.getElementById('menu-username').textContent=profile.name
   document.getElementById('menu-email').textContent=profile.email||window._currentUser?.email||''
   document.getElementById('settings-user-email').textContent='Conta: '+(profile.email||'')
-  const planNames={free:'Free',basico:'Básico',basicoAnual:'Básico Anual',pro:'Pro ⭐',proAnual:'Pro Anual ⭐'}
+  const planNames={free:'Free',basico:'Básico',basicoAnual:'Básico Anual',pro:'Pro [*]',proAnual:'Pro Anual [*]'}
   const planColors={free:'#EEF3FF',basico:'#dbeafe',basicoAnual:'#dbeafe',pro:'#FEF3C7',proAnual:'#FEF3C7'}
   const planText={free:'#0038A8',basico:'#1d4ed8',basicoAnual:'#1d4ed8',pro:'#92400e',proAnual:'#92400e'}
   const badge=document.getElementById('menu-plan-badge')
@@ -1945,7 +1945,7 @@ function renderDashboard(){
   document.getElementById('yesterday-mins').textContent=yMins?fmtMins(yMins):'—'
   const wMins=studySessions.filter(s=>(new Date()-new Date(s.date+'T00:00:00'))/86400000<=7).reduce((a,s)=>a+s.minutes,0)
   document.getElementById('weekly-avg').textContent=wMins?fmtMins(Math.round(wMins/7)):'—'
-  const streak=calcStreak();document.getElementById('streak-count').textContent=streak;document.getElementById('dash-streak').textContent=streak+'🔥'
+  const streak=calcStreak();document.getElementById('streak-count').textContent=streak;document.getElementById('dash-streak').textContent=streak+'[F]'
   updateHeaderXP();renderMonthlyProgress()
   const qsC=document.getElementById('quick-subjects');qsC.innerHTML=''
   subjects.slice(0,6).forEach(sub=>{
@@ -1963,14 +1963,14 @@ function renderDashboard(){
   document.getElementById('dash-level-bar').style.width=pct2+'%'
   const br=document.getElementById('dash-badges-row');br.innerHTML=''
   BADGE_DEFS.filter(b=>gamification.badges.includes(b.id)).slice(0,6).forEach(b=>{const sp=document.createElement('span');sp.title=b.name;sp.style.cssText='font-size:1.4rem;cursor:default;';sp.textContent=b.icon;br.appendChild(sp)})
-  if(!br.children.length)br.innerHTML='<span style="font-size:.78rem;opacity:.7">Nenhum badge ainda. Comece a estudar! 🎯</span>'
+  if(!br.children.length)br.innerHTML='<span style="font-size:.78rem;opacity:.7">Nenhum badge ainda. Comece a estudar! [>]</span>'
   const todayTasks=dailyTasks.filter(t=>!t.done&&(t.date===today||!t.date)).slice(0,3)
   document.getElementById('dashboard-tasks').innerHTML=todayTasks.length?todayTasks.map(t=>`<div style="display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;background:#f9fafb;border-radius:.65rem"><div style="width:3px;height:1.5rem;border-radius:9999px;background:${t.type==='study'?'#0038A8':t.type==='work'?'#7c3aed':'#16a34a'};flex-shrink:0"></div><div style="flex:1;min-width:0"><p style="font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(t.text)}</p>${t.start?`<p style="font-size:.65rem;color:#9ca3af">${t.start}${t.end?' – '+t.end:''}</p>`:''}</div></div>`).join(''):'<p style="font-size:.78rem;color:#9ca3af;font-style:italic">Nenhuma tarefa para hoje.</p>'
   const pendRevs=reviewItems.filter(r=>r.nextReview<=today)
   const pb=document.getElementById('pending-badge')
   if(pendRevs.length>0){pb.style.display='flex';document.getElementById('pending-count').textContent=pendRevs.length}else pb.style.display='none'
-  document.getElementById('dashboard-reviews').innerHTML=pendRevs.length?pendRevs.slice(0,3).map(r=>`<div onclick="navigateTo(4)" style="display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;background:#fef2f2;border-radius:.65rem;cursor:pointer"><i class="fas fa-exclamation-circle" style="color:#ef4444;font-size:.8rem;flex-shrink:0"></i><span style="font-size:.78rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.topic}</span></div>`).join(''):`<p style="font-size:.78rem;color:#9ca3af;font-style:italic">Sem revisões pendentes 🎉</p>`
-  const tips=["Vendas + Conhecimentos Bancários = 30% da prova!","2h consistentes por dia > 8h caóticas no fim de semana.","Leia → explique em voz alta → resolva questões.","Use o Caderno de Matérias para criar seus resumos! 📚","Active Recall fixa até 60% mais do que só reler.","Crie um mapa mental para cada tópico revisado!"]
+  document.getElementById('dashboard-reviews').innerHTML=pendRevs.length?pendRevs.slice(0,3).map(r=>`<div onclick="navigateTo(4)" style="display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;background:#fef2f2;border-radius:.65rem;cursor:pointer"><i class="fas fa-exclamation-circle" style="color:#ef4444;font-size:.8rem;flex-shrink:0"></i><span style="font-size:.78rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.topic}</span></div>`).join(''):`<p style="font-size:.78rem;color:#9ca3af;font-style:italic">Sem revisões pendentes (!)</p>`
+  const tips=["Vendas + Conhecimentos Bancários = 30% da prova!","2h consistentes por dia > 8h caóticas no fim de semana.","Leia → explique em voz alta → resolva questões.","Use o Caderno de Matérias para criar seus resumos! [L]","Active Recall fixa até 60% mais do que só reler.","Crie um mapa mental para cada tópico revisado!"]
   document.getElementById('daily-tip').textContent=tips[new Date().getDay()%tips.length]
 }
 function renderMonthlyProgress(){
@@ -2017,7 +2017,7 @@ async function logSession(subjectId,minutes){
 }
 async function checkDailyGoal(){
   const goalMins=(profile?.dailyGoalH||2)*60
-  if(dailyLog.minutes>=goalMins){const key='bb_daily_goal_hit_'+todayStr();if(!localStorage.getItem(key)){localStorage.setItem(key,'1');addXP(100,'Meta diária batida! 🏆')}}
+  if(dailyLog.minutes>=goalMins){const key='bb_daily_goal_hit_'+todayStr();if(!localStorage.getItem(key)){localStorage.setItem(key,'1');addXP(100,'Meta diária batida! [T]')}}
 }
 
 // ═══════════════════════════════════════════════════
@@ -2073,7 +2073,7 @@ async function onTimerFinished(){
   sessionFinishedSubjectId=currentTimerSubjectId;sessionFinishedMinutes=mins
   const sub=subjects.find(s=>s.id===currentTimerSubjectId)
   await logSession(currentTimerSubjectId,mins);gamification.stats.totalSessions++;await saveData()
-  addXP(30,`Sessão de ${mins}min concluída! 🎯`)
+  addXP(30,`Sessão de ${mins}min concluída! [>]`)
   document.getElementById('session-done-text').textContent=`+${mins} minutos em ${sub?.name||'estudo'}. Continue assim!`
   document.getElementById('session-topic').value='';showModal('modal-session-done');resetTimer()
   document.getElementById('logged-time-today').textContent=fmtMins(dailyLog.minutes)
@@ -2128,10 +2128,10 @@ function pushReviewItem(topic,subjectId,subjectName,notes_){
 function renderTimeline(){
   const today=todayStr()
   const todayItems=reviewItems.filter(r=>r.nextReview<=today)
-  document.getElementById('today-review-count').textContent=todayItems.length?`${todayItems.length} revisão(ões) pendente(s)`:'✅ Tudo em dia!'
+  document.getElementById('today-review-count').textContent=todayItems.length?`${todayItems.length} revisão(ões) pendente(s)`:'[V] Tudo em dia!'
   document.getElementById('today-reviews-list').innerHTML=todayItems.length?todayItems.map((r)=>{
     const idx=reviewItems.indexOf(r)
-    return `<div style="display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;background:${r.nextReview<today?'#FEF2F2':'#EEF3FF'};border-radius:.85rem;border:1.5px solid ${r.nextReview<today?'#fca5a5':'#bfdbfe'}"><div style="flex:1;min-width:0"><p style="font-weight:700;font-size:.85rem">${r.topic}</p><p style="font-size:.7rem;color:#9ca3af">${r.subjectName} • Estágio ${r.stage}/6</p></div><button onclick="openReviewModal(${idx})" class="btn-bb" style="padding:.4rem .85rem;border-radius:.65rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer"><i class="fas fa-brain"></i> Revisar</button></div>`}).join(''):`<p style="font-size:.82rem;color:#10b981;font-weight:600;text-align:center;padding:.5rem">🎉 Nenhuma revisão pendente!</p>`
+    return `<div style="display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;background:${r.nextReview<today?'#FEF2F2':'#EEF3FF'};border-radius:.85rem;border:1.5px solid ${r.nextReview<today?'#fca5a5':'#bfdbfe'}"><div style="flex:1;min-width:0"><p style="font-weight:700;font-size:.85rem">${r.topic}</p><p style="font-size:.7rem;color:#9ca3af">${r.subjectName} • Estágio ${r.stage}/6</p></div><button onclick="openReviewModal(${idx})" class="btn-bb" style="padding:.4rem .85rem;border-radius:.65rem;font-size:.75rem;font-weight:700;border:none;cursor:pointer"><i class="fas fa-brain"></i> Revisar</button></div>`}).join(''):`<p style="font-size:.82rem;color:#10b981;font-weight:600;text-align:center;padding:.5rem">(!) Nenhuma revisão pendente!</p>`
   const strip=document.getElementById('timeline-strip');strip.innerHTML=''
   for(let i=0;i<14;i++){
     const d=addDays(today,i),items=reviewItems.filter(r=>r.nextReview===d)
@@ -2162,8 +2162,8 @@ async function confirmReviewed(){
   const r=reviewItems[activeReviewIndex],today=todayStr(),days=STAGES[r.stage]||60
   r.lastReview=today;r.nextReview=addDays(today,days);r.stage=Math.min(r.stage+1,6)
   gamification.stats.totalReviews++;gamification.stats.totalRecalls++
-  if(reviewItems.filter(rv=>rv.nextReview<=today).length===0)addXP(50,'Todas as revisões do dia! 🏅')
-  closeModal('modal-review-topic');addXP(25,'Active Recall concluído! 🧠')
+  if(reviewItems.filter(rv=>rv.nextReview<=today).length===0)addXP(50,'Todas as revisões do dia! [M]')
+  closeModal('modal-review-topic');addXP(25,'Active Recall concluído! [C]')
   await checkBadges();await saveData();renderTimeline();renderDashboard()
 }
 function postponeReview(){reviewItems[activeReviewIndex].nextReview=addDays(todayStr(),1);closeModal('modal-review-topic');saveData();renderTimeline()}
@@ -2217,7 +2217,7 @@ function renderTaskList(){
   const colorMap={study:'#0038A8',personal:'#16a34a',work:'#7c3aed'}
   const badgeBg={study:'#dbeafe',personal:'#dcfce7',work:'#ede9fe'}
   const badgeFg={study:'#1d4ed8',personal:'#15803d',work:'#6d28d9'}
-  const labelMap={study:'📚 Estudo',personal:'🏃 Pessoal',work:'💼 CLT'}
+  const labelMap={study:'[L] Estudo',personal:'🏃 Pessoal',work:'💼 CLT'}
   filtered.forEach(task=>{
     const gi=dailyTasks.indexOf(task),div=document.createElement('div')
     div.style.cssText=`display:flex;align-items:flex-start;gap:.65rem;padding:.85rem 1rem;border-radius:1rem;border:2px solid #f3f4f6;background:${task.done?'#f9fafb':'white'};transition:all .15s;`
@@ -2253,7 +2253,7 @@ async function saveTask(){
 }
 async function toggleTask(i){
   dailyTasks[i].done=!dailyTasks[i].done
-  if(dailyTasks[i].done){gamification.stats.totalTasksDone++;const xpAmt=dailyTasks[i].type==='study'?20:10;addXP(xpAmt,dailyTasks[i].type==='study'?'Tarefa de estudo concluída! 📚':'Tarefa concluída! ✅');checkBadges()}
+  if(dailyTasks[i].done){gamification.stats.totalTasksDone++;const xpAmt=dailyTasks[i].type==='study'?20:10;addXP(xpAmt,dailyTasks[i].type==='study'?'Tarefa de estudo concluída! [L]':'Tarefa concluída! [V]');checkBadges()}
   await saveData();renderDailyOrganizer();renderDashboard()
 }
 async function removeTask(i){dailyTasks.splice(i,1);await saveData();renderDailyOrganizer();renderDashboard()}
@@ -2264,13 +2264,13 @@ async function removeTask(i){dailyTasks.splice(i,1);await saveData();renderDaily
 function renderBooks(){
   if(!requirePlan('books','pro'))return;
   const grid=document.getElementById('books-grid');grid.innerHTML=''
-  if(!books.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af"><div style="font-size:3rem;margin-bottom:1rem">📚</div><p style="font-weight:600;font-size:1rem">Nenhum caderno ainda</p><p style="font-size:.82rem;margin-top:.25rem">Clique em "Novo caderno" para criar!</p></div>`;return}
+  if(!books.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af"><div style="font-size:3rem;margin-bottom:1rem">[L]</div><p style="font-weight:600;font-size:1rem">Nenhum caderno ainda</p><p style="font-size:.82rem;margin-top:.25rem">Clique em "Novo caderno" para criar!</p></div>`;return}
   books.forEach(book=>{
     const div=document.createElement('div');div.className='subject-book';div.style.background=book.color||'#0038A8'
     div.onclick=()=>openBook(book.id)
     div.innerHTML=`<div class="book-spine"><div class="book-spine-text">${sanitizeHTML(book.name)}</div></div>
     <div class="book-cover">${book.coverImg?`<img class="book-cover-img" src="${book.coverImg}" alt="">`:''}
-      <div class="book-emoji-big">${sanitizeHTML(book.emoji||'📚')}</div>
+      <div class="book-emoji-big">${sanitizeHTML(book.emoji||'[L]')}</div>
       <div class="book-title">${sanitizeHTML(book.name)}</div>
       <div class="book-meta">${book.pages?book.pages.length:1} página(s)</div>
     </div>
@@ -2281,9 +2281,9 @@ function renderBooks(){
   })
 }
 function openNewBookModal(){
-  bookSelectedColor='#0038A8';bookSelectedEmoji='📚';bookCoverImgData=''
+  bookSelectedColor='#0038A8';bookSelectedEmoji='[L]';bookCoverImgData=''
   document.getElementById('book-name').value=''
-  document.getElementById('book-emoji-preview').textContent='📚'
+  document.getElementById('book-emoji-preview').textContent='[L]'
   document.getElementById('book-cover-preview').style.display='none'
   document.getElementById('book-img-label').textContent='Clique para escolher imagem de capa'
   const eg=document.getElementById('book-emoji-grid');eg.innerHTML=''
@@ -2313,7 +2313,7 @@ async function saveNewBook(){
   const name=document.getElementById('book-name').value.trim().substring(0,80);if(!name){shakeEl('book-name');return}
   const book={id:uid(),name,emoji:bookSelectedEmoji,color:bookSelectedColor,coverImg:bookCoverImgData,pages:[{id:uid(),title:'Página 1',blocks:[]}],createdAt:new Date().toISOString()}
   books.push(book);gamification.stats.totalBooks=(gamification.stats.totalBooks||0)+1
-  await saveData();closeModal('modal-new-book');renderBooks();checkBadges();addXP(15,'Caderno criado! 📚')
+  await saveData();closeModal('modal-new-book');renderBooks();checkBadges();addXP(15,'Caderno criado! [L]')
 }
 async function deleteBook(bookId){
   if(!confirm('Excluir este caderno e todo seu conteúdo?'))return
@@ -2420,7 +2420,7 @@ function renderBlock(block){
     const mmId='mm_'+block.id.replace(/[^a-z0-9]/gi,'')
     content=`<div style="background:#f9fafb;border-radius:.85rem;padding:1.25rem;border:1.5px solid #e5e7eb">
     <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.85rem;flex-wrap:wrap">
-      <span style="font-size:.82rem;font-weight:700;color:#374151">🧠 Mapa Mental</span>
+      <span style="font-size:.82rem;font-weight:700;color:#374151">[C] Mapa Mental</span>
       <button onclick="addMMNode('${block.id}','child')" style="padding:.28rem .7rem;border-radius:.5rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#0038A8;color:white">+ Ramo</button>
       <button onclick="addMMNode('${block.id}','grandchild')" style="padding:.28rem .7rem;border-radius:.5rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#f3f4f6;color:#374151">+ Sub-ramo</button>
       <button onclick="clearMM('${block.id}')" style="padding:.28rem .7rem;border-radius:.5rem;font-size:.72rem;font-weight:700;border:none;cursor:pointer;background:#fee2e2;color:#dc2626">Limpar</button>
@@ -2428,16 +2428,16 @@ function renderBlock(block){
     <!-- Painel de emojis -->
     <div style="background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:.6rem;margin-bottom:.65rem">
       <div style="font-size:.68rem;color:#9ca3af;margin-bottom:.4rem">Selecione um nó e clique num emoji:</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.2rem">${['📚','📖','✏️','🎓','📐','🔬','💰','⚖️','💻','🌎','🧮','📊','✅','❌','⚠️','🔴','🟡','🟢','⭐','🔥','💡','🎯','🏆','💪','🧠','🎨','🗒️','⏱️','📅','🔑'].map(e=>`<button onclick="applyMMEmoji('${block.id}','${e}')" style="font-size:1.15rem;padding:.2rem;border:2px solid transparent;border-radius:.4rem;cursor:pointer;background:none;transition:all .12s" onmouseenter="this.style.background='#EEF3FF'" onmouseleave="this.style.background='none'">${e}</button>`).join('')}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.2rem">${['[L]','📖','✏️','[G]','📐','🔬','💰','⚖️','💻','🌎','🧮','[G]','[V]','[X]','⚠️','[!]','[~]','[OK]','[*]','[F]','[L]','[>]','[T]','💪','[C]','🎨','🗒️','[T]️','📅','🔑'].map(e=>`<button onclick="applyMMEmoji('${block.id}','${e}')" style="font-size:1.15rem;padding:.2rem;border:2px solid transparent;border-radius:.4rem;cursor:pointer;background:none;transition:all .12s" onmouseenter="this.style.background='#EEF3FF'" onmouseleave="this.style.background='none'">${e}</button>`).join('')}</div>
     </div>
-    <div style="font-size:.65rem;color:#9ca3af;margin-bottom:.4rem">💡 Clique no nó para selecionar • Duplo clique para editar • Arraste para mover</div>
+    <div style="font-size:.65rem;color:#9ca3af;margin-bottom:.4rem">[L] Clique no nó para selecionar • Duplo clique para editar • Arraste para mover</div>
     <div id="${mmId}" style="position:relative;width:100%;height:380px;background:linear-gradient(135deg,#f8faff,#f0f4ff);border-radius:.85rem;overflow:hidden;border:1px solid #e5e7eb">
       <svg id="svg_${mmId}" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></svg>
     </div></div>`
     div.innerHTML+=content
     container.appendChild(div)
     // Init mapa
-    if(!block.mmNodes){block.mmNodes=[{id:1,text:'Tema Central',emoji:'🧠',type:'central',x:280,y:190}];block.mmNextId=2;block.mmSelected=null}
+    if(!block.mmNodes){block.mmNodes=[{id:1,text:'Tema Central',emoji:'[C]',type:'central',x:280,y:190}];block.mmNextId=2;block.mmSelected=null}
     renderMM(block,mmId)
     return
   }
@@ -2553,7 +2553,7 @@ function applyMMEmoji(blockId,emoji){
 function clearMM(blockId){
   const block=getBlock(blockId);if(!block)return
   if(!confirm('Limpar mapa mental?'))return
-  block.mmNodes=[{id:1,text:'Tema Central',emoji:'🧠',type:'central',x:280,y:190}];block.mmNextId=2;block.mmSelected=null
+  block.mmNodes=[{id:1,text:'Tema Central',emoji:'[C]',type:'central',x:280,y:190}];block.mmNextId=2;block.mmSelected=null
   const mmId='mm_'+blockId.replace(/[^a-z0-9]/gi,'');renderMM(block,mmId)
 }
 function moveBlock(blockId,dir){
@@ -2571,7 +2571,7 @@ function deleteBlock(blockId){
 }
 async function saveBookPage(){
   syncEditableBlocks()
-  await saveData();showXPToast(0,'Caderno salvo! ✅')
+  await saveData();showXPToast(0,'Caderno salvo! [V]')
 }
 // ── Sanitiza HTML para prevenir XSS ──
 function sanitizeHTML(str){
@@ -2727,7 +2727,7 @@ async function exportBookPDF(){
 
     } else if(block.type==='mindmap'){
       blocksHTML += `<div style="margin-bottom:20px;">
-        <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">🧠 Mapa Mental</div>
+        <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">[C] Mapa Mental</div>
         ${mmToStaticSVG(block)}
       </div>`
     }
@@ -2872,7 +2872,7 @@ function renderNotesGrid(searchQuery=''){
   let filtered=notes;if(currentNoteFilter!=='all')filtered=filtered.filter(n=>n.type===currentNoteFilter)
   if(searchQuery){const q=searchQuery.toLowerCase();filtered=filtered.filter(n=>(n.title||'').toLowerCase().includes(q)||(n.preview||'').toLowerCase().includes(q))}
   if(!filtered.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9ca3af"><i class="fas fa-sticky-note" style="font-size:2.5rem;margin-bottom:1rem;opacity:.3"></i><p style="font-weight:600">${notes.length?'Nenhuma nota encontrada':'Nenhuma anotação ainda'}</p></div>`;return}
-  const tc={text:{icon:'📝',color:'#dbeafe',iconColor:'#1d4ed8',label:'Texto'},mindmap:{icon:'🧠',color:'#dcfce7',iconColor:'#15803d',label:'Mapa'},draw:{icon:'🎨',color:'#fef3c7',iconColor:'#92400e',label:'Desenho'},table:{icon:'📊',color:'#ede9fe',iconColor:'#6d28d9',label:'Tabela'}}
+  const tc={text:{icon:'📝',color:'#dbeafe',iconColor:'#1d4ed8',label:'Texto'},mindmap:{icon:'[C]',color:'#dcfce7',iconColor:'#15803d',label:'Mapa'},draw:{icon:'🎨',color:'#fef3c7',iconColor:'#92400e',label:'Desenho'},table:{icon:'[G]',color:'#ede9fe',iconColor:'#6d28d9',label:'Tabela'}}
   filtered.forEach(note=>{
     const t=tc[note.type||'text']||tc.text,div=document.createElement('div');div.className='notebook-card'
     div.onclick=()=>openEditNoteModal(note.id)
@@ -2962,7 +2962,7 @@ function filterRecursos(tipo){
 // RECOMPENSAS + CONFIGURAÇÕES
 // ═══════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════
-// 🔥 HEATMAP DE ESTUDOS
+// [F] HEATMAP DE ESTUDOS
 // ═══════════════════════════════════════════════════
 function renderHeatmap(){
   if(!requirePlan('heatmap','basico'))return;
@@ -2998,9 +2998,9 @@ function renderHeatmap(){
 
   const summaryData = [
     { label:'Dias estudados',  value: totalDays,           icon:'📅', color:'#dbeafe', fg:'#1d4ed8' },
-    { label:'Total estudado',  value: fmtMins(totalMins),  icon:'⏱️',  color:'#dcfce7', fg:'#15803d' },
-    { label:'Streak atual',    value: streak + ' dias 🔥', icon:'🔥', color:'#fef3c7', fg:'#92400e' },
-    { label:'Melhor dia',      value: bestDay ? fmtMins(bestDay[1]) : '—', icon:'🏆', color:'#ede9fe', fg:'#6d28d9' },
+    { label:'Total estudado',  value: fmtMins(totalMins),  icon:'[T]️',  color:'#dcfce7', fg:'#15803d' },
+    { label:'Streak atual',    value: streak + ' dias [F]', icon:'[F]', color:'#fef3c7', fg:'#92400e' },
+    { label:'Melhor dia',      value: bestDay ? fmtMins(bestDay[1]) : '—', icon:'[T]', color:'#ede9fe', fg:'#6d28d9' },
   ]
   const cardsEl = document.getElementById('heatmap-summary-cards')
   cardsEl.innerHTML = summaryData.map(c => `
@@ -3157,7 +3157,7 @@ function renderRewards(){
   document.getElementById('rewards-level-name').textContent=`${lv.icon} ${lv.name}`
   document.getElementById('rewards-xp-text').textContent=`${xp} XP total`
   document.getElementById('rewards-level-bar').style.width=pct+'%'
-  document.getElementById('rewards-next-level').textContent=next?`Próximo (${next.icon} ${next.name}): ${next.minXP} XP`:'🎉 Nível máximo!'
+  document.getElementById('rewards-next-level').textContent=next?`Próximo (${next.icon} ${next.name}): ${next.minXP} XP`:'(!) Nível máximo!'
   const s=gamification.stats
   document.getElementById('rewards-stats').innerHTML=[
     ['fas fa-stopwatch','Sessões',s.totalSessions||0],['fas fa-brain','Revisões',s.totalReviews||0],
@@ -3176,7 +3176,7 @@ function renderSettings(){if(profile){document.getElementById('settings-name').v
 async function saveSettings(){
   const name=document.getElementById('settings-name').value.trim();if(!name){shakeEl('settings-name');return}
   profile.name=name;profile.dailyGoalH=parseInt(document.getElementById('settings-daily').value)||2;profile.monthlyGoalH=parseInt(document.getElementById('settings-monthly').value)||60
-  await saveData();updateHeaderUser();showXPToast(0,'Configurações salvas! ✅')
+  await saveData();updateHeaderUser();showXPToast(0,'Configurações salvas! [V]')
 }
 
 // ═══════════════════════════════════════════════════
@@ -3336,7 +3336,7 @@ const CRONO_DAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
 const CRONO_HOURS = ['05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00']
 const CRONO_TYPES = [
   {id:'',label:'Livre',bg:'white',border:'#e5e7eb',text:'#9ca3af'},
-  {id:'study',label:'📚 Estudo',bg:'#dbeafe',border:'#0038A8',text:'#1d4ed8'},
+  {id:'study',label:'[L] Estudo',bg:'#dbeafe',border:'#0038A8',text:'#1d4ed8'},
   {id:'personal',label:'🏃 Pessoal',bg:'#dcfce7',border:'#16a34a',text:'#15803d'},
   {id:'work',label:'💼 CLT',bg:'#ede9fe',border:'#7c3aed',text:'#6d28d9'},
   {id:'meal',label:'🍽️ Refeição',bg:'#fef3c7',border:'#d97706',text:'#92400e'},
@@ -3352,7 +3352,7 @@ function loadCronograma() {
 
 async function saveCronograma() {
   await saveData()
-  showXPToast(0, 'Cronograma salvo! ✅')
+  showXPToast(0, 'Cronograma salvo! [V]')
 }
 
 async function clearCronograma() {
@@ -3479,7 +3479,7 @@ function saveCronoCell(dayIdx, hourIdx) {
   if (m) m.remove()
   // Re-render grid
   renderCronograma()
-  showXPToast(0, 'Horário salvo! ✅')
+  showXPToast(0, 'Horário salvo! [V]')
 }
 
 function clearCronoCell(dayIdx, hourIdx) {
@@ -3503,7 +3503,7 @@ async function saveDistribuicao() {
     if (inp) _distribuicao[String(s.id)] = parseFloat(inp.value) || 0
   })
   await saveData()
-  showXPToast(0, 'Distribuição salva! ✅')
+  showXPToast(0, 'Distribuição salva! [V]')
   renderDistribuicao()
 }
 
@@ -3923,7 +3923,7 @@ async function adminChangePlan(uid, plan) {
     // Atualiza local sem recarregar tudo
     if (userObj) userObj.plan = plan
     if (uid === _uid) { _userPlan = plan; updateHeaderUser() }
-    if (btn) { btn.textContent = '✅'; btn.style.background = '#10b981' }
+    if (btn) { btn.textContent = '[V]'; btn.style.background = '#10b981' }
     // Atualiza só a linha da tabela visualmente
     const sel = document.getElementById('sel-' + _safe)
     if (sel) {
@@ -3931,14 +3931,14 @@ async function adminChangePlan(uid, plan) {
       sel.options[0].text = (planLbl[plan]||plan.toUpperCase()) + ' (atual)'
       sel.options[0].value = plan
     }
-    showXPToast(0, `✅ Plano de ${userName.split(' ')[0]} atualizado!`)
+    showXPToast(0, `[V] Plano de ${userName.split(' ')[0]} atualizado!`)
     adminUpdateStats(_adminUsers)
     setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8'; btn.disabled = false } }, 2000)
   } catch (e) {
     if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
     setTimeout(() => { if (btn) { btn.textContent = 'Salvar'; btn.style.background = '#0038A8' } }, 2500)
     IS_DEV&&console.error('adminChangePlan error:', e)
-    alert('❌ Erro ao salvar: ' + e.message)
+    alert('[X] Erro ao salvar: ' + e.message)
   }
 }
 
@@ -4061,7 +4061,7 @@ async function loadPlanTemplate(templateId) {
 
   // 5. Criar cadernos automaticamente
   const bookColors = ['#0038A8','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2']
-  const bookEmojis = ['📚','📖','✏️','🎓','📐','🔬']
+  const bookEmojis = ['[L]','📖','✏️','[G]','📐','🔬']
   let booksCreated = 0
   tpl.books.forEach((bookName, i) => {
     const exists = books.find(b => b.name === bookName)
@@ -4086,9 +4086,9 @@ async function loadPlanTemplate(templateId) {
   await saveData()
 
   // 7. Feedback com toasts
-  showXPToast(0, `✅ Plano "${tpl.name}" carregado!`)
+  showXPToast(0, `[V] Plano "${tpl.name}" carregado!`)
   if (booksCreated > 0) {
-    setTimeout(() => showXPToast(0, `📚 ${booksCreated} caderno(s) criado(s) automaticamente!`), 1600)
+    setTimeout(() => showXPToast(0, `[L] ${booksCreated} caderno(s) criado(s) automaticamente!`), 1600)
   }
 
   // 8. Re-renderizar
@@ -4113,11 +4113,11 @@ async function adminDeleteUser(uid) {
     _adminUsers = _adminUsers.filter(u => u.uid !== uid)
     adminRenderTable(_adminUsers)
     adminUpdateStats(_adminUsers)
-    showXPToast(0, '✅ Usuário excluído.')
+    showXPToast(0, '[V] Usuário excluído.')
   } catch(e) {
     if (btn) { btn.textContent = 'Erro!'; btn.style.background = '#dc2626'; btn.disabled = false }
     setTimeout(() => { if (btn) { btn.textContent = 'Excluir'; btn.disabled = false } }, 2500)
-    alert('❌ Erro: ' + e.message)
+    alert('[X] Erro: ' + e.message)
   }
 }
 
@@ -4434,7 +4434,7 @@ function renderBancoQuestoes() {
     const cores = {portugues:'#1A3D9E',matematica:'#7C3AED',bancarios:'#D4A017',atualidades:'#1A7A4A',informatica:'#C0392B'};
     const nomes = {portugues:'Português',matematica:'Matemática',bancarios:'Conh. Bancários',atualidades:'Atualidades',informatica:'Informática'};
     const cor = cores[q.materia] || '#888';
-    const status = resp === true ? '✅' : resp === false ? '❌' : '⬜';
+    const status = resp === true ? '[V]' : resp === false ? '[X]' : '⬜';
     return `<div style="background:#fff;border-radius:14px;padding:1rem;box-shadow:0 1px 8px rgba(0,27,94,.07);border-left:3px solid ${cor}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
         <span style="background:${cor}20;color:${cor};padding:.15rem .5rem;border-radius:20px;font-size:.68rem;font-weight:700">${nomes[q.materia]}</span>
@@ -4447,7 +4447,7 @@ function renderBancoQuestoes() {
             style="text-align:left;padding:.5rem .75rem;border-radius:8px;border:1.5px solid ${respondida && ai === q.alternativas.indexOf(q.gabarito) ? '#1A7A4A' : respondida && q.alternativas[ai] === q.alternativas[ai] && resp === false && alt.startsWith(q.gabarito+')') ? '#1A7A4A' : '#e8eaf0'};background:${respondida && alt.startsWith(q.gabarito+')') ? '#E4F8EE' : '#f5f7fc'};color:#0D1F4C;font-size:.8rem;cursor:${respondida ? 'default' : 'pointer'};width:100%">${alt}</button>
         `).join('')}
       </div>
-      ${respondida ? `<div style="margin-top:.6rem;padding:.6rem;background:#f0f9ff;border-radius:8px;font-size:.75rem;color:#555;line-height:1.4"><strong>💡 ${q.gabarito}</strong> — ${q.comentario}</div>` : ''}
+      ${respondida ? `<div style="margin-top:.6rem;padding:.6rem;background:#f0f9ff;border-radius:8px;font-size:.75rem;color:#555;line-height:1.4"><strong>[L] ${q.gabarito}</strong> — ${q.comentario}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -4469,10 +4469,10 @@ function responderQuestao(qId, altIdx) {
       localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
     }
     if (typeof addXP === 'function') addXP(2);
-    if (typeof showToast === 'function') showToast('❌ Errado! Questão adicionada ao caderno de erros.');
+    if (typeof showToast === 'function') showToast('[X] Errado! Questão adicionada ao caderno de erros.');
   } else {
     if (typeof addXP === 'function') addXP(10);
-    if (typeof showToast === 'function') showToast('✅ Correto! +10 XP');
+    if (typeof showToast === 'function') showToast('[V] Correto! +10 XP');
   }
   renderBancoQuestoes();
 }
@@ -4541,7 +4541,7 @@ function selecionarAlternativaSimulado(idx) {
     localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
   }
   document.getElementById('sim-btn-proximo').style.display = 'block';
-  if (simQuestaoIdx === simuladoAtivo.numQuestoes - 1) document.getElementById('sim-btn-proximo').textContent = '✅ Ver Resultado';
+  if (simQuestaoIdx === simuladoAtivo.numQuestoes - 1) document.getElementById('sim-btn-proximo').textContent = '[V] Ver Resultado';
 }
 
 function proximaQuestaoSimulado() {
@@ -4594,7 +4594,7 @@ function encerrarSimulado(salvar) {
   document.getElementById('sim-res-erros').textContent = erros;
   document.getElementById('sim-res-taxa').textContent = taxa + '%';
   document.getElementById('sim-res-tempo').textContent = String(tm).padStart(2,'0') + ':' + String(ts).padStart(2,'0');
-  document.getElementById('sim-emoji-resultado').textContent = taxa >= 70 ? '🏆' : taxa >= 50 ? '📚' : '💪';
+  document.getElementById('sim-emoji-resultado').textContent = taxa >= 70 ? '[T]' : taxa >= 50 ? '[L]' : '💪';
   
   // Por matéria
   const porMateria = {};
@@ -4662,7 +4662,7 @@ function renderCadernoErros(filtro) {
 sadas' ? revisadas : cadernoErros;
   if (itens.length === 0) {
     lista.innerHTML = `<div style="text-align:center;padding:3rem 1rem">
-      <div style="font-size:3rem;margin-bottom:.5rem">${filtro==='pendentes'?'🎉':'📋'}</div>
+      <div style="font-size:3rem;margin-bottom:.5rem">${filtro==='pendentes'?'(!)':'[E]'}</div>
       <div style="font-weight:700;color:#001B5E;margin-bottom:.25rem">${filtro==='pendentes'?'Nenhuma questão pendente!':'Nenhuma questão aqui'}</div>
       <div style="font-size:.82rem;color:#888">${filtro==='pendentes'?'Ótimo trabalho! Continue resolvendo questões.':'Resolva questões para preencher o caderno de erros.'}</div>
       <button onclick="navigateTo('questoes')" style="margin-top:1rem;background:#001B5E;color:#fff;border:none;padding:.75rem 1.5rem;border-radius:12px;font-weight:700;cursor:pointer">Resolver Questões</button>
@@ -4682,11 +4682,11 @@ sadas' ? revisadas : cadernoErros;
       </div>
       <p style="font-size:.8rem;line-height:1.4;color:#0D1F4C;margin-bottom:.6rem">${q.enunciado.slice(0,120)}...</p>
       <div style="background:#f0f4ff;padding:.5rem .75rem;border-radius:8px;font-size:.75rem;color:#555;margin-bottom:.6rem">
-        <strong>✅ Gabarito: ${q.gabarito}</strong> — ${q.comentario.slice(0,80)}...
+        <strong>[V] Gabarito: ${q.gabarito}</strong> — ${q.comentario.slice(0,80)}...
       </div>
       <div style="display:flex;gap:.5rem">
         <button onclick="marcarRevisada('${e.qId}')" style="flex:1;background:${e.revisada?'#E4F8EE':'#001B5E'};color:${e.revisada?'#1A7A4A':'#fff'};border:none;padding:.45rem;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer">
-          ${e.revisada?'✅ Revisada':'Marcar como revisada'}
+          ${e.revisada?'[V] Revisada':'Marcar como revisada'}
         </button>
         <button onclick="removerErro('${e.qId}')" style="background:#fdeef0;color:#C0392B;border:none;padding:.45rem .75rem;border-radius:8px;font-size:.75rem;cursor:pointer">🗑️</button>
       </div>
@@ -4710,7 +4710,7 @@ function marcarRevisada(qId) {
     localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
     renderCadernoErros('pendentes');
     if (typeof addXP === 'function') addXP(5);
-    if (typeof showToast === 'function') showToast('✅ Questão revisada! +5 XP');
+    if (typeof showToast === 'function') showToast('[V] Questão revisada! +5 XP');
   }
 }
 
