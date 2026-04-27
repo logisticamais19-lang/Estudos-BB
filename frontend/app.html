@@ -2790,7 +2790,7 @@ async function exportBookPDF(){
 // ═══════════════════════════════════════════════════
 // NOTAS RÁPIDAS
 // ---
-function renderNotebook(); if(to==='questoes')setTimeout(renderBancoQuestoes,100); if(to==='erros')setTimeout(()=>renderCadernoErros('pendentes'),100); if(to==='simulado')reiniciarSimuladoTela();{renderNotesGrid()}
+renderNotebook(); if(to==='questoes')setTimeout(renderBancoQuestoes,100); if(to==='erros')setTimeout(()=>renderCadernoErros('pendentes'),100); if(to==='simulado')reiniciarSimuladoTela();{renderNotesGrid()}
 function openNewNoteModal(){
   editingNoteId=null;currentNoteType='text'
   document.getElementById('note-title-input').value=''
