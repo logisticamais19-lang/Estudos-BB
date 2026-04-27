@@ -2789,7 +2789,7 @@ async function exportBookPDF(){
 
 // ═══════════════════════════════════════════════════
 // NOTAS RÁPIDAS
-// ═══════════════════════════════════════════════════
+// ---
 function renderNotebook(); if(to==='questoes')setTimeout(renderBancoQuestoes,100); if(to==='erros')setTimeout(()=>renderCadernoErros('pendentes'),100); if(to==='simulado')reiniciarSimuladoTela();{renderNotesGrid()}
 function openNewNoteModal(){
   editingNoteId=null;currentNoteType='text'
@@ -4657,7 +4657,7 @@ function renderCadernoErros(filtro) {
   if (el1) el1.textContent = pendentes.length;
   if (el2) el2.textContent = revisadas.length;
   if (el3) el3.textContent = cadernoErros.length;
-  
+
   let itens = filtro === 'pendentes' ? pendentes : filtro === 'revi
 sadas' ? revisadas : cadernoErros;
   if (itens.length === 0) {
