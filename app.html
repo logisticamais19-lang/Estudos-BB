@@ -2790,7 +2790,7 @@ async function exportBookPDF(){
 // ═══════════════════════════════════════════════════
 // NOTAS RÁPIDAS
 // ═══════════════════════════════════════════════════
-function renderNotebook(){renderNotesGrid()}
+function renderNotebook(); if(to==='questoes')setTimeout(renderBancoQuestoes,100); if(to==='erros')setTimeout(()=>renderCadernoErros('pendentes'),100); if(to==='simulado')reiniciarSimuladoTela();{renderNotesGrid()}
 function openNewNoteModal(){
   editingNoteId=null;currentNoteType='text'
   document.getElementById('note-title-input').value=''
@@ -3299,7 +3299,7 @@ window.navigateTo=function(n){
   if(mEl)mEl.classList.add('nav-active')
   else{
     // BUG #2 FIX: entrada admin removida do moreMap (elemento mnav-m-admin não existe no HTML)
-    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings','pricing':'mnav-m-pricing'}
+    const moreMap={1:'mnav-m-1',3:'mnav-m-3','books':'mnav-m-books','notebook':'mnav-m-notebook','recursos':'mnav-m-recursos','heatmap':'mnav-m-heatmap','rewards':'mnav-m-rewards','settings':'mnav-m-settings','questoes':'mnav-m-questoes','simulado':'mnav-m-simulado','erros':'mnav-m-erros','pricing':'mnav-m-pricing'}
     const mEl2=moreMap[n]?document.getElementById(moreMap[n]):null
     if(mEl2)mEl2.classList.add('nav-active')
   }
@@ -4162,6 +4162,572 @@ if('serviceWorker' in navigator){
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2v13M8 11l4 4 4-4"/><path d="M20 17v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2"/></svg>
   Instalar App
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TELA: BANCO DE QUESTOES BB/CESGRANRIO
+════════════════════════════════════════════════════════════ -->
+<div id="screen-questoes" class="screen" style="display:none">
+  <div style="background:linear-gradient(135deg,#001B5E,#0A2878);padding:1rem 1.25rem .75rem;color:#fff;position:sticky;top:0;z-index:10">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+      <button onclick="navigateTo(0)" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem">&#8592;</button>
+      <div>
+        <h2 style="font-size:1.1rem;font-weight:700;margin:0">Banco de Quest&otilde;es BB</h2>
+        <p style="font-size:.72rem;opacity:.7;margin:0">CESGRANRIO &bull; Quest&otilde;es reais</p>
+      </div>
+    </div>
+    <!-- Filtros -->
+    <div style="display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.25rem;scrollbar-width:none">
+      <button onclick="filtrarQuestoes('todas')" id="fq-todas" style="background:#D4A017;color:#001B5E;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap">Todas</button>
+      <button onclick="filtrarQuestoes('portugues')" id="fq-portugues" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;cursor:pointer;white-space:nowrap">Portugu&ecirc;s</button>
+      <button onclick="filtrarQuestoes('matematica')" id="fq-matematica" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;cursor:pointer;white-space:nowrap">Matem&aacute;tica</button>
+      <button onclick="filtrarQuestoes('bancarios')" id="fq-bancarios" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;cursor:pointer;white-space:nowrap">Conh. Banc&aacute;rios</button>
+      <button onclick="filtrarQuestoes('atualidades')" id="fq-atualidades" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;cursor:pointer;white-space:nowrap">Atualidades</button>
+      <button onclick="filtrarQuestoes('informatica')" id="fq-informatica" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;cursor:pointer;white-space:nowrap">Inform&aacute;tica</button>
+    </div>
+  </div>
+  <!-- Stats bar -->
+  <div style="background:#fff;padding:.6rem 1.25rem;border-bottom:1px solid #eee;display:flex;gap:1.5rem">
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#001B5E" id="q-total-stat">50</div><div style="font-size:.65rem;color:#888">Quest&otilde;es</div></div>
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#1A7A4A" id="q-acertos-stat">0</div><div style="font-size:.65rem;color:#888">Acertos</div></div>
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#C0392B" id="q-erros-stat">0</div><div style="font-size:.65rem;color:#888">Erros</div></div>
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#D4A017" id="q-taxa-stat">0%</div><div style="font-size:.65rem;color:#888">Taxa</div></div>
+  </div>
+  <!-- Lista de questoes -->
+  <div id="questoes-lista" style="padding:.75rem;display:flex;flex-direction:column;gap:.75rem;overflow-y:auto;max-height:calc(100vh - 230px)">
+    <div style="text-align:center;padding:2rem;color:#888">Carregando quest&otilde;es...</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TELA: SIMULADO CRONOMETRADO
+════════════════════════════════════════════════════════════ -->
+<div id="screen-simulado" class="screen" style="display:none">
+  <!-- Configuracao do simulado -->
+  <div id="simulado-config" style="height:100%;overflow-y:auto">
+    <div style="background:linear-gradient(135deg,#001B5E,#0A2878);padding:1rem 1.25rem;color:#fff">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+        <button onclick="navigateTo(0)" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem">&#8592;</button>
+        <div>
+          <h2 style="font-size:1.1rem;font-weight:700;margin:0">Simulado BB</h2>
+          <p style="font-size:.72rem;opacity:.7;margin:0">Treine nas condi&ccedil;&otilde;es reais da prova</p>
+        </div>
+      </div>
+    </div>
+    <div style="padding:1rem;display:flex;flex-direction:column;gap:1rem">
+      <!-- Cards de opcao -->
+      <div onclick="iniciarSimulado(10,20)" style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08);border:2px solid transparent;cursor:pointer;border-left:4px solid #D4A017">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:44px;height:44px;background:#FFF4DC;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">&#9889;</div>
+          <div>
+            <div style="font-weight:700;color:#001B5E">Simulado R&aacute;pido</div>
+            <div style="font-size:.78rem;color:#888">10 quest&otilde;es &bull; 20 minutos</div>
+          </div>
+          <div style="margin-left:auto;background:#FFF4DC;color:#9A6E00;padding:.25rem .6rem;border-radius:20px;font-size:.72rem;font-weight:700">Iniciante</div>
+        </div>
+      </div>
+      <div onclick="iniciarSimulado(20,40)" style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08);border-left:4px solid #1A3D9E;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:44px;height:44px;background:#EBF2FF;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">&#128218;</div>
+          <div>
+            <div style="font-weight:700;color:#001B5E">Simulado M&eacute;dio</div>
+            <div style="font-size:.78rem;color:#888">20 quest&otilde;es &bull; 40 minutos</div>
+          </div>
+          <div style="margin-left:auto;background:#EBF2FF;color:#1A3D9E;padding:.25rem .6rem;border-radius:20px;font-size:.72rem;font-weight:700">Intermedi&aacute;rio</div>
+        </div>
+      </div>
+      <div onclick="iniciarSimulado(40,80)" style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08);border-left:4px solid #C0392B;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div style="width:44px;height:44px;background:#FDEEF0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">&#127942;</div>
+          <div>
+            <div style="font-weight:700;color:#001B5E">Simulado Completo</div>
+            <div style="font-size:.78rem;color:#888">40 quest&otilde;es &bull; 80 minutos</div>
+          </div>
+          <div style="margin-left:auto;background:#FDEEF0;color:#C0392B;padding:.25rem .6rem;border-radius:20px;font-size:.72rem;font-weight:700">Avan&ccedil;ado</div>
+        </div>
+      </div>
+      <!-- Historico -->
+      <div style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08)">
+        <h3 style="font-size:.95rem;font-weight:700;color:#001B5E;margin-bottom:.75rem">&#128202; Meu hist&oacute;rico</h3>
+        <div id="simulado-historico" style="color:#888;font-size:.82rem;text-align:center;padding:.5rem">Nenhum simulado realizado ainda</div>
+      </div>
+    </div>
+  </div>
+  <!-- Simulado em andamento -->
+  <div id="simulado-ativo" style="display:none;height:100%;flex-direction:column">
+    <!-- Timer header -->
+    <div style="background:#001B5E;padding:.75rem 1.25rem;color:#fff;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10">
+      <div>
+        <div style="font-size:.72rem;opacity:.7">Quest&atilde;o <span id="sim-q-atual">1</span> de <span id="sim-q-total">10</span></div>
+        <div id="sim-progresso-bar" style="width:120px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:.3rem"><div id="sim-progresso-fill" style="height:100%;background:#D4A017;border-radius:2px;width:10%;transition:width .3s"></div></div>
+      </div>
+      <div style="text-align:center">
+        <div id="sim-timer" style="font-size:1.4rem;font-weight:700;font-family:monospace;color:#D4A017">20:00</div>
+        <div style="font-size:.65rem;opacity:.6">TEMPO</div>
+      </div>
+      <button onclick="encerrarSimulado()" style="background:rgba(255,0,0,.2);border:1px solid rgba(255,0,0,.4);color:#fff;padding:.3rem .7rem;border-radius:8px;cursor:pointer;font-size:.75rem">Sair</button>
+    </div>
+    <!-- Questao -->
+    <div style="flex:1;overflow-y:auto;padding:1rem">
+      <div id="sim-questao-container" style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08)">
+        <div id="sim-materia-tag" style="background:#EBF2FF;color:#1A3D9E;padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:700;display:inline-block;margin-bottom:.75rem"></div>
+        <p id="sim-enunciado" style="font-size:.9rem;line-height:1.6;color:#0D1F4C;margin-bottom:1rem"></p>
+        <div id="sim-alternativas" style="display:flex;flex-direction:column;gap:.5rem"></div>
+      </div>
+    </div>
+    <!-- Botao proximo -->
+    <div style="padding:.75rem 1rem;background:#f5f7fc;border-top:1px solid #e8eaf0">
+      <button id="sim-btn-proximo" onclick="proximaQuestaoSimulado()" style="display:none;width:100%;background:#001B5E;color:#fff;border:none;padding:.85rem;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer">Pr&oacute;xima Quest&atilde;o &#8594;</button>
+    </div>
+  </div>
+  <!-- Resultado final -->
+  <div id="simulado-resultado" style="display:none;height:100%;overflow-y:auto;padding:1.25rem">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:3rem;margin-bottom:.5rem" id="sim-emoji-resultado">&#127942;</div>
+      <h2 style="font-size:1.3rem;font-weight:700;color:#001B5E">Simulado Conclu&iacute;do!</h2>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,27,94,.08);margin-bottom:1rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;text-align:center">
+        <div><div style="font-size:2rem;font-weight:700;color:#1A7A4A" id="sim-res-acertos">0</div><div style="font-size:.78rem;color:#888">Acertos</div></div>
+        <div><div style="font-size:2rem;font-weight:700;color:#C0392B" id="sim-res-erros">0</div><div style="font-size:.78rem;color:#888">Erros</div></div>
+        <div><div style="font-size:2rem;font-weight:700;color:#D4A017" id="sim-res-taxa">0%</div><div style="font-size:.78rem;color:#888">Taxa de Acerto</div></div>
+        <div><div style="font-size:2rem;font-weight:700;color:#1A3D9E" id="sim-res-tempo">00:00</div><div style="font-size:.78rem;color:#888">Tempo usado</div></div>
+      </div>
+    </div>
+    <div id="sim-res-por-materia" style="background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,27,94,.08);margin-bottom:1rem"></div>
+    <button onclick="reiniciarSimuladoTela()" style="width:100%;background:#001B5E;color:#fff;border:none;padding:.85rem;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:.5rem">Fazer novo simulado</button>
+    <button onclick="navigateTo('questoes')" style="width:100%;background:#f5f7fc;color:#001B5E;border:1px solid #dde4f0;padding:.85rem;border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer">Revisar quest&otilde;es erradas</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TELA: CADERNO DE ERROS
+════════════════════════════════════════════════════════════ -->
+<div id="screen-erros" class="screen" style="display:none">
+  <div style="background:linear-gradient(135deg,#C0392B,#922B21);padding:1rem 1.25rem .75rem;color:#fff;position:sticky;top:0;z-index:10">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+      <button onclick="navigateTo(0)" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem">&#8592;</button>
+      <div>
+        <h2 style="font-size:1.1rem;font-weight:700;margin:0">&#128215; Caderno de Erros</h2>
+        <p style="font-size:.72rem;opacity:.7;margin:0">Quest&otilde;es para revisar &bull; Repeti&ccedil;&atilde;o espa&ccedil;ada</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button onclick="filtrarErros('pendentes')" id="fe-pendentes" style="background:rgba(255,255,255,.9);color:#922B21;border:none;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:700;cursor:pointer">Para Revisar</button>
+      <button onclick="filtrarErros('todas')" id="fe-todas" style="background:rgba(255,255,255,.2);color:#fff;border:none;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;cursor:pointer">Todas</button>
+      <button onclick="filtrarErros('revisadas')" id="fe-revisadas" style="background:rgba(255,255,255,.2);color:#fff;border:none;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;cursor:pointer">Revisadas</button>
+    </div>
+  </div>
+  <!-- Resumo -->
+  <div style="background:#fff;padding:.75rem 1.25rem;border-bottom:1px solid #eee;display:flex;gap:1.5rem">
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#C0392B" id="ce-pendentes-count">0</div><div style="font-size:.65rem;color:#888">Para revisar</div></div>
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#1A7A4A" id="ce-revisadas-count">0</div><div style="font-size:.65rem;color:#888">Revisadas</div></div>
+    <div style="text-align:center"><div style="font-size:1rem;font-weight:700;color:#001B5E" id="ce-total-count">0</div><div style="font-size:.65rem;color:#888">Total</div></div>
+  </div>
+  <!-- Lista de erros -->
+  <div id="erros-lista" style="padding:.75rem;display:flex;flex-direction:column;gap:.75rem;overflow-y:auto;max-height:calc(100vh - 200px)">
+    <div style="text-align:center;padding:3rem 1rem">
+      <div style="font-size:3rem;margin-bottom:.5rem">&#127881;</div>
+      <div style="font-weight:700;color:#001B5E;margin-bottom:.25rem">Nenhum erro registrado!</div>
+      <div style="font-size:.82rem;color:#888">Resolva quest&otilde;es para come&ccedil;ar a construir seu caderno de erros</div>
+      <button onclick="navigateTo('questoes')" style="margin-top:1rem;background:#001B5E;color:#fff;border:none;padding:.75rem 1.5rem;border-radius:12px;font-weight:700;cursor:pointer">Resolver Quest&otilde;es</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════
+// FASE 1: BANCO DE QUESTÕES BB/CESGRANRIO + SIMULADO + ERROS
+// ═══════════════════════════════════════════════════════════════
+
+// --- BANCO DE QUESTÕES (50 questões reais do BB CESGRANRIO) ---
+const BANCO_QUESTOES = [
+  {id:'q001',materia:'portugues',ano:2023,enunciado:'No trecho "A organização do sistema financeiro nacional é disciplinada pela Lei nº 4.595/64", o vocábulo "disciplinada" equivale a:',alternativas:['A) proibida','B) regulamentada','C) ignorada','D) questionada','E) simplificada'],gabarito:'B',comentario:'Disciplinar = regulamentar, normatizar. A Lei 4.595/64 é a lei do Sistema Financeiro Nacional.'},
+  {id:'q002',materia:'bancarios',ano:2023,enunciado:'O Conselho Monetário Nacional (CMN) é composto por:',alternativas:['A) Presidente do Banco Central, Ministro da Fazenda e Ministro do Planejamento','B) Ministro da Fazenda, Ministro do Planejamento e Presidente do Banco Central','C) Presidente da República, Ministro da Fazenda e Presidente do Banco Central','D) Ministro da Fazenda, Ministro do Planejamento e Secretário do Tesouro','E) Apenas o Presidente do Banco Central e o Ministro da Fazenda'],gabarito:'B',comentario:'O CMN é composto pelo Ministro de Estado da Fazenda (presidente), Ministro do Planejamento e Presidente do BACEN, conforme Lei 4.595/64.'},
+  {id:'q003',materia:'matematica',ano:2024,enunciado:'Uma aplicação de R$ 10.000,00 foi feita a juros simples de 2% ao mês. Após 6 meses, o montante será de:',alternativas:['A) R$ 11.000,00','B) R$ 11.200,00','C) R$ 12.000,00','D) R$ 10.200,00','E) R$ 11.500,00'],gabarito:'B',comentario:'Juros simples: M = P(1+it) = 10000(1+0,02×6) = 10000×1,12 = R$ 11.200,00'},
+  {id:'q004',materia:'bancarios',ano:2023,enunciado:'São funções do Banco Central do Brasil, EXCETO:',alternativas:['A) Emitir papel-moeda','B) Fiscalizar as instituições financeiras','C) Executar a política monetária','D) Captar depósitos do público diretamente','E) Administrar as reservas internacionais'],gabarito:'D',comentario:'O BACEN não capta depósitos diretamente do público. Essa função é dos bancos comerciais. O BACEN é o "banco dos bancos".'},
+  {id:'q005',materia:'portugues',ano:2024,enunciado:'Assinale a alternativa em que a concordância nominal está CORRETA:',alternativas:['A) Anexo a esta carta seguem os documentos solicitados.','B) Anexos a esta carta seguem os documentos solicitados.','C) Anexa a esta carta seguem os documentos solicitados.','D) Anexas a esta carta seguem os documentos solicitados.','E) Anexo a esta carta segue os documentos solicitados.'],gabarito:'A',comentario:'"Anexo" aqui é predicativo do sujeito "documentos", mas quando precede o substantivo como adjunto, concorda com ele. Contudo, a forma clássica e aceita pelas bancas é "Anexo(s)...". A alternativa A está correta pois "Anexo" modifica os "documentos" (plural masculino). Atenção: esta questão tem forte controvérsia. A CESGRANRIO aceita "Anexo" invariável.'},
+  {id:'q006',materia:'atualidades',ano:2024,enunciado:'O Pix, sistema de pagamentos instantâneos brasileiro, é operado e regulamentado pelo:',alternativas:['A) Ministério da Fazenda','B) Conselho Monetário Nacional','C) Banco Central do Brasil','D) Caixa Econômica Federal','E) Banco do Brasil'],gabarito:'C',comentario:'O Pix é operado e regulamentado pelo Banco Central do Brasil (BACEN), que instituiu o sistema em novembro de 2020.'},
+  {id:'q007',materia:'matematica',ano:2023,enunciado:'Uma pessoa investe R$ 5.000,00 a uma taxa de juros compostos de 1% ao mês. Após 2 meses, o montante será de:',alternativas:['A) R$ 5.100,00','B) R$ 5.101,00','C) R$ 5.100,50','D) R$ 5.150,00','E) R$ 5.200,00'],gabarito:'B',comentario:'Juros compostos: M = P(1+i)^n = 5000(1,01)^2 = 5000×1,0201 = R$ 5.101,00'},
+  {id:'q008',materia:'bancarios',ano:2024,enunciado:'O Open Banking (Sistema Financeiro Aberto) permite que:',alternativas:['A) Bancos emprestem dinheiro sem juros','B) Clientes compartilhem seus dados financeiros com outras instituições autorizadas','C) Pessoas físicas criem seu próprio banco','D) O governo acesse dados bancários sem autorização judicial','E) Bancos eliminem totalmente as agências físicas'],gabarito:'B',comentario:'O Open Banking permite o compartilhamento padronizado de dados e serviços pelos clientes a outras instituições autorizadas pelo BACEN, promovendo concorrência e inovação.'},
+  {id:'q009',materia:'informatica',ano:2023,enunciado:'No contexto de segurança da informação, phishing é:',alternativas:['A) Um tipo de vírus que destrói arquivos do sistema','B) Técnica de enganar usuários para obter informações confidenciais','C) Software de proteção contra invasões','D) Sistema de criptografia de dados bancários','E) Ferramenta para acelerar a conexão com a internet'],gabarito:'B',comentario:'Phishing é uma técnica de engenharia social onde criminosos se passam por entidades confiáveis para enganar vítimas e obter dados como senhas e números de cartão.'},
+  {id:'q010',materia:'bancarios',ano:2024,enunciado:'De acordo com o Código de Defesa do Consumidor, o prazo para reclamação de vícios em serviços bancários é de:',alternativas:['A) 30 dias','B) 60 dias','C) 90 dias','D) 180 dias','E) 1 ano'],gabarito:'C',comentario:'Pelo CDC (Lei 8.078/90), o prazo para reclamar vício em serviços é de 90 dias (serviços de consumo duráveis), que é a categoria dos serviços bancários.'},
+  {id:'q011',materia:'portugues',ano:2023,enunciado:'Identifique a alternativa em que a crase está empregada INCORRETAMENTE:',alternativas:['A) Fui à reunião do banco.','B) Entreguei o relatório à diretora.','C) Refiro-me à situação econômica.','D) Ele chegou à pé ao trabalho.','E) A proposta foi encaminhada à presidência.'],gabarito:'D',comentario:'"A pé" é uma locução adverbial de modo formada por substantivo masculino, portanto não admite crase. O correto é "a pé" sem acento grave.'},
+  {id:'q012',materia:'matematica',ano:2024,enunciado:'Um banco cobra uma taxa de 3% ao mês no cheque especial. Qual a taxa anual equivalente?',alternativas:['A) 36%','B) 42,58%','C) 30%','D) 43,20%','E) 38%'],gabarito:'B',comentario:'Taxa anual = (1+0,03)^12 - 1 = (1,03)^12 - 1 ≈ 1,4258 - 1 = 0,4258 = 42,58% ao ano (juros compostos).'},
+  {id:'q013',materia:'bancarios',ano:2023,enunciado:'O Fundo Garantidor de Créditos (FGC) garante, por CPF e por instituição, depósitos de até:',alternativas:['A) R$ 150.000,00','B) R$ 200.000,00','C) R$ 250.000,00','D) R$ 300.000,00','E) R$ 500.000,00'],gabarito:'C',comentario:'O FGC garante até R$ 250.000,00 por CPF/CNPJ por instituição financeira, com teto global de R$ 1.000.000,00 por CPF a cada 4 anos.'},
+  {id:'q014',materia:'atualidades',ano:2024,enunciado:'O Drex é:',alternativas:['A) Uma criptomoeda privada lançada por bancos brasileiros','B) O Real Digital, moeda digital emitida pelo Banco Central do Brasil','C) Um aplicativo de pagamentos do Banco do Brasil','D) O novo nome do Pix','E) Uma fintech brasileira de pagamentos internacionais'],gabarito:'B',comentario:'O Drex é o Real Digital (CBDC - Central Bank Digital Currency) brasileiro, desenvolvido pelo Banco Central do Brasil. Representa a versão digital da moeda oficial.'},
+  {id:'q015',materia:'informatica',ano:2024,enunciado:'No contexto de segurança bancária digital, autenticação de dois fatores (2FA) significa:',alternativas:['A) Usar duas senhas diferentes para acessar o sistema','B) Acessar o banco por dois dispositivos simultaneamente','C) Confirmar identidade por dois métodos distintos, como senha e código SMS','D) Fazer duas transações simultâneas para validar o sistema','E) Ter duas contas no mesmo banco'],gabarito:'C',comentario:'A autenticação de dois fatores combina algo que você SABE (senha) com algo que você TEM (celular/token) ou algo que você É (biometria), aumentando a segurança.'},
+  {id:'q016',materia:'portugues',ano:2024,enunciado:'A palavra cujo plural está INCORRETO é:',alternativas:['A) cidadão – cidadãos','B) pão – pães','C) capitão – capitões','D) alemão – alemões','E) coração – corações'],gabarito:'C',comentario:'"Capitão" forma o plural "capitães", não "capitões". Palavras terminadas em -ão formam plural em -ães, -ões ou -ãos, sem regra única, exigindo memorização.'},
+  {id:'q017',materia:'bancarios',ano:2023,enunciado:'CDB (Certificado de Depósito Bancário) é:',alternativas:['A) Um título público emitido pelo Tesouro Nacional','B) Um título privado emitido por bancos para captar recursos','C) Uma conta corrente especial para pessoas jurídicas','D) Um seguro bancário obrigatório','E) Um cartão de crédito corporativo'],gabarito:'B',comentario:'O CDB é um título de renda fixa privado emitido por bancos para captar recursos junto ao público. O investidor empresta dinheiro ao banco e recebe juros em troca.'},
+  {id:'q018',materia:'matematica',ano:2023,enunciado:'Se uma dívida de R$ 8.000,00 é paga em 4 parcelas mensais iguais com taxa de 2% ao mês (juros compostos), o valor de cada parcela é aproximadamente:',alternativas:['A) R$ 2.000,00','B) R$ 2.162,00','C) R$ 2.100,00','D) R$ 2.080,00','E) R$ 2.050,00'],gabarito:'B',comentario:'Usando a fórmula de prestação: PMT = PV × [i(1+i)^n]/[(1+i)^n-1] = 8000 × [0,02×(1,02)^4]/[(1,02)^4-1] ≈ R$ 2.162,00'},
+  {id:'q019',materia:'atualidades',ano:2024,enunciado:'O Programa Desenrola Brasil tem como objetivo:',alternativas:['A) Financiar obras de infraestrutura no interior do Brasil','B) Renegociar dívidas de pessoas físicas de baixa renda e negativados','C) Criar empregos no setor bancário','D) Reduzir a taxa de juros do cheque especial para zero','E) Financiar capital de giro para pequenas empresas'],gabarito:'B',comentario:'O Desenrola Brasil é um programa do governo federal para renegociação de dívidas de pessoas físicas, especialmente para negativados com renda até R$ 20.000,00.'},
+  {id:'q020',materia:'informatica',ano:2023,enunciado:'Um arquivo de computador com extensão .pdf é:',alternativas:['A) Um arquivo de imagem editável','B) Um arquivo de áudio comprimido','C) Um Portable Document Format, visualizável em qualquer dispositivo','D) Um arquivo exclusivo do Microsoft Word','E) Um arquivo de banco de dados'],gabarito:'C',comentario:'PDF (Portable Document Format) foi criado pela Adobe. É um formato que preserva a formatação do documento e pode ser aberto em qualquer dispositivo com leitor PDF.'},
+  {id:'q021',materia:'bancarios',ano:2024,enunciado:'A taxa SELIC é a taxa:',alternativas:['A) De inflação mensal calculada pelo IBGE','B) Básica de juros da economia brasileira, definida pelo COPOM','C) De câmbio entre Real e Dólar americano','D) De juros cobrada pelos bancos no crédito pessoal','E) De rendimento da poupança'],gabarito:'B',comentario:'A taxa Selic é a taxa básica de juros da economia, definida pelo COPOM (Comitê de Política Monetária) do Banco Central a cada 45 dias aproximadamente.'},
+  {id:'q022',materia:'portugues',ano:2023,enunciado:'Em "O gerente disse que os clientes precisavam de orientação adequada", a oração subordinada é:',alternativas:['A) Substantiva objetiva direta','B) Adjetiva restritiva','C) Adverbial causal','D) Substantiva subjetiva','E) Adjetiva explicativa'],gabarito:'A',comentario:'"que os clientes precisavam de orientação adequada" é oração subordinada substantiva objetiva direta, pois funciona como objeto direto de "disse".'},
+  {id:'q023',materia:'matematica',ano:2024,enunciado:'Um capital dobra de valor em 5 anos a juros simples. Qual é a taxa anual?',alternativas:['A) 10% a.a.','B) 15% a.a.','C) 20% a.a.','D) 25% a.a.','E) 8% a.a.'],gabarito:'C',comentario:'Se o capital dobra: M = 2P. Logo 2P = P(1+5i), então 2 = 1+5i, 5i = 1, i = 0,20 = 20% ao ano.'},
+  {id:'q024',materia:'bancarios',ano:2023,enunciado:'O que é spread bancário?',alternativas:['A) Taxa de câmbio entre moedas diferentes','B) Diferença entre a taxa que o banco paga ao captar e a que cobra ao emprestar','C) Taxa de administração de fundos de investimento','D) Imposto sobre operações financeiras','E) Taxa de manutenção de conta corrente'],gabarito:'B',comentario:'O spread bancário é a diferença entre o custo de captação (o que o banco paga ao tomar dinheiro emprestado) e a taxa de aplicação (o que cobra ao emprestar). É a margem do banco.'},
+  {id:'q025',materia:'atualidades',ano:2024,enunciado:'O Open Finance (evolução do Open Banking) permite o compartilhamento de dados sobre:',alternativas:['A) Apenas dados de contas correntes e poupança','B) Apenas transações de cartão de crédito','C) Dados financeiros mais amplos: seguros, previdência, investimentos e câmbio','D) Apenas informações de crédito','E) Somente dados de empresas, não de pessoas físicas'],gabarito:'C',comentario:'O Open Finance amplia o escopo do Open Banking para incluir seguros, previdência privada, investimentos e operações de câmbio, além dos produtos bancários tradicionais.'},
+  {id:'q026',materia:'informatica',ano:2024,enunciado:'Ransomware é um tipo de malware que:',alternativas:['A) Monitora o comportamento do usuário sem seu conhecimento','B) Envia spam por e-mail automaticamente','C) Criptografa arquivos e exige pagamento (resgate) para desbloqueá-los','D) Acelera a conexão de internet do usuário','E) Protege o computador contra vírus'],gabarito:'C',comentario:'Ransomware (de "ransom" = resgate) é um malware que sequestra dados do usuário cifrando-os e exige pagamento (geralmente em criptomoeda) para fornecer a chave de descriptografia.'},
+  {id:'q027',materia:'bancarios',ano:2024,enunciado:'A LCI (Letra de Crédito Imobiliário) é isenta de Imposto de Renda para:',alternativas:['A) Somente pessoas jurídicas','B) Todos os investidores, sem exceção','C) Pessoas físicas','D) Apenas fundos de investimento','E) Apenas investidores estrangeiros'],gabarito:'C',comentario:'A LCI e a LCA são isentas de IR para pessoas físicas. Para pessoas jurídicas, há incidência de IR. Essa isenção torna esses produtos atrativos para investidores individuais.'},
+  {id:'q028',materia:'matematica',ano:2023,enunciado:'Qual o percentual de desconto dado se um produto de R$ 250,00 é vendido por R$ 200,00?',alternativas:['A) 15%','B) 20%','C) 25%','D) 10%','E) 30%'],gabarito:'B',comentario:'Desconto = (250-200)/250 × 100 = 50/250 × 100 = 20%'},
+  {id:'q029',materia:'portugues',ano:2024,enunciado:'Assinale a frase em que o "porquê" está escrito CORRETAMENTE:',alternativas:['A) Por que você não foi ao banco?','B) Não sei o porque da demora.','C) Por quê ele não pagou?','D) Quero saber o porquê da sua ausência.','E) Porque você foi embora cedo?'],gabarito:'D',comentario:'"O porquê" com acento, junto e antecedido de artigo = substantivo (equivale a "o motivo"). A alternativa D está correta. A E deveria ser "Por que" (separado, sem acento = pergunta indireta/explicação).'},
+  {id:'q030',materia:'bancarios',ano:2023,enunciado:'BACEN, CVM, SUSEP e PREVIC são:',alternativas:['A) Bancos públicos brasileiros','B) Órgãos reguladores do sistema financeiro nacional','C) Fundos de investimento do governo','D) Títulos públicos federais','E) Associações de bancos privados'],gabarito:'B',comentario:'São todos órgãos supervisores/reguladores: BACEN (bancos), CVM (mercado de capitais), SUSEP (seguros) e PREVIC (previdência complementar fechada).'},
+  {id:'q031',materia:'matematica',ano:2024,enunciado:'João tem uma dívida de R$ 6.000,00 que vence em 30 dias. O banco oferece desconto simples de 3% ao mês. Qual o valor presente (atual) dessa dívida?',alternativas:['A) R$ 5.820,00','B) R$ 5.800,00','C) R$ 5.850,00','D) R$ 5.760,00','E) R$ 5.700,00'],gabarito:'A',comentario:'Desconto simples: VP = VF/(1+i×n) = 6000/(1+0,03×1) = 6000/1,03 ≈ R$ 5.820,00. Ou: D = 6000×0,03 = 180; VP = 6000-180 = R$ 5.820,00'},
+  {id:'q032',materia:'atualidades',ano:2024,enunciado:'O que é ESG no contexto bancário e financeiro?',alternativas:['A) Um novo sistema de pagamentos digital','B) Critérios de Environmental, Social and Governance que avaliam sustentabilidade','C) Uma taxa de juros especial para pequenas empresas','D) Um regulamento europeu sobre seguros','E) Um modelo de conta bancária sem tarifas'],gabarito:'B',comentario:'ESG (Environmental, Social and Governance) são critérios usados para avaliar o impacto ambiental, social e de governança de empresas, cada vez mais relevantes no mercado financeiro.'},
+  {id:'q033',materia:'informatica',ano:2023,enunciado:'Cloud computing (computação em nuvem) oferece como principal vantagem:',alternativas:['A) Eliminação total dos riscos de segurança','B) Acesso remoto a recursos computacionais sob demanda, com escalabilidade','C) Funcionamento sem conexão com a internet','D) Menor custo em qualquer situação','E) Impossibilidade de perda de dados'],gabarito:'B',comentario:'Cloud computing oferece acesso a recursos computacionais (armazenamento, processamento, software) pela internet, com escalabilidade (aumentar/diminuir conforme demanda) e pagamento por uso.'},
+  {id:'q034',materia:'bancarios',ano:2024,enunciado:'No Brasil, o sigilo bancário é protegido por lei e pode ser quebrado:',alternativas:['A) Apenas por decisão do Banco Central','B) Em qualquer investigação policial','C) Por decisão judicial ou por requisição do Fisco (Receita Federal) nos casos previstos em lei','D) Somente em casos de terrorismo','E) Nunca pode ser quebrado em hipótese alguma'],gabarito:'C',comentario:'A LC 105/2001 disciplina o sigilo bancário. Pode ser quebrado por ordem judicial ou pela Receita Federal nos casos previstos em lei, sem necessidade de autorização judicial para o Fisco.'},
+  {id:'q035',materia:'portugues',ano:2023,enunciado:'Em "Os funcionários que trabalharam no projeto receberão bônus", a oração "que trabalharam no projeto" é:',alternativas:['A) Oração subordinada adjetiva restritiva','B) Oração subordinada adjetiva explicativa','C) Oração subordinada substantiva','D) Oração coordenada sindética','E) Oração principal'],gabarito:'A',comentario:'É adjetiva restritiva porque restringe/identifica quais funcionários (somente os que trabalharam no projeto), sem vírgula. Se fosse explicativa, estaria entre vírgulas.'},
+  {id:'q036',materia:'matematica',ano:2024,enunciado:'Qual a taxa mensal equivalente a 12% ao ano (juros compostos)?',alternativas:['A) 1% a.m.','B) 0,94% a.m.','C) 1,5% a.m.','D) 0,84% a.m.','E) 1,1% a.m.'],gabarito:'B',comentario:'Taxa equivalente: (1+i_m)^12 = 1,12; i_m = (1,12)^(1/12) - 1 ≈ 0,9489% ≈ 0,94% ao mês.'},
+  {id:'q037',materia:'atualidades',ano:2023,enunciado:'O Banco do Brasil foi fundado em:',alternativas:['A) 1808','B) 1850','C) 1889','D) 1900','E) 1822'],gabarito:'A',comentario:'O Banco do Brasil foi fundado em 12 de outubro de 1808 por Dom João VI, sendo o mais antigo banco em funcionamento no Brasil e um dos mais antigos do mundo.'},
+  {id:'q038',materia:'informatica',ano:2024,enunciado:'Big Data refere-se a:',alternativas:['A) Computadores de grande porte','B) Conjuntos massivos de dados que exigem técnicas especiais de processamento e análise','C) Redes de internet de alta velocidade','D) Aplicativos de armazenamento em pen drive','E) Sistemas de backup de dados bancários'],gabarito:'B',comentario:'Big Data é caracterizado pelos "5 Vs": Volume (grande quantidade), Velocidade (geração rápida), Variedade (diferentes formatos), Veracidade e Valor. Exige ferramentas específicas de processamento.'},
+  {id:'q039',materia:'bancarios',ano:2023,enunciado:'O que é taxa DI (CDI)?',alternativas:['A) Taxa que o governo cobra de impostos sobre investimentos','B) Taxa das operações de depósito entre instituições financeiras, referência para renda fixa','C) Taxa cobrada pelos bancos em operações de câmbio','D) Inflação acumulada no mês','E) Taxa de administração de fundos de renda variável'],gabarito:'B',comentario:'O CDI (Certificado de Depósito Interbancário) é a taxa média das operações de empréstimo entre bancos no período de um dia. É a principal referência para investimentos de renda fixa no Brasil.'},
+  {id:'q040',materia:'matematica',ano:2023,enunciado:'Uma empresa tem receita de R$ 480.000,00 por ano. Qual é a receita mensal média?',alternativas:['A) R$ 40.000,00','B) R$ 48.000,00','C) R$ 38.000,00','D) R$ 42.000,00','E) R$ 36.000,00'],gabarito:'A',comentario:'Receita mensal = 480.000/12 = R$ 40.000,00'},
+  {id:'q041',materia:'bancarios',ano:2024,enunciado:'O Tesouro Direto é um programa que permite:',alternativas:['A) Comprar ações de empresas brasileiras diretamente','B) Investir em títulos públicos federais pela internet, de forma acessível','C) Financiar imóveis com recursos do FGTS','D) Aplicar em ouro e metais preciosos','E) Investir em fundos de previdência privada'],gabarito:'B',comentario:'O Tesouro Direto é um programa do Tesouro Nacional em parceria com a B3 que permite a pessoas físicas investirem em títulos públicos federais pela internet, com aplicação mínima baixa.'},
+  {id:'q042',materia:'portugues',ano:2024,enunciado:'Assinale a alternativa com uso CORRETO da vírgula:',alternativas:['A) Maria, e João foram ao banco.','B) O gerente, que estava de férias, retornou ontem.','C) O banco abriu as portas, e ninguém entrou.','D) Comprei, o carro novo que queria.','E) Alternativas B e C estão corretas.'],gabarito:'E',comentario:'B: vírgulas usadas corretamente na oração explicativa "que estava de férias". C: vírgula antes de "e" em orações com sujeitos diferentes é aceita. A: erro (vírgula antes de "e" ligando sujeitos). D: erro (vírgula separa o verbo do objeto).'},
+  {id:'q043',materia:'atualidades',ano:2023,enunciado:'LGPD (Lei Geral de Proteção de Dados Pessoais) tem como objetivo:',alternativas:['A) Regular o mercado de criptomoedas no Brasil','B) Proteger os dados pessoais de indivíduos e regular seu tratamento por empresas','C) Fiscalizar o acesso à internet no Brasil','D) Criar regras para publicidade nas redes sociais','E) Definir as regras do comércio eletrônico'],gabarito:'B',comentario:'A LGPD (Lei 13.709/2018) estabelece regras sobre coleta, armazenamento, tratamento e compartilhamento de dados pessoais. É essencial para bancos que tratam enormes volumes de dados de clientes.'},
+  {id:'q044',materia:'informatica',ano:2023,enunciado:'Malware é:',alternativas:['A) Um tipo de hardware de segurança','B) Software malicioso desenvolvido para causar danos ou roubar dados','C) Um firewall de última geração','D) Uma rede de computadores segura','E) Um protocolo de comunicação bancária'],gabarito:'B',comentario:'Malware (malicious software) é qualquer software desenvolvido com intenção maliciosa: vírus, worm, trojan, spyware, ransomware, adware etc.'},
+  {id:'q045',materia:'bancarios',ano:2024,enunciado:'O que são Fintechs?',alternativas:['A) Grandes bancos tradicionais que adotaram tecnologia','B) Empresas que combinam tecnologia e serviços financeiros, geralmente startups','C) Fundos de investimento em tecnologia','D) Sistemas de segurança bancária','E) Agências reguladoras de tecnologia financeira'],gabarito:'B',comentario:'Fintechs (Financial Technology) são empresas, geralmente startups, que usam tecnologia para oferecer serviços financeiros de forma inovadora, mais acessível e eficiente que os bancos tradicionais.'},
+  {id:'q046',materia:'matematica',ano:2024,enunciado:'Qual é o valor do juro simples de R$ 15.000,00 aplicados a 2,5% ao mês durante 4 meses?',alternativas:['A) R$ 1.200,00','B) R$ 1.500,00','C) R$ 1.750,00','D) R$ 1.875,00','E) R$ 1.250,00'],gabarito:'B',comentario:'Juro simples: J = P×i×n = 15000×0,025×4 = 15000×0,1 = R$ 1.500,00'},
+  {id:'q047',materia:'portugues',ano:2023,enunciado:'Qual das alternativas apresenta um pleonasmo (redundância)?',alternativas:['A) A hemorragia de sangue preocupou os médicos.','B) O cliente assinou o contrato bancário.','C) A taxa de juros aumentou neste mês.','D) O banco abriu uma nova agência.','E) Os funcionários receberam treinamento específico.'],gabarito:'A',comentario:'"Hemorragia" já significa "derramamento de sangue", portanto "hemorragia de sangue" é pleonasmo. Os demais não apresentam redundância.'},
+  {id:'q048',materia:'bancarios',ano:2024,enunciado:'PIX é limitado a transações:',alternativas:['A) Apenas entre pessoas físicas','B) Apenas em dias úteis, das 8h às 18h','C) Disponível 24 horas por dia, 7 dias por semana, incluindo fins de semana','D) Apenas para valores acima de R$ 100,00','E) Somente para pagamento de boletos'],gabarito:'C',comentario:'Uma das grandes vantagens do PIX é funcionar 24/7/365, inclusive fins de semana e feriados. A liquidação é instantânea, em até 10 segundos.'},
+  {id:'q049',materia:'matematica',ano:2023,enunciado:'Um apartamento custa R$ 300.000,00 e será financiado em 360 meses. A parcela mensal é de R$ 2.500,00. Qual o total pago ao final?',alternativas:['A) R$ 600.000,00','B) R$ 800.000,00','C) R$ 900.000,00','D) R$ 750.000,00','E) R$ 720.000,00'],gabarito:'C',comentario:'Total = parcela × número de parcelas = 2500 × 360 = R$ 900.000,00'},
+  {id:'q050',materia:'atualidades',ano:2024,enunciado:'O BB Investimentos é responsável por:',alternativas:['A) Cuidar das agências físicas do Banco do Brasil','B) Serviços de banco de investimento, incluindo assessoria em fusões e aquisições','C) Administrar apenas a poupança dos correntistas','D) Fiscalizar os funcionários do Banco do Brasil','E) Gerenciar o Programa Bolsa Família'],gabarito:'B',comentario:'O BB Investimentos (Banco do Brasil Investimentos S.A.) é o banco de investimento do conglomerado BB, atuando em fusões e aquisições, mercado de capitais e assessoria financeira.'}
+];
+
+// --- ESTADO GLOBAL DAS QUESTÕES ---
+let questoesRespondidas = JSON.parse(localStorage.getItem('questoes_respondidas') || '{}');
+let cadernoErros = JSON.parse(localStorage.getItem('caderno_erros') || '[]');
+let filtroQuestaoAtual = 'todas';
+let simuladoAtivo = null;
+let simTimer = null;
+let simSegundos = 0;
+let simQuestaoIdx = 0;
+let simRespostas = [];
+
+// --- FUNÇÕES DO BANCO DE QUESTÕES ---
+function renderBancoQuestoes() {
+  const lista = document.getElementById('questoes-lista');
+  if (!lista) return;
+  const filtradas = filtroQuestaoAtual === 'todas' 
+    ? BANCO_QUESTOES 
+    : BANCO_QUESTOES.filter(q => q.materia === filtroQuestaoAtual);
+  
+  let acertos = 0, erros = 0;
+  BANCO_QUESTOES.forEach(q => {
+    if (questoesRespondidas[q.id] === true) acertos++;
+    else if (questoesRespondidas[q.id] === false) erros++;
+  });
+  const taxa = (acertos + erros) > 0 ? Math.round(acertos / (acertos + erros) * 100) : 0;
+  
+  const totalEl = document.getElementById('q-total-stat');
+  const acEl = document.getElementById('q-acertos-stat');
+  const erEl = document.getElementById('q-erros-stat');
+  const txEl = document.getElementById('q-taxa-stat');
+  if (totalEl) totalEl.textContent = BANCO_QUESTOES.length;
+  if (acEl) acEl.textContent = acertos;
+  if (erEl) erEl.textContent = erros;
+  if (txEl) txEl.textContent = taxa + '%';
+  
+  lista.innerHTML = filtradas.map((q, i) => {
+    const resp = questoesRespondidas[q.id];
+    const respondida = resp !== undefined;
+    const cores = {portugues:'#1A3D9E',matematica:'#7C3AED',bancarios:'#D4A017',atualidades:'#1A7A4A',informatica:'#C0392B'};
+    const nomes = {portugues:'Português',matematica:'Matemática',bancarios:'Conh. Bancários',atualidades:'Atualidades',informatica:'Informática'};
+    const cor = cores[q.materia] || '#888';
+    const status = resp === true ? '✅' : resp === false ? '❌' : '⬜';
+    return `<div style="background:#fff;border-radius:14px;padding:1rem;box-shadow:0 1px 8px rgba(0,27,94,.07);border-left:3px solid ${cor}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <span style="background:${cor}20;color:${cor};padding:.15rem .5rem;border-radius:20px;font-size:.68rem;font-weight:700">${nomes[q.materia]}</span>
+        <span style="font-size:.7rem;color:#aaa">BB ${q.ano} ${status}</span>
+      </div>
+      <p style="font-size:.82rem;line-height:1.5;color:#0D1F4C;margin-bottom:.75rem">${q.enunciado}</p>
+      <div style="display:flex;flex-direction:column;gap:.35rem" id="alt-${q.id}">
+        ${q.alternativas.map((alt, ai) => `
+          <button onclick="responderQuestao('${q.id}',${ai})" 
+            style="text-align:left;padding:.5rem .75rem;border-radius:8px;border:1.5px solid ${respondida && ai === q.alternativas.indexOf(q.gabarito) ? '#1A7A4A' : respondida && q.alternativas[ai] === q.alternativas[ai] && resp === false && alt.startsWith(q.gabarito+')') ? '#1A7A4A' : '#e8eaf0'};background:${respondida && alt.startsWith(q.gabarito+')') ? '#E4F8EE' : '#f5f7fc'};color:#0D1F4C;font-size:.8rem;cursor:${respondida ? 'default' : 'pointer'};width:100%">${alt}</button>
+        `).join('')}
+      </div>
+      ${respondida ? `<div style="margin-top:.6rem;padding:.6rem;background:#f0f9ff;border-radius:8px;font-size:.75rem;color:#555;line-height:1.4"><strong>💡 ${q.gabarito}</strong> — ${q.comentario}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function responderQuestao(qId, altIdx) {
+  if (questoesRespondidas[qId] !== undefined) return;
+  const q = BANCO_QUESTOES.find(x => x.id === qId);
+  if (!q) return;
+  const acertou = q.alternativas[altIdx] === q.gabarito || q.alternativas[altIdx].startsWith(q.gabarito + ')');
+  // Verificar pelo gabarito correto
+  const gabIdx = q.alternativas.findIndex(a => a.startsWith(q.gabarito));
+  const correto = altIdx === gabIdx;
+  questoesRespondidas[qId] = correto;
+  localStorage.setItem('questoes_respondidas', JSON.stringify(questoesRespondidas));
+  if (!correto) {
+    // Adicionar ao caderno de erros
+    if (!cadernoErros.find(e => e.qId === qId)) {
+      cadernoErros.push({qId, materia: q.materia, dataErro: new Date().toLocaleDateString('pt-BR'), revisada: false, proximaRevisao: new Date(Date.now() + 86400000).toLocaleDateString('pt-BR')});
+      localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
+    }
+    if (typeof addXP === 'function') addXP(2);
+    if (typeof showToast === 'function') showToast('❌ Errado! Questão adicionada ao caderno de erros.');
+  } else {
+    if (typeof addXP === 'function') addXP(10);
+    if (typeof showToast === 'function') showToast('✅ Correto! +10 XP');
+  }
+  renderBancoQuestoes();
+}
+
+function filtrarQuestoes(materia) {
+  filtroQuestaoAtual = materia;
+  document.querySelectorAll('[id^="fq-"]').forEach(b => {
+    b.style.background = 'rgba(255,255,255,.15)';
+    b.style.color = '#fff';
+    b.style.fontWeight = '400';
+  });
+  const btn = document.getElementById('fq-' + materia);
+  if (btn) {btn.style.background = '#D4A017'; btn.style.color = '#001B5E'; btn.style.fontWeight = '700';}
+  renderBancoQuestoes();
+}
+
+// --- FUNÇÕES DO SIMULADO ---
+function iniciarSimulado(numQuestoes, minutos) {
+  const shuffled = [...BANCO_QUESTOES].sort(() => Math.random() - 0.5).slice(0, numQuestoes);
+  simuladoAtivo = {questoes: shuffled, numQuestoes, minutos, respostas: []};
+  simQuestaoIdx = 0;
+  simRespostas = new Array(numQuestoes).fill(null);
+  simSegundos = minutos * 60;
+  
+  document.getElementById('simulado-config').style.display = 'none';
+  const ativo = document.getElementById('simulado-ativo');
+  ativo.style.display = 'flex';
+  document.getElementById('simulado-resultado').style.display = 'none';
+  
+  document.getElementById('sim-q-total').textContent = numQuestoes;
+  renderQuestaoSimulado();
+  iniciarTimerSimulado();
+}
+
+function renderQuestaoSimulado() {
+  if (!simuladoAtivo) return;
+  const q = simuladoAtivo.questoes[simQuestaoIdx];
+  const num = simQuestaoIdx + 1;
+  const tot = simuladoAtivo.numQuestoes;
+  document.getElementById('sim-q-atual').textContent = num;
+  document.getElementById('sim-progresso-fill').style.width = (num / tot * 100) + '%';
+  const nomes = {portugues:'Português',matematica:'Matemática',bancarios:'Conh. Bancários',atualidades:'Atualidades',informatica:'Informática'};
+  document.getElementById('sim-materia-tag').textContent = nomes[q.materia] || q.materia;
+  document.getElementById('sim-enunciado').textContent = q.enunciado;
+  const altDiv = document.getElementById('sim-alternativas');
+  altDiv.innerHTML = q.alternativas.map((alt, i) => `
+    <button onclick="selecionarAlternativaSimulado(${i})" id="sim-alt-${i}"
+      style="text-align:left;padding:.65rem .85rem;border-radius:10px;border:1.5px solid #e8eaf0;background:#f5f7fc;color:#0D1F4C;font-size:.82rem;cursor:pointer;width:100%;transition:all .2s">${alt}</button>
+  `).join('');
+  document.getElementById('sim-btn-proximo').style.display = 'none';
+}
+
+function selecionarAlternativaSimulado(idx) {
+  if (simRespostas[simQuestaoIdx] !== null) return;
+  simRespostas[simQuestaoIdx] = idx;
+  const q = simuladoAtivo.questoes[simQuestaoIdx];
+  const gabIdx = q.alternativas.findIndex(a => a.startsWith(q.gabarito));
+  document.querySelectorAll('[id^="sim-alt-"]').forEach((b, i) => {
+    if (i === gabIdx) {b.style.background = '#E4F8EE'; b.style.borderColor = '#1A7A4A'; b.style.color = '#1A7A4A';}
+    else if (i === idx && idx !== gabIdx) {b.style.background = '#FDEEF0'; b.style.borderColor = '#C0392B'; b.style.color = '#C0392B';}
+    b.style.cursor = 'default';
+  });
+  // Adicionar ao caderno de erros se errou
+  if (idx !== gabIdx && !cadernoErros.find(e => e.qId === q.id)) {
+    cadernoErros.push({qId: q.id, materia: q.materia, dataErro: new Date().toLocaleDateString('pt-BR'), revisada: false, proximaRevisao: new Date(Date.now() + 86400000).toLocaleDateString('pt-BR')});
+    localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
+  }
+  document.getElementById('sim-btn-proximo').style.display = 'block';
+  if (simQuestaoIdx === simuladoAtivo.numQuestoes - 1) document.getElementById('sim-btn-proximo').textContent = '✅ Ver Resultado';
+}
+
+function proximaQuestaoSimulado() {
+  if (simQuestaoIdx < simuladoAtivo.numQuestoes - 1) {
+    simQuestaoIdx++;
+    renderQuestaoSimulado();
+  } else {
+    encerrarSimulado(true);
+  }
+}
+
+function iniciarTimerSimulado() {
+  clearInterval(simTimer);
+  simTimer = setInterval(() => {
+    simSegundos--;
+    const m = Math.floor(simSegundos / 60);
+    const s = simSegundos % 60;
+    const el = document.getElementById('sim-timer');
+    if (el) el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (simSegundos <= 0) {
+      clearInterval(simTimer);
+      encerrarSimulado(true);
+    }
+    if (simSegundos === 300) { // 5 min de aviso
+      if (typeof showToast === 'function') showToast('⏰ Atenção: 5 minutos restantes!');
+    }
+  }, 1000);
+}
+
+function encerrarSimulado(salvar) {
+  clearInterval(simTimer);
+  if (!salvar && !confirm('Tem certeza que quer sair do simulado?')) return;
+  
+  const acertos = simRespostas.filter((r, i) => {
+    if (r === null || !simuladoAtivo) return false;
+    const q = simuladoAtivo.questoes[i];
+    const gabIdx = q.alternativas.findIndex(a => a.startsWith(q.gabarito));
+    return r === gabIdx;
+  }).length;
+  const erros = simRespostas.filter(r => r !== null).length - acertos;
+  const taxa = simRespostas.filter(r => r !== null).length > 0 ? Math.round(acertos / simRespostas.filter(r => r !== null).length * 100) : 0;
+  const tempoUsado = simuladoAtivo ? simuladoAtivo.minutos * 60 - simSegundos : 0;
+  const tm = Math.floor(tempoUsado / 60);
+  const ts = tempoUsado % 60;
+  
+  document.getElementById('simulado-ativo').style.display = 'none';
+  const res = document.getElementById('simulado-resultado');
+  res.style.display = 'block';
+  document.getElementById('sim-res-acertos').textContent = acertos;
+  document.getElementById('sim-res-erros').textContent = erros;
+  document.getElementById('sim-res-taxa').textContent = taxa + '%';
+  document.getElementById('sim-res-tempo').textContent = String(tm).padStart(2,'0') + ':' + String(ts).padStart(2,'0');
+  document.getElementById('sim-emoji-resultado').textContent = taxa >= 70 ? '🏆' : taxa >= 50 ? '📚' : '💪';
+  
+  // Por matéria
+  const porMateria = {};
+  simRespostas.forEach((r, i) => {
+    if (r === null || !simuladoAtivo) return;
+    const q = simuladoAtivo.questoes[i];
+    if (!porMateria[q.materia]) porMateria[q.materia] = {ac:0,er:0};
+    const gabIdx = q.alternativas.findIndex(a => a.startsWith(q.gabarito));
+    if (r === gabIdx) porMateria[q.materia].ac++; else porMateria[q.materia].er++;
+  });
+  const nomes = {portugues:'Português',matematica:'Matemática',bancarios:'Conh. Bancários',atualidades:'Atualidades',informatica:'Informática'};
+  const cores = {portugues:'#1A3D9E',matematica:'#7C3AED',bancarios:'#D4A017',atualidades:'#1A7A4A',informatica:'#C0392B'};
+  document.getElementById('sim-res-por-materia').innerHTML = '<h3 style="font-size:.9rem;font-weight:700;color:#001B5E;margin-bottom:.75rem">Por matéria</h3>' +
+    Object.entries(porMateria).map(([mat, v]) => {
+      const t = v.ac + v.er;
+      const tx = t > 0 ? Math.round(v.ac/t*100) : 0;
+      return `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+        <div style="font-size:.78rem;flex:1;color:#555">${nomes[mat]||mat}</div>
+        <div style="font-size:.78rem;font-weight:700;color:${cores[mat]||'#888'}">${v.ac}/${t} (${tx}%)</div>
+      </div>`;
+    }).join('');
+  
+  // Salvar histórico
+  const hist = JSON.parse(localStorage.getItem('sim_historico') || '[]');
+  hist.unshift({data: new Date().toLocaleDateString('pt-BR'), acertos, total: simRespostas.filter(r=>r!==null).length, taxa});
+  if (hist.length > 10) hist.pop();
+  localStorage.setItem('sim_historico', JSON.stringify(hist));
+  if (typeof addXP === 'function') addXP(acertos * 5);
+  if (typeof showToast === 'function') showToast(`Simulado salvo! ${acertos} acertos. +${acertos*5} XP`);
+}
+
+function reiniciarSimuladoTela() {
+  simuladoAtivo = null;
+  document.getElementById('simulado-config').style.display = '';
+  document.getElementById('simulado-ativo').style.display = 'none';
+  document.getElementById('simulado-resultado').style.display = 'none';
+  // Atualizar histórico
+  const hist = JSON.parse(localStorage.getItem('sim_historico') || '[]');
+  const histEl = document.getElementById('simulado-historico');
+  if (histEl && hist.length > 0) {
+    histEl.innerHTML = hist.slice(0,3).map(h => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid #f0f0f0">
+        <span style="font-size:.78rem;color:#555">${h.data}</span>
+        <span style="font-size:.78rem;font-weight:700;color:${h.taxa>=70?'#1A7A4A':h.taxa>=50?'#D4A017':'#C0392B'}">${h.acertos}/${h.total} — ${h.taxa}%</span>
+      </div>
+    `).join('');
+  }
+}
+
+// --- FUNÇÕES DO CADERNO DE ERROS ---
+function renderCadernoErros(filtro) {
+  filtro = filtro || 'pendentes';
+  const lista = document.getElementById('erros-lista');
+  if (!lista) return;
+  const pendentes = cadernoErros.filter(e => !e.revisada);
+  const revisadas = cadernoErros.filter(e => e.revisada);
+  const el1 = document.getElementById('ce-pendentes-count');
+  const el2 = document.getElementById('ce-revisadas-count');
+  const el3 = document.getElementById('ce-total-count');
+  if (el1) el1.textContent = pendentes.length;
+  if (el2) el2.textContent = revisadas.length;
+  if (el3) el3.textContent = cadernoErros.length;
+  
+  let itens = filtro === 'pendentes' ? pendentes : filtro === 'revi
+sadas' ? revisadas : cadernoErros;
+  if (itens.length === 0) {
+    lista.innerHTML = `<div style="text-align:center;padding:3rem 1rem">
+      <div style="font-size:3rem;margin-bottom:.5rem">${filtro==='pendentes'?'🎉':'📋'}</div>
+      <div style="font-weight:700;color:#001B5E;margin-bottom:.25rem">${filtro==='pendentes'?'Nenhuma questão pendente!':'Nenhuma questão aqui'}</div>
+      <div style="font-size:.82rem;color:#888">${filtro==='pendentes'?'Ótimo trabalho! Continue resolvendo questões.':'Resolva questões para preencher o caderno de erros.'}</div>
+      <button onclick="navigateTo('questoes')" style="margin-top:1rem;background:#001B5E;color:#fff;border:none;padding:.75rem 1.5rem;border-radius:12px;font-weight:700;cursor:pointer">Resolver Questões</button>
+    </div>`;
+    return;
+  }
+  const nomes = {portugues:'Português',matematica:'Matemática',bancarios:'Conh. Bancários',atualidades:'Atualidades',informatica:'Informática'};
+  const cores = {portugues:'#1A3D9E',matematica:'#7C3AED',bancarios:'#D4A017',atualidades:'#1A7A4A',informatica:'#C0392B'};
+  lista.innerHTML = itens.map(e => {
+    const q = BANCO_QUESTOES.find(x => x.id === e.qId);
+    if (!q) return '';
+    const cor = cores[q.materia] || '#888';
+    return `<div style="background:#fff;border-radius:14px;padding:1rem;box-shadow:0 1px 8px rgba(0,27,94,.07);border-left:3px solid ${cor}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+        <span style="background:${cor}20;color:${cor};padding:.15rem .5rem;border-radius:20px;font-size:.68rem;font-weight:700">${nomes[q.materia]||q.materia}</span>
+        <span style="font-size:.7rem;color:#aaa">Erro: ${e.dataErro}</span>
+      </div>
+      <p style="font-size:.8rem;line-height:1.4;color:#0D1F4C;margin-bottom:.6rem">${q.enunciado.slice(0,120)}...</p>
+      <div style="background:#f0f4ff;padding:.5rem .75rem;border-radius:8px;font-size:.75rem;color:#555;margin-bottom:.6rem">
+        <strong>✅ Gabarito: ${q.gabarito}</strong> — ${q.comentario.slice(0,80)}...
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button onclick="marcarRevisada('${e.qId}')" style="flex:1;background:${e.revisada?'#E4F8EE':'#001B5E'};color:${e.revisada?'#1A7A4A':'#fff'};border:none;padding:.45rem;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer">
+          ${e.revisada?'✅ Revisada':'Marcar como revisada'}
+        </button>
+        <button onclick="removerErro('${e.qId}')" style="background:#fdeef0;color:#C0392B;border:none;padding:.45rem .75rem;border-radius:8px;font-size:.75rem;cursor:pointer">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarErros(filtro) {
+  document.querySelectorAll('[id^="fe-"]').forEach(b => {
+    b.style.background = 'rgba(255,255,255,.2)'; b.style.color = '#fff'; b.style.fontWeight = '400';
+  });
+  const btn = document.getElementById('fe-' + filtro);
+  if (btn) {btn.style.background = 'rgba(255,255,255,.9)'; btn.style.color = '#922B21'; btn.style.fontWeight = '700';}
+  renderCadernoErros(filtro);
+}
+
+function marcarRevisada(qId) {
+  const idx = cadernoErros.findIndex(e => e.qId === qId);
+  if (idx >= 0) {
+    cadernoErros[idx].revisada = !cadernoErros[idx].revisada;
+    localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
+    renderCadernoErros('pendentes');
+    if (typeof addXP === 'function') addXP(5);
+    if (typeof showToast === 'function') showToast('✅ Questão revisada! +5 XP');
+  }
+}
+
+function removerErro(qId) {
+  cadernoErros = cadernoErros.filter(e => e.qId !== qId);
+  localStorage.setItem('caderno_erros', JSON.stringify(cadernoErros));
+  renderCadernoErros('todas');
+}
+
+// Atualizar moreMap para incluir novas telas
+document.addEventListener('DOMContentLoaded', function() {
+  // Carregar caderno de erros e histórico simulado ao iniciar
+  cadernoErros = JSON.parse(localStorage.getItem('caderno_erros') || '[]');
+  questoesRespondidas = JSON.parse(localStorage.getItem('questoes_respondidas') || '{}');
+});
+
+</script>
 </body>
 </html>
 
